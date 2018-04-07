@@ -185,14 +185,31 @@
       }));
 
       it('shows error message when arguments are insufficient', function() {
-        spyOn(toastService, 'add');
-
         service.createImage.apply(null, [{name: 1}]);
 
+        try {
+          imageQueuedPromise.reject({'data': 'invalid'});
+          $rootScope.$apply();
+        } catch (error) {
+          expect(error).toBeDefined();
+          expect(error.data).toEqual('invalid');
+        }
+
         expect(apiService.put).toHaveBeenCalledWith('/api/glance/images/', {name: 1});
-        imageQueuedPromise.reject();
-        $rootScope.$apply();
-        expect(toastService.add).toHaveBeenCalledWith('error', "Unable to create the image.");
+      });
+
+      it('shows a generic message when it gets a unexpected error', function() {
+        service.createImage.apply(null, [{name: 1}]);
+
+        try {
+          imageQueuedPromise.reject();
+          $rootScope.$apply();
+        } catch (error) {
+          expect(error).toBeDefined();
+          expect(error).toEqual('Unable to create the image.');
+        }
+
+        expect(apiService.put).toHaveBeenCalledWith('/api/glance/images/', {name: 1});
       });
 
       describe('external upload of a local file', function() {
@@ -228,8 +245,13 @@
         });
 
         it('second call is not started if the initial image creation fails', function() {
-          imageQueuedPromise.reject();
-          $rootScope.$apply();
+          try {
+            imageQueuedPromise.reject({'data': 'invalid'});
+            $rootScope.$apply();
+          } catch (error) {
+            expect(error).toBeDefined();
+            expect(error.data).toEqual('invalid');
+          }
 
           expect(apiService.put.calls.count()).toBe(1);
         });
@@ -251,6 +273,17 @@
           );
         });
 
+        it('second call is not started if image creation returns no upload_url', function() {
+          var missingUrl = {
+            'name': imageData.name,
+            'token_id': 'my token'
+          };
+          imageQueuedPromise.resolve({data: missingUrl});
+          $rootScope.$apply();
+
+          expect(apiService.put.calls.count()).toBe(1);
+        });
+
         it('sends back upload progress', function() {
           imageQueuedPromise.resolve({data: queuedImage});
           $rootScope.$apply();
@@ -262,6 +295,7 @@
             loaded: 2,
             total: 2
           });
+          imageUploadPromise.resolve();
           $rootScope.$apply();
 
           expect(onProgress.calls.allArgs()).toEqual([[50], [100]]);

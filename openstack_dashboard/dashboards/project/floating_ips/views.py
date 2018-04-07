@@ -21,7 +21,7 @@
 Views for managing floating IPs.
 """
 
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
 from neutronclient.common import exceptions as neutron_exc
@@ -61,14 +61,15 @@ class AllocateView(forms.ModalFormView):
     def get_context_data(self, **kwargs):
         context = super(AllocateView, self).get_context_data(**kwargs)
         try:
-            context['usages'] = quotas.tenant_quota_usages(self.request)
+            context['usages'] = quotas.tenant_quota_usages(
+                self.request, targets=('floatingip', ))
         except Exception:
             exceptions.handle(self.request)
         return context
 
     def get_initial(self):
         try:
-            pools = api.network.floating_ip_pools_list(self.request)
+            pools = api.neutron.floating_ip_pools_list(self.request)
         except neutron_exc.ConnectionFailed:
             pools = []
             exceptions.handle(self.request)
@@ -88,7 +89,7 @@ class IndexView(tables.DataTableView):
 
     def get_data(self):
         try:
-            floating_ips = api.network.tenant_floating_ip_list(self.request)
+            floating_ips = api.neutron.tenant_floating_ip_list(self.request)
         except neutron_exc.ConnectionFailed:
             floating_ips = []
             exceptions.handle(self.request)
@@ -99,7 +100,7 @@ class IndexView(tables.DataTableView):
 
         try:
             floating_ip_pools = \
-                api.network.floating_ip_pools_list(self.request)
+                api.neutron.floating_ip_pools_list(self.request)
         except neutron_exc.ConnectionFailed:
             floating_ip_pools = []
             exceptions.handle(self.request)
@@ -111,6 +112,7 @@ class IndexView(tables.DataTableView):
 
         attached_instance_ids = [ip.instance_id for ip in floating_ips
                                  if ip.instance_id is not None]
+        instances_dict = {}
         if attached_instance_ids:
             instances = []
             try:
@@ -124,8 +126,8 @@ class IndexView(tables.DataTableView):
 
             instances_dict = dict([(obj.id, obj.name) for obj in instances])
 
-            for ip in floating_ips:
-                ip.instance_name = instances_dict.get(ip.instance_id)
-                ip.pool_name = pool_dict.get(ip.pool, ip.pool)
+        for ip in floating_ips:
+            ip.instance_name = instances_dict.get(ip.instance_id)
+            ip.pool_name = pool_dict.get(ip.pool, ip.pool)
 
         return floating_ips

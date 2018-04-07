@@ -19,10 +19,6 @@ limitations under the License.
   'use strict';
 
   angular.module('serialConsoleApp', [])
-    .constant('protocols', [
-      'binary',
-      'base64'
-    ])
     .constant('states', [
       gettext('Connecting'),
       gettext('Open'),
@@ -36,23 +32,27 @@ limitations under the License.
      *
      * @description
      * The serial-console element creates a terminal based on the widely-used term.js.
-     * The "connection" attribute is input to a WebSocket object, which connects
-     * to a server. In Horizon, this directive is used to connect to nova-serialproxy,
-     * opening a serial console to any instance. Each key the user types is transmitted
-     * to the instance, and each character the instance reponds with is displayed.
+     * The "connection" and "protocols" attributes are input to a WebSocket object,
+     * which connects to a server. In Horizon, this directive is used to connect to
+     * nova-serialproxy, opening a serial console to any instance. Each key the user
+     * types is transmitted to the instance, and each character the instance reponds
+     * with is displayed.
      */
     .directive('serialConsole', serialConsole);
 
-  serialConsole.$inject = ['protocols', 'states'];
+  serialConsole.$inject = ['states', '$timeout'];
 
-  function serialConsole(protocols, states) {
+  function serialConsole(states, $timeout) {
     return {
       scope: true,
-      template: '<div id="terminalNode"></div><br>{{statusMessage()}}',
+      template: '<div id="terminalNode"' +
+        'termCols="{{termCols()}}" termRows="{{termRows()}}"></div>' +
+        '<br>{{statusMessage()}}',
       restrict: 'E',
       link: function postLink(scope, element, attrs) {
 
         var connection = scope.$eval(attrs.connection);
+        var protocols = scope.$eval(attrs.protocols);
         var term = new Terminal();
         var socket = new WebSocket(connection, protocols);
 
@@ -72,6 +72,43 @@ limitations under the License.
         // attach the Terminal to it
         var termElement = angular.element(element)[0];
         term.open(termElement.ownerDocument.getElementById('terminalNode'));
+
+        // default size of term.js
+        scope.cols = 80;
+        scope.rows = 24;
+        // event handler to resize console according to window resize.
+        angular.element(window).bind('resize', resizeTerminal);
+        function resizeTerminal() {
+          var terminal = angular.element('.terminal')[0];
+          // take margin for scroll-bars on window.
+          var winWidth = angular.element(window).width() - 30;
+          var winHeight = angular.element(window).height() - 50;
+          // calculate cols and rows.
+          var newCols = Math.floor(winWidth / (terminal.clientWidth / scope.cols));
+          var newRows = Math.floor(winHeight / (terminal.clientHeight / scope.rows));
+          if ((newCols !== scope.cols || newRows !== scope.rows) && newCols > 0 && newRows > 0) {
+            term.resize(newCols, newRows);
+            scope.cols = newCols;
+            scope.rows = newRows;
+            // To set size into directive attributes for watched by outside,
+            // termCols() and termRows() are needed to be execute for refreshing template.
+            // NOTE(shu-mutou): But scope.$apply is not useful here.
+            //                  "scope.$apply already in progress" error occurs at here.
+            //                  So we need to use $timeout.
+            $timeout(scope.termCols);
+            $timeout(scope.termRows);
+          }
+        }
+        // termCols and termRows provide console size into attribute of this directive.
+        // NOTE(shu-mutou): setting scope variables directly on template definition seems
+        //                  not to be effective for refreshing template.
+        scope.termCols = function () {
+          return scope.cols;
+        };
+        scope.termRows = function () {
+          return scope.rows;
+        };
+        resizeTerminal();
 
         term.on('data', function(data) {
           socket.send(data);

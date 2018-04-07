@@ -15,19 +15,21 @@
 from collections import defaultdict
 from collections import OrderedDict
 import copy
+import functools
 import logging
 import types
 
 from django.conf import settings
-from django.core import urlresolvers
 from django import shortcuts
 from django.template.loader import render_to_string
+from django import urls
 from django.utils.functional import Promise
 from django.utils.http import urlencode
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ungettext_lazy
 import six
 
+from horizon import exceptions
 from horizon import messages
 from horizon.utils import functions
 from horizon.utils import html
@@ -42,8 +44,8 @@ STRING_SEPARATOR = "__"
 
 
 class BaseActionMetaClass(type):
-    """Metaclass for adding all actions options from inheritance tree
-    to action.
+    """Metaclass for adding all actions options from inheritance tree to action.
+
     This way actions can inherit from each other but still use
     the class attributes DSL. Meaning, all attributes of Actions are
     defined as class attributes, but in the background, it will be used as
@@ -99,6 +101,7 @@ class BaseAction(html.HTMLElement):
 
     def data_type_matched(self, datum):
         """Method to see if the action is allowed for a certain type of data.
+
         Only affects mixed data type tables.
         """
         if datum:
@@ -148,13 +151,15 @@ class BaseAction(html.HTMLElement):
         pass
 
     def get_default_classes(self):
-        """Returns a list of the default classes for the action. Defaults to
-        ``["btn", "btn-default", "btn-sm"]``.
+        """Returns a list of the default classes for the action.
+
+        Defaults to ``["btn", "btn-default", "btn-sm"]``.
         """
         return getattr(settings, "ACTION_CSS_CLASSES", ACTION_CSS_CLASSES)
 
     def get_default_attrs(self):
         """Returns a list of the default HTML attributes for the action.
+
         Defaults to returning an ``id`` attribute with the value
         ``{{ table.name }}__action_{{ action.name }}__{{ creation counter }}``.
         """
@@ -225,8 +230,10 @@ class Action(BaseAction):
         list of scope and rule tuples to do policy checks on, the
         composition of which is (scope, rule)
 
-            scope: service type managing the policy for action
-            rule: string representing the action to be checked
+        * scope: service type managing the policy for action
+        * rule: string representing the action to be checked
+
+        .. code-block:: python
 
             for a policy that requires a single rule check:
                 policy_rules should look like
@@ -399,10 +406,10 @@ class LinkAction(BaseAction):
         try:
             if datum:
                 obj_id = self.table.get_object_id(datum)
-                return urlresolvers.reverse(self.url, args=(obj_id,))
+                return urls.reverse(self.url, args=(obj_id,))
             else:
-                return urlresolvers.reverse(self.url)
-        except urlresolvers.NoReverseMatch as ex:
+                return urls.reverse(self.url)
+        except urls.NoReverseMatch as ex:
             LOG.info('No reverse found for "%(url)s": %(exception)s',
                      {'url': self.url, 'exception': ex})
             return self.url
@@ -527,9 +534,7 @@ class FilterAction(BaseAction):
         return data
 
     def is_api_filter(self, filter_field):
-        """Determine if the given filter field should be used as an
-        API filter.
-        """
+        """Determine if agiven filter field should be used as an API filter."""
         if self.filter_type == 'server':
             for choice in self.filter_choices:
                 if (choice[0] == filter_field and len(choice) > 2 and
@@ -538,8 +543,9 @@ class FilterAction(BaseAction):
         return False
 
     def get_select_options(self):
-        """Provide the value, string, and help_text (if applicable)
-        for the template to render.
+        """Provide the value, string, and help_text for the template to render.
+
+        help_text is returned if applicable.
         """
         if self.filter_choices:
             return [choice[:4] for choice in self.filter_choices
@@ -579,8 +585,7 @@ class FixedFilterAction(FilterAction):
         return self.categories[filter_string]
 
     def get_fixed_buttons(self):
-        """Returns a list of dictionaries describing the fixed buttons
-        to use for filtering.
+        """Returns a list of dict describing fixed buttons used for filtering.
 
         Each list item should be a dict with the following keys:
 
@@ -605,9 +610,9 @@ class FixedFilterAction(FilterAction):
 
 
 class BatchAction(Action):
-    """A table action which takes batch action on one or more
-    objects. This action should not require user input on a
-    per-object basis.
+    """A table action which takes batch action on one or more objects.
+
+    This action should not require user input on a per-object basis.
 
     .. attribute:: name
 
@@ -723,8 +728,9 @@ class BatchAction(Action):
         return action
 
     def action(self, request, datum_id):
-        """Required. Accepts a single object id and performs the specific
-        action.
+        """Accepts a single object id and performs the specific action.
+
+        This method is required.
 
         Return values are discarded, errors raised are caught and logged.
         """
@@ -771,10 +777,22 @@ class BatchAction(Action):
                          {'action': self._get_action_name(past=True),
                           'datum_display': datum_display})
             except Exception as ex:
-                # Handle the exception but silence it since we'll display
-                # an aggregate error message later. Otherwise we'd get
-                # multiple error messages displayed to the user.
-                action_failure.append(datum_display)
+                handled_exc = isinstance(ex, exceptions.HandledException)
+                if handled_exc:
+                    # In case of HandledException, an error message should be
+                    # handled in exceptions.handle() or other logic,
+                    # so we don't need to handle the error message here.
+                    # NOTE(amotoki): To raise HandledException from the logic,
+                    # pass escalate=True and do not pass redirect argument
+                    # to exceptions.handle().
+                    # If an exception is handled, the original exception object
+                    # is stored in ex.wrapped[1].
+                    ex = ex.wrapped[1]
+                else:
+                    # Handle the exception but silence it since we'll display
+                    # an aggregate error message later. Otherwise we'd get
+                    # multiple error messages displayed to the user.
+                    action_failure.append(datum_display)
                 action_description = (
                     self._get_action_name(past=True).lower(), datum_display)
                 LOG.warning(
@@ -873,6 +891,79 @@ class DeleteAction(BatchAction):
 
         Override to provide delete functionality specific to your data.
         """
+
+
+class handle_exception_with_detail_message(object):
+    """Decorator to allow special exception handling in BatchAction.action().
+
+    An exception from BatchAction.action() or DeleteAction.delete() is
+    normally caught by BatchAction.handle() and BatchAction.handle() displays
+    an aggregated error message. However, there are cases where we would like
+    to provide an error message which explains a failure reason if some
+    exception occurs so that users can understand situation better.
+
+    This decorator allows us to do this kind of special handling easily.
+    This can be applied to BatchAction.action() and DeleteAction.delete()
+    methods.
+
+    :param normal_log_message: Log message template when an exception other
+        than ``target_exception`` is detected. Keyword substituion "%(id)s"
+        and "%(exc)s" can be used.
+
+    :param target_exception: Exception class should be handled specially.
+        If this exception is caught, a log message will be logged using
+        ``target_log_message`` and a user visible will be shown using
+        ``target_user_message``. In this case, an aggregated error message
+        generated by BatchAction.handle() does not include an object which
+        causes this exception.
+
+    :param target_log_message: Log message template when an exception specified
+        in ``target_exception`` is detected. Keyword substituion "%(id)s"
+        and "%(exc)s" can be used.
+
+    :param target_user_message: User visible message template when an exception
+        specified in ``target_exception`` is detected. It is recommended to
+        use an internationalized string. Keyword substituion "%(name)s"
+        and "%(exc)s" can be used.
+
+    :param logger_name: (optional) Logger name to be used.
+        The usual pattern is to pass __name__ of a caller.
+        This allows us to show a module name of a caller in a logged message.
+    """
+
+    def __init__(self, normal_log_message, target_exception,
+                 target_log_message, target_user_message, logger_name=None):
+        self.logger = logging.getLogger(logger_name or __name__)
+        self.normal_log_message = normal_log_message
+        self.target_exception = target_exception
+        self.target_log_message = target_log_message
+        self.target_user_message = target_user_message
+
+    def __call__(self, fn):
+        @functools.wraps(fn)
+        def decorated(instance, request, obj_id):
+            try:
+                fn(instance, request, obj_id)
+            except self.target_exception as e:
+                self.logger.info(self.target_log_message,
+                                 {'id': obj_id, 'exc': e})
+                obj = instance.table.get_object_by_id(obj_id)
+                name = instance.table.get_object_display(obj)
+                msg = self.target_user_message % {'name': name, 'exc': e}
+                # 'escalate=True' is required to notify the caller
+                # (DeleteAction) of the failure. exceptions.handle() will
+                # raise a wrapped exception of HandledException and BatchAction
+                # will handle it. 'redirect' should not be passed here as
+                # 'redirect' has a priority over 'escalate' argument.
+                exceptions.handle(request, msg, escalate=True)
+            except Exception as e:
+                self.logger.info(self.normal_log_message,
+                                 {'id': obj_id, 'exc': e})
+                # NOTE: No exception handling is required here because
+                # BatchAction.handle() does it. What we need to do is
+                # just to re-raise the exception.
+                raise
+        return decorated
 
 
 class Deprecated(type):

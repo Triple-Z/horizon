@@ -10,13 +10,13 @@ Key New Features
   mechanism to use from those support by the deployment. This feature must be
   enabled by changes to local_settings.py to be utilized. The related settings
   to enable and configure can be found `here
-  <http://docs.openstack.org/developer/horizon/topics/settings.html#websso-enabled>`__.
+  <https://docs.openstack.org/horizon/latest/configuration/settings.html#websso-enabled>`__.
 
 * Support for Theming -- A simpler mechanism to specify a custom theme for
   Horizon has been included. Allowing for use of CSS values for Bootstrap and
   Horizon variables, as well as the inclusion of custom CSS. More details
   available `here
-  <http://docs.openstack.org/developer/horizon/topics/settings.html#custom-theme-path>`__
+  <https://docs.openstack.org/horizon/latest/configuration/settings.html#custom-theme-path>`__
 
 * Sahara UX Improvements -- Dramatic improvements to the Sahara user experience
   have been made with the addition of guided cluster creation and guided job
@@ -26,9 +26,9 @@ Key New Features
   workflow has been implemented in AngularJS to address usability issues in the
   existing launch instance workflow. Due to the late inclusion date and limited
   testing, this feature is marked as beta for Kilo and not enabled by default.
-  To use the new workflow, the following change to local_settings.py is required:
-  ``LAUNCH_INSTANCE_NG_ENABLED = True``. Additionally, you can disable the
-  default launch instance wizard with the following:
+  To use the new workflow, the following change to local_settings.py is
+  required: ``LAUNCH_INSTANCE_NG_ENABLED = True``. Additionally, you can disable
+  the default launch instance wizard with the following:
   ``LAUNCH_INSTANCE_LEGACY_ENABLED = False``. This new work is a view into
   future development in Horizon.
 

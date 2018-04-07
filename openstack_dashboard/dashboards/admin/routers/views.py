@@ -17,7 +17,7 @@ Views for managing Neutron Routers.
 """
 
 from django.conf import settings
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
 from horizon import exceptions
@@ -40,6 +40,12 @@ class IndexView(r_views.IndexView, n_views.IndexView):
     def _get_routers(self):
         try:
             filters = self.get_filters(filters_map=self.FILTERS_MAPPING)
+
+            # If the tenant filter selected and the tenant does not exist.
+            # We do not need to retrieve the list from neutron,just return
+            # an empty list.
+            if 'tenant_id' in filters and not filters['tenant_id']:
+                return []
 
             # If admin_filter_first is set and if there are not other filters
             # selected, then search criteria must be provided and return an
@@ -98,14 +104,18 @@ class DetailView(r_views.DetailView):
         context["url"] = self.failure_url
         router = context["router"]
         # try to lookup the l3 agent location so we know where to troubleshoot
-        try:
-            agents = api.neutron.list_l3_agent_hosting_router(self.request,
-                                                              router.id)
-            router.l3_host_agents = agents
-        except Exception:
-            exceptions.handle(self.request,
-                              _('The L3 agent information could not '
-                                'be located.'))
+        if api.neutron.is_extension_supported(self.request,
+                                              'l3_agent_scheduler'):
+            try:
+                agents = api.neutron.list_l3_agent_hosting_router(self.request,
+                                                                  router.id)
+                router.l3_host_agents = agents
+            except Exception:
+                exceptions.handle(self.request,
+                                  _('The L3 agent information could not '
+                                    'be located.'))
+        else:
+            router.l3_host_agents = []
         context["actions"] = table.render_row_actions(router)
         return context
 

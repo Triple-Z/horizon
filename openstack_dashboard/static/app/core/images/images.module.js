@@ -73,6 +73,7 @@
     registry.getResourceType(imageResourceType)
       .setNames(gettext('Image'), gettext('Images'))
       .setSummaryTemplateUrl(basePath + 'details/drawer.html')
+      .setDefaultIndexUrl('/project/images/')
       .setItemInTransitionFunction(imagesService.isInTransition)
       .setProperties(imageProperties(imagesService, statuses))
       .setListFunction(imagesService.getImagesPromise)
@@ -142,7 +143,7 @@
       .append({
         label: gettext('Visibility'),
         name: 'visibility',
-        isServer: false,
+        isServer: true,
         singleton: true,
         options: [
           {label: gettext('Public'), key: 'public'},
@@ -243,18 +244,18 @@
       name: gettext('Name'),
       owner: gettext('Owner'),
       tags: gettext('Tags'),
-      updated_at: gettext('Updated At'),
+      'updated_at': {label: gettext('Updated At'), filters: ['simpleDate'] },
       virtual_size: gettext('Virtual Size'),
       visibility: gettext('Visibility'),
       description: gettext('Description'),
       architecture: gettext('Architecture'),
       kernel_id: gettext('Kernel ID'),
       ramdisk_id: gettext('Ramdisk ID'),
-      created_at: gettext('Created At'),
+      'created_at': {label: gettext('Created At'), filters: ['simpleDate'] },
       container_format: { label: gettext('Container Format'), filters: ['uppercase'] },
       disk_format: { label: gettext('Disk Format'), filters: ['noValue', 'uppercase'] },
       is_public: { label: gettext('Is Public'), filters: ['yesno'] },
-      type: { label: gettext('Type'), filters: [imagesService.imageType] },
+      type: { label: gettext('Type')},
       'protected': { label: gettext('Protected'), filters: ['yesno'] },
       size: { label: gettext('Size'), filters: ['bytes'] },
       status: { label: gettext('Status'), values: statuses }
@@ -269,8 +270,6 @@
    */
   function events() {
     return {
-      IMAGE_CHANGED: 'horizon.app.core.images.IMAGE_CHANGED',
-      IMAGE_METADATA_CHANGED: 'horizon.app.core.images.IMAGE_METADATA_CHANGED',
       IMAGE_UPLOAD_PROGRESS: 'horizon.app.core.images.IMAGE_UPLOAD_PROGRESS'
     };
   }

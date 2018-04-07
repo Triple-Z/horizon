@@ -21,10 +21,10 @@ from horizon.utils.memoized import memoized
 
 from openstack_dashboard.api import base
 from openstack_dashboard.api import cinder
-from openstack_dashboard.api import network
 from openstack_dashboard.api import neutron
 from openstack_dashboard.api import nova
 from openstack_dashboard.contrib.developer.profiler import api as profiler
+from openstack_dashboard.utils import futurist_utils
 
 
 LOG = logging.getLogger(__name__)
@@ -41,18 +41,41 @@ NOVA_COMPUTE_QUOTA_FIELDS = {
     "key_pairs",
 }
 
-NOVA_NETWORK_QUOTA_FIELDS = {
-    "floating_ips",
-    "fixed_ips",
-    "security_groups",
-    "security_group_rules",
-}
+# We no longer supports nova-network, so network related quotas from nova
+# are not considered.
+NOVA_QUOTA_FIELDS = NOVA_COMPUTE_QUOTA_FIELDS
 
-NOVA_QUOTA_FIELDS = NOVA_COMPUTE_QUOTA_FIELDS | NOVA_NETWORK_QUOTA_FIELDS
+NOVA_QUOTA_LIMIT_MAP = {
+    'instances': {
+        'limit': 'maxTotalInstances',
+        'usage': 'totalInstancesUsed'
+    },
+    'cores': {
+        'limit': 'maxTotalCores',
+        'usage': 'totalCoresUsed'
+    },
+    'ram': {
+        'limit': 'maxTotalRAMSize',
+        'usage': 'totalRAMUsed'
+    },
+    'key_pairs': {
+        'limit': 'maxTotalKeypairs',
+        'usage': None
+    },
+}
 
 CINDER_QUOTA_FIELDS = {"volumes",
                        "snapshots",
                        "gigabytes"}
+
+CINDER_QUOTA_LIMIT_MAP = {
+    'volumes': {'usage': 'totalVolumesUsed',
+                'limit': 'maxTotalVolumes'},
+    'gigabytes': {'usage': 'totalGigabytesUsed',
+                  'limit': 'maxTotalVolumeGigabytes'},
+    'snapshots': {'usage': 'totalSnapshotsUsed',
+                  'limit': 'maxTotalSnapshots'},
+}
 
 NEUTRON_QUOTA_FIELDS = {"network",
                         "subnet",
@@ -66,21 +89,20 @@ NEUTRON_QUOTA_FIELDS = {"network",
 QUOTA_FIELDS = NOVA_QUOTA_FIELDS | CINDER_QUOTA_FIELDS | NEUTRON_QUOTA_FIELDS
 
 QUOTA_NAMES = {
+    # nova
     "metadata_items": _('Metadata Items'),
     "cores": _('VCPUs'),
     "instances": _('Instances'),
     "injected_files": _('Injected Files'),
     "injected_file_content_bytes": _('Injected File Content Bytes'),
     "ram": _('RAM (MB)'),
-    "floating_ips": _('Floating IPs'),
-    "fixed_ips": _('Fixed IPs'),
-    "security_groups": _('Security Groups'),
-    "security_group_rules": _('Security Group Rules'),
     "key_pairs": _('Key Pairs'),
     "injected_file_path_bytes": _('Injected File Path Bytes'),
+    # cinder
     "volumes": _('Volumes'),
     "snapshots": _('Volume Snapshots'),
     "gigabytes": _('Total Size of Volumes and Snapshots (GB)'),
+    # neutron
     "network": _("Networks"),
     "subnet": _("Subnets"),
     "port": _("Ports"),
@@ -116,7 +138,7 @@ class QuotaUsage(dict):
 
     def add_quota(self, quota):
         """Adds an internal tracking reference for the given quota."""
-        if quota.limit is None or quota.limit == -1:
+        if quota.limit in (None, -1, float('inf')):
             # Handle "unlimited" quotas.
             self.usages[quota.name]['quota'] = float("inf")
             self.usages[quota.name]['available'] = float("inf")
@@ -142,119 +164,80 @@ class QuotaUsage(dict):
         self.usages[name]['available'] = available
 
 
-def _get_quota_data(request, tenant_mode=True, disabled_quotas=None,
-                    tenant_id=None):
+@profiler.trace
+def get_default_quota_data(request, disabled_quotas=None, tenant_id=None):
     quotasets = []
     if not tenant_id:
         tenant_id = request.user.tenant_id
     if disabled_quotas is None:
         disabled_quotas = get_disabled_quotas(request)
 
-    qs = base.QuotaSet()
-
     if NOVA_QUOTA_FIELDS - disabled_quotas:
-        if tenant_mode:
-            quotasets.append(nova.tenant_quota_get(request, tenant_id))
-        else:
-            quotasets.append(nova.default_quota_get(request, tenant_id))
+        quotasets.append(nova.default_quota_get(request, tenant_id))
 
     if CINDER_QUOTA_FIELDS - disabled_quotas:
         try:
-            if tenant_mode:
-                quotasets.append(cinder.tenant_quota_get(request, tenant_id))
-            else:
-                quotasets.append(cinder.default_quota_get(request, tenant_id))
+            quotasets.append(cinder.default_quota_get(request, tenant_id))
         except cinder.cinder_exception.ClientException:
             disabled_quotas.update(CINDER_QUOTA_FIELDS)
-            msg = _("Unable to retrieve volume limit information.")
+            msg = _("Unable to retrieve volume quota information.")
             exceptions.handle(request, msg)
 
+    if NEUTRON_QUOTA_FIELDS - disabled_quotas:
+        try:
+            quotasets.append(neutron.default_quota_get(request,
+                                                       tenant_id=tenant_id))
+        except Exception:
+            disabled_quotas.update(NEUTRON_QUOTA_FIELDS)
+            msg = _('Unable to retrieve Neutron quota information.')
+            exceptions.handle(request, msg)
+
+    qs = base.QuotaSet()
     for quota in itertools.chain(*quotasets):
-        if quota.name not in disabled_quotas:
+        if quota.name not in disabled_quotas and quota.name in QUOTA_FIELDS:
             qs[quota.name] = quota.limit
     return qs
 
 
 @profiler.trace
-def get_default_quota_data(request, disabled_quotas=None, tenant_id=None):
-    return _get_quota_data(request,
-                           tenant_mode=False,
-                           disabled_quotas=disabled_quotas,
-                           tenant_id=tenant_id)
-
-
-@profiler.trace
 def get_tenant_quota_data(request, disabled_quotas=None, tenant_id=None):
-    qs = _get_quota_data(request,
-                         tenant_mode=True,
-                         disabled_quotas=disabled_quotas,
-                         tenant_id=tenant_id)
+    quotasets = []
+    if not tenant_id:
+        tenant_id = request.user.tenant_id
+    if disabled_quotas is None:
+        disabled_quotas = get_disabled_quotas(request)
 
-    # TODO(jpichon): There is no API to get the default system quotas
-    # in Neutron (cf. LP#1204956), so for now handle tenant quotas here.
-    # This should be handled in _get_quota_data() eventually.
+    if NOVA_QUOTA_FIELDS - disabled_quotas:
+        quotasets.append(nova.tenant_quota_get(request, tenant_id))
 
-    # TODO(amotoki): Purge this tricky usage.
-    # openstack_dashboard/dashboards/identity/projects/views.py
-    # calls get_tenant_quota_data directly and it expects
-    # neutron data is not returned.
-    if not disabled_quotas:
-        return qs
+    if CINDER_QUOTA_FIELDS - disabled_quotas:
+        try:
+            quotasets.append(cinder.tenant_quota_get(request, tenant_id))
+        except cinder.cinder_exception.ClientException:
+            disabled_quotas.update(CINDER_QUOTA_FIELDS)
+            msg = _("Unable to retrieve volume limit information.")
+            exceptions.handle(request, msg)
 
-    # Check if neutron is enabled by looking for network
-    if not (NEUTRON_QUOTA_FIELDS - disabled_quotas):
-        return qs
+    if NEUTRON_QUOTA_FIELDS - disabled_quotas:
+        quotasets.append(neutron.tenant_quota_get(request, tenant_id))
 
-    tenant_id = tenant_id or request.user.tenant_id
-    neutron_quotas = neutron.tenant_quota_get(request, tenant_id)
-
-    if 'floating_ips' in disabled_quotas:
-        if 'floatingip' not in disabled_quotas:
-            # Rename floatingip to floating_ips since that's how it's
-            # expected in some places (e.g. Security & Access' Floating IPs)
-            fips_quota = neutron_quotas.get('floatingip').limit
-            qs.add(base.QuotaSet({'floating_ips': fips_quota}))
-
-    if 'security_groups' in disabled_quotas:
-        if 'security_group' not in disabled_quotas:
-            # Rename security_group to security_groups since that's how it's
-            # expected in some places (e.g. Security & Access' Security Groups)
-            sec_quota = neutron_quotas.get('security_group').limit
-            qs.add(base.QuotaSet({'security_groups': sec_quota}))
-
-    if 'network' in disabled_quotas:
-        for item in qs.items:
-            if item.name == 'networks':
-                qs.items.remove(item)
-                break
-    else:
-        net_quota = neutron_quotas.get('network').limit
-        qs.add(base.QuotaSet({'networks': net_quota}))
-
-    if 'subnet' in disabled_quotas:
-        for item in qs.items:
-            if item.name == 'subnets':
-                qs.items.remove(item)
-                break
-    else:
-        net_quota = neutron_quotas.get('subnet').limit
-        qs.add(base.QuotaSet({'subnets': net_quota}))
-
-    if 'router' in disabled_quotas:
-        for item in qs.items:
-            if item.name == 'routers':
-                qs.items.remove(item)
-                break
-    else:
-        router_quota = neutron_quotas.get('router').limit
-        qs.add(base.QuotaSet({'routers': router_quota}))
-
+    qs = base.QuotaSet()
+    for quota in itertools.chain(*quotasets):
+        if quota.name not in disabled_quotas and quota.name in QUOTA_FIELDS:
+            qs[quota.name] = quota.limit
     return qs
 
 
+# TOOD(amotoki): Do not use neutron specific quota field names.
+# At now, quota names from nova-network are used in the dashboard code,
+# but get_disabled_quotas() returns quota names from neutron API.
+# It is confusing and makes the code complicated. They should be push away.
+# Check Identity Project panel and System Defaults panel too.
 @profiler.trace
 def get_disabled_quotas(request):
-    disabled_quotas = set([])
+    # We no longer supports nova network, so we always disable
+    # network related nova quota fields.
+    disabled_quotas = set()
 
     # Cinder
     if not cinder.is_volume_service_enabled(request):
@@ -264,14 +247,7 @@ def get_disabled_quotas(request):
     if not base.is_service_enabled(request, 'network'):
         disabled_quotas.update(NEUTRON_QUOTA_FIELDS)
     else:
-        # Remove the nova network quotas
-        disabled_quotas.update(['floating_ips', 'fixed_ips'])
-
-        if neutron.is_extension_supported(request, 'security-group'):
-            # If Neutron security group is supported, disable Nova quotas
-            disabled_quotas.update(['security_groups', 'security_group_rules'])
-        else:
-            # If Nova security group is used, disable Neutron quotas
+        if not neutron.is_extension_supported(request, 'security-group'):
             disabled_quotas.update(['security_group', 'security_group_rule'])
 
         if not neutron.is_router_enabled(request):
@@ -293,112 +269,138 @@ def get_disabled_quotas(request):
     return disabled_quotas
 
 
+def _add_limit_and_usage(usages, name, limit, usage, disabled_quotas):
+    if name not in disabled_quotas:
+        usages.add_quota(base.Quota(name, limit))
+        if usage is not None:
+            usages.tally(name, usage)
+
+
+def _add_limit_and_usage_neutron(usages, name, quota_name,
+                                 detail, disabled_quotas):
+    if quota_name in disabled_quotas:
+        return
+    usages.add_quota(base.Quota(name, detail['limit']))
+    usages.tally(name, detail['used'] + detail['reserved'])
+
+
 @profiler.trace
 def _get_tenant_compute_usages(request, usages, disabled_quotas, tenant_id):
     enabled_compute_quotas = NOVA_COMPUTE_QUOTA_FIELDS - disabled_quotas
     if not enabled_compute_quotas:
         return
 
-    # Unlike the other services it can be the case that nova is enabled but
-    # doesn't support quotas, in which case we still want to get usage info,
-    # so don't rely on '"instances" in disabled_quotas' as elsewhere
     if not base.is_service_enabled(request, 'compute'):
         return
 
-    if tenant_id:
-        instances, has_more = nova.server_list(
-            request, search_opts={'tenant_id': tenant_id})
-    else:
-        instances, has_more = nova.server_list(request)
+    try:
+        limits = nova.tenant_absolute_limits(request, reserved=True,
+                                             tenant_id=tenant_id)
+    except nova.nova_exceptions.ClientException:
+        msg = _("Unable to retrieve compute limit information.")
+        exceptions.handle(request, msg)
 
-    # Fetch deleted flavors if necessary.
-    flavors = dict([(f.id, f) for f in nova.flavor_list(request)])
-    missing_flavors = [instance.flavor['id'] for instance in instances
-                       if instance.flavor['id'] not in flavors]
-    for missing in missing_flavors:
-        if missing not in flavors:
-            try:
-                flavors[missing] = nova.flavor_get(request, missing)
-            except Exception:
-                flavors[missing] = {}
-                exceptions.handle(request, ignore=True)
-
-    usages.tally('instances', len(instances))
-
-    # Sum our usage based on the flavors of the instances.
-    for flavor in [flavors[instance.flavor['id']] for instance in instances]:
-        usages.tally('cores', getattr(flavor, 'vcpus', None))
-        usages.tally('ram', getattr(flavor, 'ram', None))
-
-    # Initialize the tally if no instances have been launched yet
-    if len(instances) == 0:
-        usages.tally('cores', 0)
-        usages.tally('ram', 0)
+    for quota_name, limit_keys in NOVA_QUOTA_LIMIT_MAP.items():
+        if limit_keys['usage']:
+            usage = limits[limit_keys['usage']]
+        else:
+            usage = None
+        _add_limit_and_usage(usages, quota_name,
+                             limits[limit_keys['limit']],
+                             usage,
+                             disabled_quotas)
 
 
 @profiler.trace
 def _get_tenant_network_usages(request, usages, disabled_quotas, tenant_id):
-    enabled_quotas = ((NOVA_NETWORK_QUOTA_FIELDS | NEUTRON_QUOTA_FIELDS)
-                      - disabled_quotas)
+    enabled_quotas = NEUTRON_QUOTA_FIELDS - disabled_quotas
     if not enabled_quotas:
         return
 
-    # NOTE(amotoki): floatingip is Neutron quota and floating_ips is
-    # Nova quota. We need to check both.
-    if {'floatingip', 'floating_ips'} & enabled_quotas:
-        floating_ips = []
-        try:
-            if network.floating_ip_supported(request):
-                floating_ips = network.tenant_floating_ip_list(request)
-        except Exception:
-            pass
-        usages.tally('floating_ips', len(floating_ips))
+    if neutron.is_extension_supported(request, 'quota_details'):
+        details = neutron.tenant_quota_detail_get(request, tenant_id)
+        for quota_name in NEUTRON_QUOTA_FIELDS:
+            if quota_name in disabled_quotas:
+                continue
+            detail = details[quota_name]
+            usages.add_quota(base.Quota(quota_name, detail['limit']))
+            usages.tally(quota_name, detail['used'] + detail['reserved'])
+    else:
+        _get_tenant_network_usages_legacy(
+            request, usages, disabled_quotas, tenant_id)
 
-    if 'security_group' not in disabled_quotas:
-        security_groups = []
-        security_groups = network.security_group_list(request)
-        usages.tally('security_groups', len(security_groups))
 
-    if 'network' not in disabled_quotas:
-        networks = neutron.network_list(request, tenant_id=tenant_id)
-        usages.tally('networks', len(networks))
+def _get_neutron_quota_data(request, qs, disabled_quotas, tenant_id):
+    tenant_id = tenant_id or request.user.tenant_id
+    neutron_quotas = neutron.tenant_quota_get(request, tenant_id)
 
-    if 'subnet' not in disabled_quotas:
-        subnets = neutron.subnet_list(request, tenant_id=tenant_id)
-        usages.tally('subnets', len(subnets))
+    for quota_name in NEUTRON_QUOTA_FIELDS:
+        if quota_name not in disabled_quotas:
+            quota_data = neutron_quotas.get(quota_name).limit
+            qs.add(base.QuotaSet({quota_name: quota_data}))
 
-    if 'router' not in disabled_quotas:
-        routers = neutron.router_list(request, tenant_id=tenant_id)
-        usages.tally('routers', len(routers))
+    return qs
+
+
+def _get_tenant_network_usages_legacy(request, usages, disabled_quotas,
+                                      tenant_id):
+    qs = base.QuotaSet()
+    _get_neutron_quota_data(request, qs, disabled_quotas, tenant_id)
+    for quota in qs:
+        usages.add_quota(quota)
+
+    # TODO(amotoki): Add security_group_rule?
+    resource_lister = {
+        'network': (neutron.network_list, {'tenant_id': tenant_id}),
+        'subnet': (neutron.subnet_list, {'tenant_id': tenant_id}),
+        'port': (neutron.port_list, {'tenant_id': tenant_id}),
+        'router': (neutron.router_list, {'tenant_id': tenant_id}),
+        'floatingip': (neutron.tenant_floating_ip_list, {}),
+        'security_group': (neutron.security_group_list, {}),
+    }
+
+    for quota_name, lister_info in resource_lister.items():
+        if quota_name not in disabled_quotas:
+            lister = lister_info[0]
+            kwargs = lister_info[1]
+            try:
+                resources = lister(request, **kwargs)
+            except Exception:
+                resources = []
+            usages.tally(quota_name, len(resources))
 
 
 @profiler.trace
 def _get_tenant_volume_usages(request, usages, disabled_quotas, tenant_id):
-    if CINDER_QUOTA_FIELDS - disabled_quotas:
-        try:
-            if tenant_id:
-                opts = {'all_tenants': 1, 'project_id': tenant_id}
-                volumes = cinder.volume_list(request, opts)
-                snapshots = cinder.volume_snapshot_list(request, opts)
-            else:
-                volumes = cinder.volume_list(request)
-                snapshots = cinder.volume_snapshot_list(request)
-            volume_usage = sum([int(v.size) for v in volumes])
-            snapshot_usage = sum([int(s.size) for s in snapshots])
-            usages.tally('gigabytes', (snapshot_usage + volume_usage))
-            usages.tally('volumes', len(volumes))
-            usages.tally('snapshots', len(snapshots))
-        except cinder.cinder_exception.ClientException:
-            msg = _("Unable to retrieve volume limit information.")
-            exceptions.handle(request, msg)
+    enabled_volume_quotas = CINDER_QUOTA_FIELDS - disabled_quotas
+    if not enabled_volume_quotas:
+        return
 
+    try:
+        limits = cinder.tenant_absolute_limits(request, tenant_id)
+    except cinder.cinder_exception.ClientException:
+        msg = _("Unable to retrieve volume limit information.")
+        exceptions.handle(request, msg)
+
+    for quota_name, limit_keys in CINDER_QUOTA_LIMIT_MAP.items():
+        _add_limit_and_usage(usages, quota_name,
+                             limits[limit_keys['limit']],
+                             limits[limit_keys['usage']],
+                             disabled_quotas)
+
+
+# TODO(amotoki): Merge tenant_quota_usages and tenant_limit_usages.
+# These two functions are similar. There seems no reason to have both.
 
 @profiler.trace
 @memoized
-def tenant_quota_usages(request, tenant_id=None):
+def tenant_quota_usages(request, tenant_id=None, targets=None):
     """Get our quotas and construct our usage object.
-    If no tenant_id is provided, a the request.user.project_id
-    is assumed to be used
+
+    :param tenant_id: Target tenant ID. If no tenant_id is provided,
+        a the request.user.project_id is assumed to be used.
+    :param targets: A tuple of quota names to be retrieved.
+        If unspecified, all quota and usage information is retrieved.
     """
     if not tenant_id:
         tenant_id = request.user.project_id
@@ -406,15 +408,21 @@ def tenant_quota_usages(request, tenant_id=None):
     disabled_quotas = get_disabled_quotas(request)
     usages = QuotaUsage()
 
-    for quota in get_tenant_quota_data(request,
-                                       disabled_quotas=disabled_quotas,
-                                       tenant_id=tenant_id):
-        usages.add_quota(quota)
+    if targets:
+        if set(targets) - QUOTA_FIELDS:
+            raise ValueError('Unknown quota field names are included: %s'
+                             % set(targets) - QUOTA_FIELDS)
+        enabled_quotas = set(QUOTA_FIELDS) - disabled_quotas
+        enabled_quotas &= set(targets)
+        disabled_quotas = set(QUOTA_FIELDS) - enabled_quotas
 
-    # Get our usages.
-    _get_tenant_compute_usages(request, usages, disabled_quotas, tenant_id)
-    _get_tenant_network_usages(request, usages, disabled_quotas, tenant_id)
-    _get_tenant_volume_usages(request, usages, disabled_quotas, tenant_id)
+    futurist_utils.call_functions_parallel(
+        (_get_tenant_compute_usages,
+         [request, usages, disabled_quotas, tenant_id]),
+        (_get_tenant_network_usages,
+         [request, usages, disabled_quotas, tenant_id]),
+        (_get_tenant_volume_usages,
+         [request, usages, disabled_quotas, tenant_id]))
 
     return usages
 
@@ -435,19 +443,15 @@ def tenant_limit_usages(request):
     if cinder.is_volume_service_enabled(request):
         try:
             limits.update(cinder.tenant_absolute_limits(request))
-            volumes = cinder.volume_list(request)
-            snapshots = cinder.volume_snapshot_list(request)
-            # gigabytesUsed should be a total of volumes and snapshots
-            vol_size = sum([getattr(volume, 'size', 0) for volume
-                            in volumes])
-            snap_size = sum([getattr(snap, 'size', 0) for snap
-                             in snapshots])
-            limits['gigabytesUsed'] = vol_size + snap_size
-            limits['volumesUsed'] = len(volumes)
-            limits['snapshotsUsed'] = len(snapshots)
         except cinder.cinder_exception.ClientException:
             msg = _("Unable to retrieve volume limit information.")
             exceptions.handle(request, msg)
+
+    # TODO(amotoki): Support neutron quota details extensions
+    # which returns limit/usage/reserved per resource.
+    # Note that the data format is different from nova/cinder limit API.
+    # https://developer.openstack.org/
+    #   api-ref/network/v2/#quotas-details-extension-quota-details
 
     return limits
 

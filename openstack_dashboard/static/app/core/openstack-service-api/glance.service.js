@@ -169,8 +169,12 @@
         onProgress(Math.round(event.loaded / event.total * 100));
       }
 
-      function onError() {
-        toastService.add('error', gettext('Unable to create the image.'));
+      function onError(error) {
+        if (error && error.data) {
+          throw error;
+        } else {
+          throw gettext('Unable to create the image.');
+        }
       }
 
       return apiService[method]('/api/glance/images/', image)
@@ -336,7 +340,7 @@
      * @description
      * Get a list of metadata definition namespaces.
      *
-     * http://docs.openstack.org/developer/glance/metadefs-concepts.html
+     * https://docs.openstack.org/glance/latest/user/metadefs-concepts.html
      *
      * The listing result is an object with property "items". Each item is
      * a namespace.
@@ -403,7 +407,7 @@
      * @description
      * Get a list of metadata definition resource types.
      *
-     * http://docs.openstack.org/developer/glance/metadefs-concepts.html
+     * https://docs.openstack.org/glance/latest/user/metadefs-concepts.html
      *
      * The listing result is an object with property "items".
      * Each item is a resource type. Resource types are Strings that

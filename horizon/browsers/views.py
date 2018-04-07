@@ -15,6 +15,7 @@
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
 
+import horizon
 from horizon.tables import MultiTableView
 from horizon.utils import memoized
 
@@ -82,4 +83,27 @@ class AngularIndexView(generic.TemplateView):
             context["page_title"] = self.title
         else:
             context["page_title"] = self.page_title
+        return context
+
+
+class AngularDetailsView(generic.TemplateView):
+    '''View for Angularized details view
+
+    This is used to load ngdetails view via Django.
+    i.e. refresh or link directly for '^ngdetails/'
+    '''
+    template_name = 'angular.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(AngularDetailsView, self).get_context_data(**kwargs)
+        # some parameters are needed for navigation side bar and breadcrumb.
+        title = _("Horizon")
+        context["title"] = title
+        context["page_title"] = title
+        # set default dashboard and panel
+        dashboard = horizon.get_default_dashboard()
+        self.request.horizon['dashboard'] = dashboard
+        self.request.horizon['panel'] = dashboard.get_panels()[0]
+        # set flag that means routed by django
+        context['routed_by_django'] = True
         return context

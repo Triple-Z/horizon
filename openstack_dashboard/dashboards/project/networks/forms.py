@@ -18,7 +18,7 @@
 
 import logging
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from horizon import exceptions
@@ -34,10 +34,6 @@ LOG = logging.getLogger(__name__)
 
 class UpdateNetwork(forms.SelfHandlingForm):
     name = forms.CharField(label=_("Name"), required=False)
-    tenant_id = forms.CharField(widget=forms.HiddenInput)
-    network_id = forms.CharField(label=_("ID"),
-                                 widget=forms.TextInput(
-                                     attrs={'readonly': 'readonly'}))
     admin_state = forms.BooleanField(label=_("Enable Admin State"),
                                      required=False)
     shared = forms.BooleanField(label=_("Shared"), required=False)
@@ -54,19 +50,19 @@ class UpdateNetwork(forms.SelfHandlingForm):
             params = {'admin_state_up': data['admin_state'],
                       'name': data['name']}
             # Make sure we are not sending shared data when the user
-            # doesnt'have admin rights because even if the user doesn't
+            # doesn't have admin rights because even if the user doesn't
             # change it neutron sends back a 403 error
             if policy.check((("network", "update_network:shared"),), request):
                 params['shared'] = data['shared']
             network = api.neutron.network_update(request,
-                                                 data['network_id'],
+                                                 self.initial['network_id'],
                                                  **params)
             msg = _('Network %s was successfully updated.') % data['name']
             messages.success(request, msg)
             return network
         except Exception as e:
             LOG.info('Failed to update network %(id)s: %(exc)s',
-                     {'id': data['network_id'], 'exc': e})
+                     {'id': self.initial['network_id'], 'exc': e})
             msg = _('Failed to update network %s') % data['name']
             redirect = reverse(self.failure_url)
             exceptions.handle(request, msg, redirect=redirect)

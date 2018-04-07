@@ -13,12 +13,12 @@
 #    under the License.
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ungettext_lazy
+import six
 
 from horizon import tables
-import six
 
 from openstack_dashboard import api
 from openstack_dashboard import policy
@@ -52,7 +52,7 @@ class DeleteGroup(policy.PolicyTargetMixin, tables.DeleteAction):
         return security_group.name != 'default'
 
     def delete(self, request, obj_id):
-        api.network.security_group_delete(request, obj_id)
+        api.neutron.security_group_delete(request, obj_id)
 
 
 class CreateGroup(tables.LinkAction):
@@ -63,8 +63,9 @@ class CreateGroup(tables.LinkAction):
     icon = "plus"
 
     def allowed(self, request, security_group=None):
-        usages = quotas.tenant_quota_usages(request)
-        if usages['security_groups'].get('available', 1) <= 0:
+        usages = quotas.tenant_quota_usages(request,
+                                            targets=('security_group', ))
+        if usages['security_group'].get('available', 1) <= 0:
             if "disabled" not in self.classes:
                 self.classes = [c for c in self.classes] + ["disabled"]
                 self.verbose_name = _("Create Security Group (Quota exceeded)")
@@ -149,7 +150,7 @@ class DeleteRule(tables.DeleteAction):
         )
 
     def delete(self, request, obj_id):
-        api.network.security_group_rule_delete(request, obj_id)
+        api.neutron.security_group_rule_delete(request, obj_id)
 
     def get_success_url(self, request):
         sg_id = self.table.kwargs['security_group_id']

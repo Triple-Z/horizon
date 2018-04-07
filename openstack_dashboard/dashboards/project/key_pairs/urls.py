@@ -16,19 +16,26 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from django.conf import settings
 from django.conf.urls import url
-from openstack_dashboard.dashboards.project.key_pairs import views
+from django.utils.translation import ugettext_lazy as _
 
-urlpatterns = [
-    url(r'^$', views.IndexView.as_view(), name='index'),
-    url(r'^create/$', views.CreateView.as_view(), name='create'),
-    url(r'^import/$', views.ImportView.as_view(), name='import'),
-    url(r'^(?P<keypair_name>[^/]+)/download/$', views.DownloadView.as_view(),
-        name='download'),
-    url(r'^(?P<keypair_name>[^/]+)/generate/$', views.GenerateView.as_view(),
-        name='generate'),
-    url(r'^(?P<keypair_name>[^/]+)/(?P<optional>[^/]+)/generate/$',
-        views.GenerateView.as_view(), name='generate'),
-    url(r'^(?P<keypair_name>[^/]+)/$', views.DetailView.as_view(),
-        name='detail'),
-]
+from horizon.browsers import views
+from openstack_dashboard.dashboards.project.key_pairs import views as \
+    legacy_views
+
+if settings.ANGULAR_FEATURES.get('key_pairs_panel'):
+    title = _("Key Pairs")
+    urlpatterns = [
+        url('', views.AngularIndexView.as_view(title=title), name='index'),
+        url(r'^(?P<keypair_name>[^/]+)/$',
+            views.AngularIndexView.as_view(title=title),
+            name='detail'),
+    ]
+else:
+    urlpatterns = [
+        url(r'^$', legacy_views.IndexView.as_view(), name='index'),
+        url(r'^import/$', legacy_views.ImportView.as_view(), name='import'),
+        url(r'^(?P<keypair_name>[^/]+)/$', legacy_views.DetailView.as_view(),
+            name='detail'),
+    ]

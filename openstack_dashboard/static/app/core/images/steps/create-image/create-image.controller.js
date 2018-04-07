@@ -27,7 +27,8 @@
     'horizon.app.core.images.events',
     'horizon.app.core.images.imageFormats',
     'horizon.app.core.images.validationRules',
-    'horizon.app.core.openstack-service-api.settings'
+    'horizon.app.core.openstack-service-api.settings',
+    'horizon.app.core.openstack-service-api.policy'
   ];
 
   /**
@@ -42,7 +43,8 @@
     events,
     imageFormats,
     validationRules,
-    settings
+    settings,
+    policyAPI
   ) {
     var ctrl = this;
 
@@ -52,8 +54,9 @@
     ctrl.diskFormats = [];
     ctrl.prepareUpload = prepareUpload;
     ctrl.apiVersion = 0;
+    ctrl.allowPublicizeImage = true;
 
-    ctrl.image = {
+    $scope.stepModels.imageForm = ctrl.image = {
       source_type: '',
       image_url: '',
       data: {},
@@ -93,11 +96,9 @@
 
     init();
 
-    var imageChangedWatcher = $scope.$watchCollection('ctrl.image', watchImageCollection);
     var watchUploadProgress = $scope.$on(events.IMAGE_UPLOAD_PROGRESS, watchImageUpload);
 
     $scope.$on('$destroy', function() {
-      imageChangedWatcher();
       watchUploadProgress();
     });
 
@@ -116,6 +117,8 @@
       var settingsFormats = response.OPENSTACK_IMAGE_FORMATS;
       var uploadMode = response.HORIZON_IMAGES_UPLOAD_MODE;
       var dupe = angular.copy(imageFormats);
+      var imageDefaults = response.CREATE_IMAGE_DEFAULTS;
+
       angular.forEach(dupe, function stripUnknown(name, key) {
         if (settingsFormats.indexOf(key) === -1) {
           delete dupe[key];
@@ -133,6 +136,9 @@
         ctrl.image.source_type = 'url';
       }
       ctrl.imageFormats = dupe;
+      if (imageDefaults && imageDefaults.image_visibility === "private") {
+        ctrl.image.visibility = "private";
+      }
     }
 
     function isLocalFileUpload() {
@@ -140,15 +146,15 @@
       return (type === 'file-legacy' || type === 'file-direct');
     }
 
-    // emits new data to parent listeners
-    function watchImageCollection(newValue, oldValue) {
-      if (newValue !== oldValue) {
-        $scope.$emit(events.IMAGE_CHANGED, newValue);
-      }
-    }
-
     function init() {
       glance.getImages({paginate: false}).success(onGetImages);
+      policyAPI.ifAllowed({rules: [['image', 'publicize_image']]}).then(
+        angular.noop,
+        function () {
+          ctrl.image.visibility = "private";
+          ctrl.allowPublicizeImage = false;
+        }
+      );
     }
 
     function onGetImages(response) {

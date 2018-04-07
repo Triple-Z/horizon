@@ -40,6 +40,8 @@
     ctrl.chartTotalInstancesLabel = gettext('Total Instances');
     ctrl.chartTotalVcpusLabel = gettext('Total VCPUs');
     ctrl.chartTotalRamLabel = gettext('Total RAM');
+    ctrl.chartTotalVolumeLabel = gettext('Total Volumes');
+    ctrl.chartTotalVolumeStorageLabel = gettext('Total Volume Storage');
 
     ctrl.filterFacets = [
       {
@@ -71,7 +73,8 @@
     // Labels for error message on ram/disk validation
     ctrl.sourcesLabel = {
       image: gettext('image'),
-      snapshot: gettext('snapshot')
+      snapshot: gettext('snapshot'),
+      volume: gettext('volume')
     };
 
     /*
@@ -160,6 +163,25 @@
       ctrl.validateFlavor();
     });
 
+    var cinderLimitsWatcher = $scope.$watch(function () {
+      return launchInstanceModel.cinderLimits;
+    }, function (newValue, oldValue, scope) {
+      var ctrl = scope.selectFlavorCtrl;
+      ctrl.cinderLimits = newValue;
+      ctrl.updateFlavorFacades();
+    }, true);
+
+    var volumeSizeWatcher = $scope.$watchCollection(function () {
+      return [launchInstanceModel.newInstanceSpec.source_type,
+        launchInstanceModel.newInstanceSpec.vol_size,
+        launchInstanceModel.newInstanceSpec.vol_create];
+    }, function (newValue, oldValue) {
+      if (!angular.equals(newValue, oldValue)) {
+        ctrl.updateFlavorFacades();
+        ctrl.validateFlavor();
+      }
+    });
+
     //
     $scope.$on('$destroy', function() {
       novaLimitsWatcher();
@@ -167,6 +189,8 @@
       instanceCountWatcher();
       facadesWatcher();
       sourceWatcher();
+      cinderLimitsWatcher();
+      volumeSizeWatcher();
     });
 
     //////////
@@ -240,6 +264,7 @@
        */
       for (var i = 0; i < ctrl.availableFlavorFacades.length; i++) {
         var facade = ctrl.availableFlavorFacades[i];
+        var createVolume = launchInstanceModel.newInstanceSpec.vol_create;
 
         facade.instancesChartData = instancesChartData;
 
@@ -253,7 +278,27 @@
           ctrl.chartTotalRamLabel,
           ctrl.instanceCount * facade.ram,
           launchInstanceModel.novaLimits.totalRAMUsed,
-          launchInstanceModel.novaLimits.maxTotalRAMSize);
+          launchInstanceModel.novaLimits.maxTotalRAMSize,
+          "MB"
+        );
+
+        if (launchInstanceModel.cinderLimits) {
+          facade.volumeChartData = ctrl.getChartData(
+            ctrl.chartTotalVolumeLabel,
+            createVolume ? ctrl.instanceCount : 0,
+            launchInstanceModel.cinderLimits.totalVolumesUsed,
+            launchInstanceModel.cinderLimits.maxTotalVolumes
+          );
+
+          facade.volumeStorageChartData = ctrl.getChartData(
+            ctrl.chartTotalVolumeStorageLabel,
+            createVolume ? (ctrl.instanceCount * Math.max(facade.totalDisk,
+                launchInstanceModel.newInstanceSpec.vol_size)) : 0,
+            launchInstanceModel.cinderLimits.totalGigabytesUsed,
+            launchInstanceModel.cinderLimits.maxTotalVolumeGigabytes,
+            "GiB"
+          );
+        }
 
         var errors = ctrl.getErrors(facade.flavor);
         facade.errors = errors;
@@ -261,7 +306,7 @@
       }
     }
 
-    function getChartData(title, added, totalUsed, maxAllowed) {
+    function getChartData(title, added, totalUsed, maxAllowed, unit) {
 
       var used = ctrl.defaultIfUndefined(totalUsed, 0);
       var allowed = ctrl.defaultIfUndefined(maxAllowed, 1);
@@ -288,7 +333,8 @@
         maxLimit: allowed,
         label: quotaCalc + '%',
         overMax: overMax,
-        data:  [usageData, addedData, remainingData]
+        data: [usageData, addedData, remainingData],
+        unit: unit
       };
 
       return chartData;
@@ -329,8 +375,19 @@
       // Check source minimum requirements against this flavor
       var sourceType = launchInstanceModel.newInstanceSpec.source_type;
       if (source && sourceType &&
-        (sourceType.type === 'image' || sourceType.type === 'snapshot')) {
-        if (source.min_disk > 0 && source.min_disk > flavor.disk) {
+         (sourceType.type === 'image' ||
+          sourceType.type === 'snapshot' ||
+          sourceType.type === 'volume')) {
+
+        /* If sourceType is volume and has image metadata the min_disk and min_ram
+        values are no longer source.min_ but source.volume_image_metadata.min_. */
+        if (sourceType.type === 'volume' && source.volume_image_metadata) {
+          source.min_disk = source.volume_image_metadata.min_disk;
+          source.min_ram = source.volume_image_metadata.min_ram;
+        }
+        /* Error if min_disk is greater than 0 (if min_disk == 0 it is variable and valid)
+        and min_disk is then greater than the flavor to be selected. */
+        if (source.min_disk > 0 && flavor.disk > 0 && source.min_disk > flavor.disk) {
           /*eslint-disable max-len */
           var srcMinDiskMsg = gettext('The selected %(sourceType)s source requires a flavor with at least %(minDisk)s GB of root disk. Select a flavor with a larger root disk or use a different %(sourceType)s source.');
           /*eslint-enable max-len */

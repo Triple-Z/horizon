@@ -50,7 +50,7 @@
 
         scope.model = {
           allowedBootSources: [{type: 'image', label: 'Image'}],
-          newInstanceSpec: { source: [], source_type: '' },
+          newInstanceSpec: { source: [], source_type: '', create_volume_default: true },
           images: [ { id: 'image-1' }, { id: 'image-2' } ],
           imageSnapshots: [ { id: 'imageSnapshot-1' } ],
           volumes: [ { id: 'volume-1' }, { id: 'volume-2' } ],
@@ -289,6 +289,20 @@
 
             scope.$apply();
             expect(scope.$broadcast).toHaveBeenCalled();
+          });
+          it('should not flush selection if boot source still the same', function() {
+            ctrl.currentBootSource = 'image';
+            ctrl.selection = ['test_selection'];
+            ctrl.updateBootSourceSelection('image');
+            scope.$apply();
+            expect(ctrl.selection).toEqual(['test_selection']);
+          });
+          it('should flush selection on new boot source', function() {
+            ctrl.currentBootSource = 'image';
+            ctrl.selection = ['test_selection'];
+            ctrl.updateBootSourceSelection('volume');
+            scope.$apply();
+            expect(ctrl.selection).toEqual([]);
           });
         });
 

@@ -4,9 +4,9 @@
 # Stanislav Ulrych <stanislav.ulrych@ultimum.io>, 2016. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: horizon 12.0.0.0b2.dev53\n"
+"Project-Id-Version: horizon VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2017-04-27 23:09+0000\n"
+"POT-Creation-Date: 2018-02-01 07:30+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -91,44 +91,6 @@ msgstr ""
 "Můžete zadat, zda svazek smazat při mazání instance. <em>Poznámka: při volbě "
 "svazku můžete spustit pouze jednu instanci.</em>"
 
-msgid ""
-"<button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>\n"
-"          <strong>Heads up!</strong>\n"
-"           This\n"
-"          <a href=\"#\" class=\"alert-link\">alert needs your attention</"
-"a>,\n"
-"           but it's not super important."
-msgstr ""
-"<button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>\n"
-"          <strong>Pozor!</strong>\n"
-"          Tato\n"
-"          <a href=\"#\" class=\"alert-link\">výstraha si žádá vaši "
-"pozornost</a>,\n"
-"          ale není zas tak důležitá."
-
-msgid ""
-"<button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>\n"
-"          <strong>Oh snap!</strong>\n"
-"          <a href=\"#\" class=\"alert-link\">Change a few things up</a>\n"
-"          and try submitting again."
-msgstr ""
-"<button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>\n"
-"          <strong>Jejda!</strong>\n"
-"          <a href=\"#\" class=\"alert-link\">Zkuste pár věcí změnit</a>\n"
-"          a formulář znovu odeslat."
-
-msgid ""
-"<button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>\n"
-"          <strong>Well done!</strong>\n"
-"          You successfully read\n"
-"          <a href=\"#\" class=\"alert-link\">this important alert message</"
-"a>."
-msgstr ""
-"<button type=\"button\" class=\"close\" data-dismiss=\"alert\"></button>\n"
-"          <strong>Výborně!</strong>\n"
-"          Úspěšně jste přečetli\n"
-"          <a href=\"#\" class=\"alert-link\">tuto důležitou výstrahu</a>."
-
 msgid "<small>This line of text is meant to be treated as fine print.</small>"
 msgstr "<small>Tento text má být vypsán drobným písmem.</small>"
 
@@ -165,13 +127,6 @@ msgstr ""
 "Klíč Vám umožňuje se připojit pomocí SSH do vaší nově vytvořené instance.\n"
 "    Zde můžete vybrat existující klíč, importovat ho nebo vytvořit zcela "
 "nový."
-
-msgid ""
-"A key pair named '{$ctrl.createdKeypair.name$}' was successfully created. "
-"This key pair should automatically download."
-msgstr ""
-"Klíč '{$ctrl.createdKeypair.name$}' byl úspěšně vytvořen. Klíč by se měl "
-"stáhnout automaticky."
 
 msgid "A local file should be selected."
 msgstr "Musíte vybrat lokální soubor."
@@ -863,9 +818,6 @@ msgstr ""
 "pak budete mít k ní velmi omezený přístup po jejím spuštění. Takto budete "
 "mít k instanci přístup pouze pomocí konzole VNC."
 
-msgid "If not, you can manually download this keypair at the following link:"
-msgstr "Pokud ne, stáhněte klíč kliknutím na následující odkaz:"
-
 msgid "If set to 'Yes' then the image cannot be deleted."
 msgstr "Pokud zadáno 'Ano', pak image nemůže být smazán."
 
@@ -1005,13 +957,6 @@ msgstr "ID kernelu"
 
 msgid "Key Pair"
 msgstr "Klíč"
-
-msgid ""
-"Key Pair Name\n"
-"        <span class=\"hz-icon-required fa fa-asterisk\"></span>"
-msgstr ""
-"Název klíče\n"
-"    <span class=\"hz-icon-required fa fa-asterisk\"></span>"
 
 msgid "Key Pairs"
 msgstr "Klíče"
@@ -1286,9 +1231,6 @@ msgstr ""
 "Poznámka: Oddělovače  ('{$ ctrl.model.DELIMETER $}') jsou povoleny v\n"
 "     názvu složky pro vytvoření hlubokých složek."
 
-msgid "Note: you will not be able to download this later."
-msgstr "Poznámka: toto nebude možné stáhnout později."
-
 msgid "Number"
 msgstr "Číslo"
 
@@ -1483,13 +1425,6 @@ msgstr "Veřejný přístup"
 
 msgid "Public Key"
 msgstr "Veřejný klíč"
-
-msgid ""
-"Public Key\n"
-"        <span class=\"hz-icon-required fa fa-asterisk\"></span>"
-msgstr ""
-"Veřejný klíč\n"
-"    <span class=\"hz-icon-required fa fa-asterisk\"></span>"
 
 msgid "QCOW2"
 msgstr "QCOW2"
@@ -1906,13 +1841,6 @@ msgid "There are no Availability Zones."
 msgstr "Žádné zóny dostupnosti."
 
 msgid ""
-"There are no allowed boot sources.\n"
-"      If you think this is wrong please contact your administrator."
-msgstr ""
-"Nelze získaty zdroje bootování.\n"
-"      Pokud si nejste jistí, kontaktujte vašeho administrátora."
-
-msgid ""
 "There are two ways to generate a key pair. From a Linux system,\n"
 "  generate the key pair with the <samp>ssh-keygen</samp> command:"
 msgstr ""
@@ -2167,10 +2095,6 @@ msgstr "Nelze získat katalog služeb."
 msgid "Unable to fetch the services."
 msgstr "Nelze získat služby."
 
-#, python-format
-msgid "Unable to generate \"%s\". Please try again."
-msgstr "Nelze generovat \"%s\". Prosím zkuste to znovu."
-
 msgid "Unable to get details of the object."
 msgstr "Nelze získat detaily objektu."
 
@@ -2291,9 +2215,6 @@ msgstr "Nelze získat typ."
 msgid "Unable to retrieve the flavors."
 msgstr "Nelze získat typy."
 
-msgid "Unable to retrieve the heat services."
-msgstr "Nelze získat služby heat."
-
 msgid "Unable to retrieve the image custom properties."
 msgstr "Nelze získat přizpůsobené vlastnosti obrazu."
 
@@ -2413,9 +2334,6 @@ msgstr "Nelze aktualizovat obraz."
 msgid "Unable to upload the object."
 msgstr "Nelze nahrát objekt."
 
-msgid "Unable to validate the template."
-msgstr "Nelze ověřit šablonu."
-
 msgid "Unknown"
 msgstr "Neznámý"
 
@@ -2479,6 +2397,12 @@ msgstr "Použít obraz jako zdroj"
 msgid "User"
 msgstr "Uživatel"
 
+msgid "User ID"
+msgstr "ID uživatele"
+
+msgid "User Name"
+msgstr "Uživatelské jméno"
+
 msgid "Users"
 msgstr "Uživatelé"
 
@@ -2539,13 +2463,6 @@ msgstr "Podrobnosti svazku"
 
 msgid "Volume Quota"
 msgstr "Kvóta svazků"
-
-msgid ""
-"Volume Size (GB)\n"
-"            <span class=\"hz-icon-required fa fa-asterisk\"></span>"
-msgstr ""
-"Velikost svazku (GB)\n"
-"      <span class=\"hz-icon-required fa fa-asterisk\"></span>"
 
 msgid "Volume Snapshot"
 msgstr "Snapshot svazku"
@@ -2669,20 +2586,8 @@ msgstr[0] "Vybrali jste \"%s\". Smazaný obraz nelze obnovit."
 msgstr[1] "Vybrali jste \"%s\". Smazané obrazy nelze obnovit."
 msgstr[2] "Vybrali jste \"%s\". Smazané obrazy nelze obnovit."
 
-msgid "error"
-msgid_plural "errors"
-msgstr[0] "chyba"
-msgstr[1] "chyby"
-msgstr[2] "chyb"
-
 msgid "image"
 msgstr "obraz"
-
-msgid "message"
-msgid_plural "messages"
-msgstr[0] "zpráva"
-msgstr[1] "zprávy"
-msgstr[2] "zpráv"
 
 #, python-format
 msgid "resource load failed: %s"
@@ -2691,30 +2596,9 @@ msgstr "Nelze načíst: %s"
 msgid "snapshot"
 msgstr "snapshot"
 
-msgid "submit"
-msgid_plural "submits"
-msgstr[0] "odeslání"
-msgstr[1] "odeslání"
-msgstr[2] "odeslání"
-
-msgid "success"
-msgid_plural "successs"
-msgstr[0] "úšpěch"
-msgstr[1] "úspěchy"
-msgstr[2] "úspěchy"
-
-msgid "title"
-msgid_plural "titles"
-msgstr[0] "název"
-msgstr[1] "názvy"
-msgstr[2] "názvů"
-
 msgid ""
 "{$ ctrl.model.counted.files $} files in\n"
 "      {$ ctrl.model.counted.folders $} folders."
 msgstr ""
 "{$ ctrl.model.counted.files $} soubory v\n"
 "      {$ ctrl.model.counted.folders $} složky."
-
-msgid "{$ row['provider:network_type'] $}"
-msgstr "{$ row['provider:network_type'] $}"

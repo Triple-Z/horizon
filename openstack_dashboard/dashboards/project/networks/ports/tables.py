@@ -14,17 +14,18 @@
 
 import logging
 
-from django.core.urlresolvers import reverse
 from django import template
+from django.urls import reverse
+from django.utils.http import urlencode
 from django.utils.translation import pgettext_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ungettext_lazy
 
-from horizon import exceptions
 from horizon import tables
 
 from openstack_dashboard import api
 from openstack_dashboard import policy
+from openstack_dashboard.usage import quotas
 
 LOG = logging.getLogger(__name__)
 
@@ -54,7 +55,10 @@ class UpdatePort(policy.PolicyTargetMixin, tables.LinkAction):
 
     def get_link_url(self, port):
         network_id = self.table.kwargs['network_id']
-        return reverse(self.url, args=(network_id, port.id))
+        base_url = reverse(self.url, args=(network_id, port.id))
+        params = {'step': 'update_info'}
+        param = urlencode(params)
+        return '?'.join([base_url, param])
 
 
 DISPLAY_CHOICES = (
@@ -82,6 +86,23 @@ class CreatePort(tables.LinkAction):
         network_id = self.table.kwargs['network_id']
         return reverse(self.url, args=(network_id,))
 
+    def allowed(self, request, datum=None):
+        usages = quotas.tenant_quota_usages(request, targets=('port', ))
+        # when Settings.OPENSTACK_NEUTRON_NETWORK['enable_quotas'] = False
+        # usages["port"] is empty
+        if usages.get('port', {}).get('available', 1) <= 0:
+            if "disabled" not in self.classes:
+                self.classes = [c for c in self.classes] + ["disabled"]
+                self.verbose_name = _("Create Port (Quota exceeded)")
+        else:
+            # If the port is deleted, the usage of port will less than
+            # the quota again, so we need to redefine the status of the
+            # button.
+            self.verbose_name = _("Create Port")
+            self.classes = [c for c in self.classes if c != "disabled"]
+
+        return True
+
 
 class DeletePort(policy.PolicyTargetMixin, tables.DeleteAction):
     @staticmethod
@@ -103,17 +124,15 @@ class DeletePort(policy.PolicyTargetMixin, tables.DeleteAction):
     policy_rules = (("network", "delete_port"),)
 
     def delete(self, request, port_id):
-        failure_url = "horizon:project:networks:detail"
         try:
             api.neutron.port_delete(request, port_id)
         except Exception as e:
             LOG.info('Failed to delete port %(id)s: %(exc)s',
                      {'id': port_id, 'exc': e})
-            msg = _('Failed to delete port %s') % port_id
-            network_id = self.table.kwargs['network_id']
-            redirect = reverse(failure_url,
-                               args=[network_id])
-            exceptions.handle(request, msg, redirect=redirect)
+            # NOTE: No exception handling is required here because
+            # BatchAction.handle() does it. What we need to do is
+            # just to re-raise the exception.
+            raise
 
 
 class PortsTable(tables.DataTable):

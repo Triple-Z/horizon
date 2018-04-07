@@ -16,9 +16,9 @@
 # Ilya Alekseyev <ilyaalekseyev@acm.org>, 2017. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: horizon 12.0.0.0b2.dev53\n"
+"Project-Id-Version: horizon VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2017-04-27 23:09+0000\n"
+"POT-Creation-Date: 2018-02-01 07:30+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -109,45 +109,6 @@ msgstr ""
 "выбрать удаление тома при завершении работы инстанса. <em>Примечание: опция "
 "Том позволяет запустить только один инстанс.</em>"
 
-msgid ""
-"<button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>\n"
-"          <strong>Heads up!</strong>\n"
-"           This\n"
-"          <a href=\"#\" class=\"alert-link\">alert needs your attention</"
-"a>,\n"
-"           but it's not super important."
-msgstr ""
-"<button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>\n"
-"          <strong>Внимание!</strong>\n"
-"           Это\n"
-"          <a href=\"#\" class=\"alert-link\">уведомление требует "
-"вмешательства</a>,\n"
-"          но это не очень важно."
-
-msgid ""
-"<button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>\n"
-"          <strong>Oh snap!</strong>\n"
-"          <a href=\"#\" class=\"alert-link\">Change a few things up</a>\n"
-"          and try submitting again."
-msgstr ""
-"<button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>\n"
-"          <strong>Ошибка!</strong>\n"
-"          <a href=\"#\" class=\"alert-link\">Исправьте кое-что</a>\n"
-"          и повторите попытку."
-
-msgid ""
-"<button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>\n"
-"          <strong>Well done!</strong>\n"
-"          You successfully read\n"
-"          <a href=\"#\" class=\"alert-link\">this important alert message</"
-"a>."
-msgstr ""
-"<button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>\n"
-"          <strong>Отлично!</strong>\n"
-"          Вы успешно прочли\n"
-"          <a href=\"#\" class=\"alert-link\">это важное тревожное сообщение</"
-"a>."
-
 msgid "<small>This line of text is meant to be treated as fine print.</small>"
 msgstr ""
 "<small>Это строка текста предназначена для демонстрации мелкого шрифта</"
@@ -220,13 +181,6 @@ msgstr ""
 "Пара ключей позволяет войти в новый экземпляр по SSH.\n"
 "    Можно выбрать существующую пару ключей, импортировать пару ключей или "
 "сгенерировать её."
-
-msgid ""
-"A key pair named '{$ctrl.createdKeypair.name$}' was successfully created. "
-"This key pair should automatically download."
-msgstr ""
-"Пара ключей с именем '{$ctrl.createdKeypair.name$}' создана успешно. Она "
-"будет загружена автоматически."
 
 msgid "A local file should be selected."
 msgstr "Необходимо выбрать локальный файл."
@@ -1012,9 +966,6 @@ msgstr ""
 "будет сильно ограниченный доступ к нему после развёртывания. Фактически, "
 "доступ будет только через VNC консоль."
 
-msgid "If not, you can manually download this keypair at the following link:"
-msgstr "Если нет - вы можете скачать этот ключ вручную по следующей ссылке:"
-
 msgid "If set to 'Yes' then the image cannot be deleted."
 msgstr "Если установлено на \"Да\", то данный образ не может быть удален."
 
@@ -1176,13 +1127,6 @@ msgstr "ИД ядра"
 
 msgid "Key Pair"
 msgstr "Ключевая пара"
-
-msgid ""
-"Key Pair Name\n"
-"        <span class=\"hz-icon-required fa fa-asterisk\"></span>"
-msgstr ""
-"Имя пары ключей\n"
-"        <span class=\"hz-icon-required fa fa-asterisk\"></span>"
 
 msgid "Key Pairs"
 msgstr "Пары ключей"
@@ -1479,9 +1423,6 @@ msgstr ""
 "Примечание: символы разделителя ('{$ ctrl.model.DELIMETER $}') в имени \n"
 "          папки позволяют создавать многоуровневую структуру папок."
 
-msgid "Note: you will not be able to download this later."
-msgstr "Внимание: позднее загрузка будет недоступна."
-
 msgid "Number"
 msgstr "Число"
 
@@ -1706,13 +1647,6 @@ msgstr "Открытый доступ"
 
 msgid "Public Key"
 msgstr "Открытый ключ"
-
-msgid ""
-"Public Key\n"
-"        <span class=\"hz-icon-required fa fa-asterisk\"></span>"
-msgstr ""
-"Открытый ключ\n"
-"        <span class=\"hz-icon-required fa fa-asterisk\"></span>"
 
 msgid "QCOW2"
 msgstr "QCOW2"
@@ -2184,13 +2118,6 @@ msgid "There are no Availability Zones."
 msgstr "Нет Зон Доступности."
 
 msgid ""
-"There are no allowed boot sources.\n"
-"      If you think this is wrong please contact your administrator."
-msgstr ""
-"Разрешенного источника загрузки не существует.\n"
-"     Если это не так,  пожалуйста, свяжитесь с вашим администратором."
-
-msgid ""
 "There are two ways to generate a key pair. From a Linux system,\n"
 "  generate the key pair with the <samp>ssh-keygen</samp> command:"
 msgstr ""
@@ -2448,10 +2375,6 @@ msgstr "Не удалось получить каталог служб."
 msgid "Unable to fetch the services."
 msgstr "Не удалось получить сервисы."
 
-#, python-format
-msgid "Unable to generate \"%s\". Please try again."
-msgstr "Не удалось сгенерировать \"%s\". Повторите попытку позже."
-
 msgid "Unable to get details of the object."
 msgstr "Не удаётся получить сведения об объекте."
 
@@ -2572,9 +2495,6 @@ msgstr "Невозможно получить тип инстанса."
 msgid "Unable to retrieve the flavors."
 msgstr "Невозможно получить типы инстансов."
 
-msgid "Unable to retrieve the heat services."
-msgstr "Не удалось получить сервисы heat."
-
 msgid "Unable to retrieve the image custom properties."
 msgstr "Не удалось получить расширенные свойства образа."
 
@@ -2694,9 +2614,6 @@ msgstr "Не удалось обновить образ."
 msgid "Unable to upload the object."
 msgstr "Не удаётся загрузить объект."
 
-msgid "Unable to validate the template."
-msgstr "Невозможно проверить шаблон."
-
 msgid "Unknown"
 msgstr "Неизвестно"
 
@@ -2766,6 +2683,12 @@ msgstr "Использовать образ как источник"
 msgid "User"
 msgstr "Пользователь"
 
+msgid "User ID"
+msgstr "ID пользователя"
+
+msgid "User Name"
+msgstr "Имя пользователя"
+
 msgid "Users"
 msgstr "Пользователи"
 
@@ -2832,13 +2755,6 @@ msgstr "Сведения о томе"
 
 msgid "Volume Quota"
 msgstr "Квота тома"
-
-msgid ""
-"Volume Size (GB)\n"
-"            <span class=\"hz-icon-required fa fa-asterisk\"></span>"
-msgstr ""
-"Размер раздела (Гб)\n"
-"            <span class=\"hz-icon-required fa fa-asterisk\"></span>"
 
 msgid "Volume Snapshot"
 msgstr "Снимок диска"
@@ -2977,20 +2893,8 @@ msgstr[0] "Выбрано образов: \"%s\". Восстановить уд�
 msgstr[1] "Выбрано образов: \"%s\". Восстановить удаленные образы невозможно."
 msgstr[2] "Выбрано образов: \"%s\". Восстановить удаленные образы невозможно."
 
-msgid "error"
-msgid_plural "errors"
-msgstr[0] "ошибка"
-msgstr[1] "ошибки"
-msgstr[2] "ошибок"
-
 msgid "image"
 msgstr "изображение"
-
-msgid "message"
-msgid_plural "messages"
-msgstr[0] "сообщение"
-msgstr[1] "сообщения"
-msgstr[2] "сообщений"
 
 #, python-format
 msgid "resource load failed: %s"
@@ -2999,30 +2903,9 @@ msgstr "загрузка ресурса не удалась: %s"
 msgid "snapshot"
 msgstr "моментальная копия"
 
-msgid "submit"
-msgid_plural "submits"
-msgstr[0] "отправка"
-msgstr[1] "отправки"
-msgstr[2] "отправки"
-
-msgid "success"
-msgid_plural "successs"
-msgstr[0] "успешный"
-msgstr[1] "успешные"
-msgstr[2] "успешные"
-
-msgid "title"
-msgid_plural "titles"
-msgstr[0] "заголовок"
-msgstr[1] "заголовки"
-msgstr[2] "заголовки"
-
 msgid ""
 "{$ ctrl.model.counted.files $} files in\n"
 "      {$ ctrl.model.counted.folders $} folders."
 msgstr ""
 "{$ ctrl.model.counted.files $} файлов в\n"
 "      {$ ctrl.model.counted.folders $} папках."
-
-msgid "{$ row['provider:network_type'] $}"
-msgstr "{$ row['provider:network_type'] $}"

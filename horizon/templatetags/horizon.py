@@ -15,7 +15,6 @@
 from __future__ import absolute_import
 
 from collections import OrderedDict
-from horizon.contrib import bootstrap_datepicker
 
 from django.conf import settings
 from django import template
@@ -26,6 +25,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from horizon.base import Horizon
 from horizon import conf
+from horizon.contrib import bootstrap_datepicker
 
 
 register = template.Library()
@@ -43,9 +43,7 @@ class MinifiedNode(Node):
 
 @register.filter
 def has_permissions(user, component):
-    """Checks if the given user meets the permissions requirements for
-    the component.
-    """
+    """Checks if the given user meets the permissions requirements."""
     return user.has_perms(getattr(component, 'permissions', set()))
 
 
@@ -188,7 +186,9 @@ class JSTemplateNode(template.Node):
 
 @register.tag
 def jstemplate(parser, token):
-    """Replaces ``[[[`` and ``]]]`` with ``{{{`` and ``}}}``,
+    """Templatetag to handle any of the Mustache-based templates.
+
+    Replaces ``[[[`` and ``]]]`` with ``{{{`` and ``}}}``,
     ``[[`` and ``]]`` with ``{{`` and ``}}``  and
     ``[%`` and ``%]`` with ``{%`` and ``%}`` to avoid conflicts
     with Django's template engine when using any of the Mustache-based
@@ -199,19 +199,19 @@ def jstemplate(parser, token):
     return JSTemplateNode(nodelist)
 
 
-@register.assignment_tag
+@register.simple_tag
 def load_config():
     return conf
 
 
-@register.assignment_tag
+@register.simple_tag
 def datepicker_locale():
     locale_mapping = getattr(settings, 'DATEPICKER_LOCALES',
                              bootstrap_datepicker.LOCALE_MAPPING)
     return locale_mapping.get(translation.get_language(), 'en')
 
 
-@register.assignment_tag
+@register.simple_tag
 def template_cache_age():
     return getattr(settings, 'NG_TEMPLATE_CACHE_AGE', 0)
 

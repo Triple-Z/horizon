@@ -66,7 +66,11 @@
      * view.
      */
     function getDetailsPath(item) {
-      return detailRoute + 'OS::Glance::Image/' + item.id;
+      var detailsPath = detailRoute + 'OS::Glance::Image/' + item.id;
+      if ($location.url() === '/admin/images') {
+        detailsPath = detailsPath + "?nav=/admin/images/";
+      }
+      return detailsPath;
     }
 
     /*
@@ -81,7 +85,8 @@
       if (null !== item &&
         angular.isDefined(item) &&
         angular.isDefined(item.properties) &&
-        item.properties.image_type === 'snapshot') {
+        (item.properties.image_type === 'snapshot' ||
+          angular.isDefined(item.properties.block_device_mapping))) {
         return gettext('Snapshot');
       } else {
         return gettext('Image');
@@ -131,6 +136,7 @@
           image.apiVersion = version;
           image.visibility = $filter('imageVisibility')(image, projectId);
           image.name = image.name || image.id;
+          image.type = imageType(image);
           return image;
         }
       }

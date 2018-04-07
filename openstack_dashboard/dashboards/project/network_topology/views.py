@@ -19,9 +19,9 @@
 import json
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
+from django.urls import reverse
+from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import View
 
@@ -30,6 +30,7 @@ from horizon import tabs
 from horizon.utils.lazy_encoder import LazyTranslationEncoder
 
 from openstack_dashboard import api
+from openstack_dashboard.dashboards.project.network_topology import forms
 from openstack_dashboard.dashboards.project.network_topology.instances \
     import tables as instances_tables
 from openstack_dashboard.dashboards.project.network_topology.networks \
@@ -44,8 +45,6 @@ from openstack_dashboard.dashboards.project.network_topology \
     import tabs as topology_tabs
 from openstack_dashboard.dashboards.project.network_topology import utils
 
-from openstack_dashboard.dashboards.project.instances import\
-    console as i_console
 from openstack_dashboard.dashboards.project.instances.tables import \
     STATUS_DISPLAY_CHOICES as instance_choices
 from openstack_dashboard.dashboards.project.instances import\
@@ -76,6 +75,7 @@ from openstack_dashboard.dashboards.project.routers.tables import \
     STATUS_DISPLAY_CHOICES as routers_status_choices
 from openstack_dashboard.dashboards.project.routers import\
     views as r_views
+from openstack_dashboard import policy
 
 # List of known server statuses that wont connect to the console
 console_invalid_status = {
@@ -85,8 +85,10 @@ console_invalid_status = {
 
 
 class TranslationHelper(object):
-    """Helper class to provide the translations of instances, networks,
-    routers and ports from other parts of the code to the network topology
+    """Helper class to provide the translations.
+
+    This allows the network topology to access the translated strings
+    for various resources defined in other parts of the code.
     """
     def __init__(self):
         # turn translation tuples into dicts for easy access
@@ -118,8 +120,9 @@ class NTAddInterfaceView(p_views.AddInterfaceView):
 
 
 class NTCreateRouterView(r_views.CreateView):
-    template_name = 'project/network_topology/create_router.html'
+    form_class = forms.NTCreateRouterForm
     success_url = reverse_lazy("horizon:project:network_topology:index")
+    submit_url = reverse_lazy("horizon:project:network_topology:createrouter")
     page_title = _("Create a Router")
 
 
@@ -247,12 +250,8 @@ class JSONView(View):
             # Avoid doing extra calls for console if the server is in
             # a invalid status for console connection
             if server.status.lower() not in console_invalid_status:
-                try:
-                    console = i_console.get_console(
-                        request, console_type, server)[0].lower()
-                    server_data['console'] = console
-                except exceptions.NotAvailable:
-                    pass
+                if console_type:
+                    server_data['console'] = 'auto_console'
 
             data.append(server_data)
         self.add_resource_url('horizon:project:instances:detail', data)
@@ -272,12 +271,19 @@ class JSONView(View):
             neutron_networks = []
         networks = []
         for network in neutron_networks:
+            allow_delete_subnet = policy.check(
+                (("network", "delete_subnet"),),
+                request,
+                target={'network:tenant_id': getattr(network,
+                                                     'tenant_id', None)}
+            )
             obj = {'name': network.name_or_id,
                    'id': network.id,
                    'subnets': [{'id': subnet.id,
                                 'cidr': subnet.cidr}
                                for subnet in network.subnets],
                    'status': self.trans.network[network.status],
+                   'allow_delete_subnet': allow_delete_subnet,
                    'original_status': network.status,
                    'router:external': network['router:external']}
             self.add_resource_url('horizon:project:networks:subnets:detail',
@@ -297,13 +303,11 @@ class JSONView(View):
                 if publicnet.id in my_network_ids:
                     continue
                 try:
-                    subnets = []
-                    for subnet in publicnet.subnets:
-                        snet = {'id': subnet.id,
+                    subnets = [{'id': subnet.id,
                                 'cidr': subnet.cidr}
-                        self.add_resource_url(
-                            'horizon:project:networks:subnets:detail', snet)
-                        subnets.append(snet)
+                               for subnet in publicnet.subnets]
+                    self.add_resource_url(
+                        'horizon:project:networks:subnets:detail', subnets)
                 except Exception:
                     subnets = []
                 networks.append({

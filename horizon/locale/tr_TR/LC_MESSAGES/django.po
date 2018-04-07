@@ -1,36 +1,22 @@
 # Mücahit Büyükyılmaz <mucahit@deltanoc.com>, 2015. #zanata
 # Steve Kowalik <steven@wedontsleep.org>, 2015. #zanata
 # Mücahit Büyükyılmaz <mucahit@deltanoc.com>, 2016. #zanata
-# evgin <evgind@gmail.com>, 2016. #zanata
-# işbaran akçayır <isbaran@gmail.com>, 2017. #zanata
+# Mücahit Büyükyılmaz <mucahit@konya.edu.tr>, 2017. #zanata
+# yasemin demiral <yasemin.demiral@tubitak.gov.tr>, 2017. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: horizon 12.0.0.0b2.dev107\n"
+"Project-Id-Version: horizon VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2017-05-16 16:52+0000\n"
+"POT-Creation-Date: 2018-03-01 14:57+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2017-05-17 08:46+0000\n"
-"Last-Translator: işbaran akçayır <isbaran@gmail.com>\n"
+"PO-Revision-Date: 2017-08-16 11:42+0000\n"
+"Last-Translator: yasemin demiral <yasemin.demiral@tubitak.gov.tr>\n"
 "Language-Team: Turkish (Turkey)\n"
-"Language: tr-TR\n"
-"X-Generator: Zanata 3.9.6\n"
+"Language: tr_TR\n"
+"X-Generator: Zanata 4.3.3\n"
 "Plural-Forms: nplurals=2; plural=(n>1)\n"
-
-#, python-format
-msgid ""
-"\n"
-"            Displaying %(counter)s item"
-msgid_plural ""
-"\n"
-"            Displaying %(counter)s items"
-msgstr[0] ""
-"\n"
-"           %(counter)s öge gösteriliyor"
-msgstr[1] ""
-"\n"
-"         %(counter)s öge gösteriliyor"
 
 #, python-format
 msgid "%(action)s: %(objs)s"
@@ -103,14 +89,6 @@ msgid "0 Bytes"
 msgstr "0 Byte"
 
 #, python-format
-msgid "<label>From:</label> %(start)s"
-msgstr "<label>Başlangıç:</label> %(start)s"
-
-#, python-format
-msgid "<label>To:</label>%(end)s"
-msgstr "<label>Bitiş:</label>%(end)s"
-
-#, python-format
 msgid "A %(resource)s with the name \"%(name)s\" already exists."
 msgstr "\"%(name)s\" isimli bir %(resource)s zaten var."
 
@@ -118,7 +96,7 @@ msgid "Actions"
 msgstr "İşlemler"
 
 msgid "Active Instances:"
-msgstr "Aktif Instancelar:"
+msgstr "Aktif Sanal Makineler:"
 
 msgid "Active RAM:"
 msgstr "Aktif RAM:"
@@ -158,6 +136,12 @@ msgid "Displaying %(content_items)s item"
 msgid_plural "Displaying %(content_items)s items"
 msgstr[0] "%(content_items)s öge görüntüleniyor"
 msgstr[1] "%(content_items)s öge görüntüleniyor"
+
+#, python-format
+msgid "Displaying %(counter)s item"
+msgid_plural "Displaying %(counter)s items"
+msgstr[0] "%(counter)s öge görüntüleniyor"
+msgstr[1] "%(counter)s öge görüntüleniyor"
 
 #, python-format
 msgid "Displaying %(nav_items)s item"
@@ -226,7 +210,7 @@ msgid "Keystone Providers:"
 msgstr "Keystone Sağlayıcıları"
 
 msgid "Limit Summary"
-msgstr "Özeti Sınırla"
+msgstr "Kota Özeti"
 
 msgid "Log in"
 msgstr "Giriş"
@@ -320,7 +304,7 @@ msgid "Select a %s to browse."
 msgstr "Göz atmak için bir %s seçin."
 
 msgid "Select a period of time to query its usage:"
-msgstr "Kullanımı listelemek için zaman aralığı seçin."
+msgstr "Kullanım bilgilerini listelemek için zaman aralığı seçin."
 
 #. Translators: test code, don't really have to translate
 msgid "Sell Puppy"
@@ -353,7 +337,7 @@ msgstr ""
 "değil."
 
 msgid "The date should be in YYYY-MM-DD format."
-msgstr "Tarih YYYY-MM-DD biçiminde olmalı"
+msgstr "Tarih YYYY-AA-GG formatında olmalı."
 
 msgid "The string may only contain ASCII printable characters."
 msgstr "Metin sadece yazdırılabilir ASCII karakterleri içerebilir."
@@ -364,8 +348,8 @@ msgid ""
 "stack from this interface, the value must start with \"http://\" or "
 "\"https://\""
 msgstr ""
-"Bu arayüz üzerinde yeni bir küme başlatırken, template içerisindeki %(name)s "
-"isimli %(resource)s \"http://\" veya \"https://\" ile başlamalıdır."
+"Bu arabirim üzerinde yeni bir küme başlatırken, template içerisindeki "
+"%(name)s isimli %(resource)s \"http://\" veya \"https://\" ile başlamalıdır."
 
 msgid "This Period's GB-Hours:"
 msgstr "Bu periyodda kullanılan GB-Saat"
@@ -415,14 +399,6 @@ msgstr[1] "Başlatılan Öğeler"
 msgid "Usage Summary"
 msgstr "Kullanım Özeti"
 
-#, python-format
-msgid "Used <span> %(used)s </span>(No Limit)"
-msgstr "Kullanılan <span> %(used)s </span>(Sınırsız)"
-
-#, python-format
-msgid "Used <span> %(used)s </span>of<span> %(available)s </span>"
-msgstr "Kullanılan <span> %(used)s </span> / <span> %(available)s </span>"
-
 msgid "Warning: "
 msgstr "Uyarı:"
 
@@ -439,3 +415,6 @@ msgstr "Kaynağa erişim için yetkiniz bulunmuyor:"
 
 msgid "You have selected: [[selection]]. "
 msgstr "Seçiminiz: [[selection]]. "
+
+msgid "to"
+msgstr "-"

@@ -23,20 +23,18 @@
 
   novaAPI.$inject = [
     'horizon.framework.util.http.service',
-    'horizon.framework.widgets.toast.service',
-    '$window'
+    'horizon.framework.widgets.toast.service'
   ];
 
   /**
    * @ngdoc service
    * @param {Object} apiService
    * @param {Object} toastService
-   * @param {Object} $window
    * @name novaApi
    * @description Provides access to Nova APIs.
    * @returns {Object} The service
    */
-  function novaAPI(apiService, toastService, $window) {
+  function novaAPI(apiService, toastService) {
 
     var service = {
       getActionList: getActionList,
@@ -44,14 +42,20 @@
       getConsoleInfo: getConsoleInfo,
       getServerVolumes: getServerVolumes,
       getServerSecurityGroups: getServerSecurityGroups,
+      isFeatureSupported: isFeatureSupported,
       getKeypairs: getKeypairs,
       createKeypair: createKeypair,
+      getKeypair: getKeypair,
+      deleteKeypair: deleteKeypair,
       getAvailabilityZones: getAvailabilityZones,
       getLimits: getLimits,
       createServer: createServer,
       getServer: getServer,
       getServers: getServers,
+      getServerGroup: getServerGroup,
       getServerGroups: getServerGroups,
+      createServerGroup: createServerGroup,
+      deleteServerGroup: deleteServerGroup,
       deleteServer: deleteServer,
       pauseServer: pauseServer,
       unpauseServer: unpauseServer,
@@ -71,8 +75,6 @@
       getServices: getServices,
       getInstanceMetadata: getInstanceMetadata,
       editInstanceMetadata: editInstanceMetadata,
-      getCreateKeypairUrl: getCreateKeypairUrl,
-      getRegenerateKeypairUrl: getRegenerateKeypairUrl,
       createFlavor: createFlavor,
       updateFlavor: updateFlavor,
       deleteFlavor: deleteFlavor,
@@ -86,6 +88,21 @@
     return service;
 
     ///////////
+
+    // Feature
+
+    /**
+     * @name isFeatureSupported
+     * @description
+     * Check if the feature is supported.
+     * @returns {Object} The result of the API call
+     */
+    function isFeatureSupported(feature) {
+      return apiService.get('/api/nova/features/' + feature)
+        .error(function () {
+          toastService.add('error', gettext('Unable to check the Nova service feature.'));
+        });
+    }
 
     // Nova Services
 
@@ -143,6 +160,45 @@
             toastService.add('error', gettext('Unable to create the keypair.'));
           }
         });
+    }
+
+    /**
+     * @name getKeypair
+     * @description
+     * Get a single keypair by name.
+     *
+     * @param {string} name
+     * The name of the keypair. Required.
+     *
+     * @returns {Object} The result of the API call.
+     */
+    function getKeypair(name) {
+      return apiService.get('/api/nova/keypairs/' + name)
+        .error(function () {
+          toastService.add('error', gettext('Unable to retrieve the keypair.'));
+        });
+    }
+
+    /**
+     * @name deleteKeypair
+     * @description
+     * Delete a single keypair by name.
+     *
+     * @param {String} name
+     * Keypair to delete
+     *
+     * @param {boolean} suppressError
+     * If passed in, this will not show the default error handling
+     * (horizon alert).
+     *
+     * @returns {Object} The result of the API call
+     */
+    function deleteKeypair(name, suppressError) {
+      var promise = apiService.delete('/api/nova/keypairs/' + name);
+      return suppressError ? promise : promise.error(function() {
+        var msg = gettext('Unable to delete the keypair with name: %(name)s');
+        toastService.add('error', interpolate(msg, { name: name }, true));
+      });
     }
 
     // Availability Zones
@@ -264,6 +320,21 @@
     }
 
     /**
+     * @name getServerGroup
+     * @description
+     * Get a single server group by ID
+     * @param {string} id
+     * Specifies the id of the server group to request.
+     * @returns {Object} The result of the API call
+     */
+    function getServerGroup(id) {
+      return apiService.get('/api/nova/servergroups/' + id)
+        .error(function () {
+          toastService.add('error', gettext('Unable to retrieve the server group.'));
+        });
+    }
+
+    /**
      * @name getServerGroups
      * @description
      * Get a list of server groups.
@@ -277,6 +348,50 @@
         .error(function () {
           toastService.add('error', gettext('Unable to retrieve server groups.'));
         });
+    }
+
+    /**
+     * @name createServerGroup
+     * @description
+     * Create a new server group. This returns the new server group object on success.
+     *
+     * @param {Object} newServerGroup
+     * The server group to create.
+     *
+     * @param {string} newServerGroup.name
+     * The name of the new server group. Required.
+     *
+     * @param {array} newServerGroup.policies
+     * The policies of the new server group. Required.
+     * @returns {Object} The result of the API call
+     */
+    function createServerGroup(newServerGroup) {
+      return apiService.post('/api/nova/servergroups/', newServerGroup)
+        .error(function () {
+          toastService.add('error', gettext('Unable to create the server group.'));
+        });
+    }
+
+    /**
+     * @name deleteServerGroup
+     * @description
+     * Delete a single server group by ID.
+     *
+     * @param {String} serverGroupId
+     * Server Group to delete
+     *
+     * @param {boolean} suppressError
+     * If passed in, this will not show the default error handling
+     * (horizon alert).
+     *
+     * @returns {Object} The result of the API call
+     */
+    function deleteServerGroup(serverGroupId, suppressError) {
+      var promise = apiService.delete('/api/nova/servergroups/' + serverGroupId + '/');
+      return suppressError ? promise : promise.error(function() {
+        var msg = gettext('Unable to delete the server group with id %(id)s');
+        toastService.add('error', interpolate(msg, { id: serverGroupId }, true));
+      });
     }
 
     /*
@@ -459,13 +574,9 @@
      * The listing result is an object with property "items". Each item is
      * a flavor.
      *
-     * @param {boolean} isPublic (optional)
-     * True if public flavors should be returned. If not specified, the API
-     * will return public flavors by default for Admins and only project
-     * flavors for non-admins.
-     * @param {boolean} getExtras (optional)
-     * Also retrieve the extra specs. This is expensive (one extra underlying
-     * call per flavor).
+     * @param {Object} params (optional)
+     * Parameters that should be passed to the API call. Currently those can
+     * be "is_public" and "get_extras", both of them boolean.
      * @returns {Object} The result of the API call
      */
     function getFlavors(params) {
@@ -745,44 +856,6 @@
         .error(function() {
           toastService.add('error', gettext('Unable to update project quota data.'));
         });
-    }
-
-    /**
-     * @ngdoc function
-     * @name getCreateKeypairUrl
-     *
-     * @description
-     * Returns a URL, respecting WEBROOT, that if called as a REST call
-     * would create and return a new key pair with the given name.  This
-     * function is provided because to perform a download of the key pair,
-     * an iframe must be given a URL to use (which is further explained in
-     * the key pair download service).
-     *
-     * @param {string} keyPairName
-     * @returns {Object} The result of the API call
-     */
-    function getCreateKeypairUrl(keyPairName) {
-      // NOTE: WEBROOT by definition must end with a slash (local_settings.py).
-      return $window.WEBROOT + "api/nova/keypairs/" +
-        encodeURIComponent(keyPairName) + "/";
-    }
-
-    /**
-     * @ngdoc function
-     * @name getRegenerateKeypairUrl
-     *
-     * @description
-     * Returns a URL, respecting WEBROOT, that if called as a REST call
-     * would regenereate an existing key pair with the given name and return
-     * the new key pair data.  This function is provided because to perform
-     * a download of the key pair, an iframe must be given a URL to use
-     * (which is further explained in the key pair download service).
-     *
-     * @param {string} keyPairName
-     * @returns {Object} The result of the API call
-     */
-    function getRegenerateKeypairUrl(keyPairName) {
-      return getCreateKeypairUrl(keyPairName) + "?regenerate=true";
     }
 
     /**

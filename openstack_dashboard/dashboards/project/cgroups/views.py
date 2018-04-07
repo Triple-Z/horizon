@@ -10,8 +10,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from django.core.urlresolvers import reverse
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse
+from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
 from horizon import exceptions
@@ -205,7 +205,7 @@ class CreateSnapshotView(forms.ModalFormView):
             num_volumes = len(volumes)
             usages = quotas.tenant_limit_usages(self.request)
 
-            if usages['snapshotsUsed'] + num_volumes > \
+            if usages['totalSnapshotsUsed'] + num_volumes > \
                     usages['maxTotalSnapshots']:
                 raise ValueError(_('Unable to create snapshots due to '
                                    'exceeding snapshot quota limit.'))
@@ -249,7 +249,7 @@ class CloneCGroupView(forms.ModalFormView):
             num_volumes = len(volumes)
             usages = quotas.tenant_limit_usages(self.request)
 
-            if usages['volumesUsed'] + num_volumes > \
+            if usages['totalVolumesUsed'] + num_volumes > \
                     usages['maxTotalVolumes']:
                 raise ValueError(_('Unable to create consistency group due to '
                                    'exceeding volume quota limit.'))

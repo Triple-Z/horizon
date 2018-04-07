@@ -22,27 +22,27 @@ the classes contained therein.
 
 import collections
 import copy
+from importlib import import_module
 import inspect
 import logging
 import os
 
-import django
 from django.conf import settings
 from django.conf.urls import include
 from django.conf.urls import url
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.functional import empty
 from django.utils.functional import SimpleLazyObject
 from django.utils.module_loading import module_has_submodule
 from django.utils.translation import ugettext_lazy as _
-from importlib import import_module
 import six
 
 from horizon import conf
 from horizon.decorators import _current_component
 from horizon.decorators import require_auth
+from horizon.decorators import require_component_access
 from horizon.decorators import require_perms
 from horizon import loaders
 from horizon.utils import settings as utils_settings
@@ -57,12 +57,7 @@ def _decorate_urlconf(urlpatterns, decorator, *args, **kwargs):
     for pattern in urlpatterns:
         if getattr(pattern, 'callback', None):
             decorated = decorator(pattern.callback, *args, **kwargs)
-            if django.VERSION >= (1, 10):
-                pattern.callback = decorated
-            else:
-                # prior to 1.10 callback was a property and we had
-                # to modify the private attribute behind the property
-                pattern._callback = decorated
+            pattern.callback = decorated
         if getattr(pattern, 'url_patterns', []):
             _decorate_urlconf(pattern.url_patterns, decorator, *args, **kwargs)
 
@@ -86,6 +81,24 @@ def access_cached(func):
             session.modified = True
         return session['allowed'][key]
     return inner
+
+
+def _wrapped_include(arg):
+    """Convert the old 3-tuple arg for include() into the new format.
+
+    The argument "arg" should be a tuple with 3 elements:
+    (pattern_list, app_namespace, instance_namespace)
+
+    Prior to Django 2.0, django.urls.conf.include() accepts 3-tuple arg
+    (urlconf, namespace, app_name), but it was droppped in Django 2.0.
+    This function is used to convert the older 3-tuple used in horizon code
+    into the new format where namespace needs to be passed as the second arg.
+
+    For more details, see
+    https://docs.djangoproject.com/en/2.0/releases/1.9/#passing-a-3-tuple-or-an-app-name-to-include
+    """
+    pattern_list, app_namespace, instance_namespace = arg
+    return include((pattern_list, app_namespace), namespace=instance_namespace)
 
 
 class NotRegistered(Exception):
@@ -320,6 +333,8 @@ class Panel(HorizonComponent):
         # Apply access controls to all views in the patterns
         permissions = getattr(self, 'permissions', [])
         _decorate_urlconf(urlpatterns, require_perms, permissions)
+        _decorate_urlconf(
+            urlpatterns, require_component_access, component=self)
         _decorate_urlconf(urlpatterns, _current_component, panel=self)
 
         # Return the three arguments to django.conf.urls.include
@@ -471,14 +486,13 @@ class Dashboard(Registry, HorizonComponent):
         self._panel_groups = None
 
     def get_panel(self, panel):
-        """Returns the specified :class:`~horizon.Panel` instance registered
-        with this dashboard.
-        """
+        """Returns the Panel instance registered with this dashboard."""
         return self._registered(panel)
 
     def get_panels(self):
-        """Returns the :class:`~horizon.Panel` instances registered with this
-        dashboard in order, without any panel groupings.
+        """Returns the Panel instances registered with this dashboard in order.
+
+        Panel grouping information is not included.
         """
         all_panels = []
         panel_groups = self.get_panel_groups()
@@ -487,8 +501,9 @@ class Dashboard(Registry, HorizonComponent):
         return all_panels
 
     def get_panel_group(self, slug):
-        """Returns the specified :class:~horizon.PanelGroup
-        or None if not registered
+        """Returns the specified :class:~horizon.PanelGroup.
+
+        Returns None if not registered.
         """
         return self._panel_groups.get(slug)
 
@@ -541,12 +556,13 @@ class Dashboard(Registry, HorizonComponent):
                 continue
             url_slug = panel.slug.replace('.', '/')
             urlpatterns.append(url(r'^%s/' % url_slug,
-                                   include(panel._decorated_urls)))
+                                   _wrapped_include(panel._decorated_urls)))
         # Now the default view, which should come last
         if not default_panel:
             raise NotRegistered('The default panel "%s" is not registered.'
                                 % self.default_panel)
-        urlpatterns.append(url(r'', include(default_panel._decorated_urls)))
+        urlpatterns.append(
+            url(r'', _wrapped_include(default_panel._decorated_urls)))
 
         # Require login if not public.
         if not self.public:
@@ -864,7 +880,7 @@ class Site(Registry, HorizonComponent):
         # Compile the dynamic urlconf.
         for dash in self._registry.values():
             urlpatterns.append(url(r'^%s/' % dash.slug,
-                                   include(dash._decorated_urls)))
+                                   _wrapped_include(dash._decorated_urls)))
 
         # Return the three arguments to django.conf.urls.include
         return urlpatterns, self.namespace, self.slug
@@ -946,8 +962,9 @@ class Site(Registry, HorizonComponent):
                 mod_path, panel_cls = panel_path.rsplit(".", 1)
                 try:
                     mod = import_module(mod_path)
-                except ImportError:
-                    LOG.warning("Could not load panel: %s", mod_path)
+                except ImportError as e:
+                    LOG.warning("Could not import panel module %(module)s: "
+                                "%(exc)s", {'module': mod_path, 'exc': e})
                     return
                 panel = getattr(mod, panel_cls)
                 # test is can_register method is present and call method if
@@ -1006,8 +1023,10 @@ class Site(Registry, HorizonComponent):
 
 
 class HorizonSite(Site):
-    """A singleton implementation of Site such that all dealings with horizon
-    get the same instance no matter what. There can be only one.
+    """A singleton implementation of Site.
+
+    All dealings with horizon get the same instance no matter what.
+    There can be only one.
     """
     _instance = None
 

@@ -17,11 +17,10 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from django.core.urlresolvers import reverse
-from django import http
+from django.urls import reverse
 from django.utils.http import urlencode
 
-from mox3.mox import IsA
+import mock
 import six
 
 from openstack_dashboard import api
@@ -37,14 +36,13 @@ NAMESPACE = "horizon:project:floating_ips"
 
 class FloatingIpViewTests(test.TestCase):
 
-    @test.create_stubs({api.network: ('floating_ip_target_list',
-                                      'tenant_floating_ip_list',)})
+    @test.create_mocks({api.neutron: ('floating_ip_target_list',
+                                      'tenant_floating_ip_list')})
     def test_associate(self):
-        api.network.floating_ip_target_list(IsA(http.HttpRequest)) \
-            .AndReturn(self._get_fip_targets())
-        api.network.tenant_floating_ip_list(IsA(http.HttpRequest)) \
-            .AndReturn(self.floating_ips.list())
-        self.mox.ReplayAll()
+        self.mock_floating_ip_target_list.return_value = \
+            self._get_fip_targets()
+        self.mock_tenant_floating_ip_list.return_value = \
+            self.floating_ips.list()
 
         url = reverse('%s:associate' % NAMESPACE)
         res = self.client.get(url)
@@ -54,20 +52,19 @@ class FloatingIpViewTests(test.TestCase):
         # Verify that our "associated" floating IP isn't in the choices list.
         self.assertNotIn(self.floating_ips.first(), choices)
 
-    @test.create_stubs({api.network: ('floating_ip_target_list',
-                                      'floating_ip_target_get_by_instance',
-                                      'tenant_floating_ip_list',)})
+        self.mock_floating_ip_target_list.assert_called_once_with(
+            test.IsHttpRequest())
+        self.mock_tenant_floating_ip_list.assert_called_once_with(
+            test.IsHttpRequest())
+
+    @test.create_mocks({api.neutron: ('floating_ip_target_list_by_instance',
+                                      'tenant_floating_ip_list')})
     def test_associate_with_instance_id(self):
         targets = self._get_fip_targets()
         target = targets[0]
-        api.network.floating_ip_target_list(IsA(http.HttpRequest)) \
-            .AndReturn(targets)
-        api.network.floating_ip_target_get_by_instance(
-            IsA(http.HttpRequest), target.instance_id, targets) \
-            .AndReturn(target.id)
-        api.network.tenant_floating_ip_list(IsA(http.HttpRequest)) \
-            .AndReturn(self.floating_ips.list())
-        self.mox.ReplayAll()
+        self.mock_floating_ip_target_list_by_instance.return_value = [target]
+        self.mock_tenant_floating_ip_list.return_value = \
+            self.floating_ips.list()
 
         base_url = reverse('%s:associate' % NAMESPACE)
         params = urlencode({'instance_id': target.instance_id})
@@ -79,6 +76,11 @@ class FloatingIpViewTests(test.TestCase):
         # Verify that our "associated" floating IP isn't in the choices list.
         self.assertNotIn(self.floating_ips.first(), choices)
 
+        self.mock_floating_ip_target_list_by_instance.assert_called_once_with(
+            test.IsHttpRequest(), target.instance_id)
+        self.mock_tenant_floating_ip_list.assert_called_once_with(
+            test.IsHttpRequest())
+
     def _get_compute_ports(self):
         return [p for p in self.ports.list()
                 if not p.device_owner.startswith('network:')]
@@ -88,30 +90,25 @@ class FloatingIpViewTests(test.TestCase):
         targets = []
         for p in self._get_compute_ports():
             for ip in p.fixed_ips:
-                p_data = {'name': '%s: %s' % (server_dict[p.device_id],
-                                              ip['ip_address']),
-                          'id': '%s_%s' % (p.id, ip['ip_address']),
-                          'port_id': p.id,
-                          'instance_id': p.device_id}
-                targets.append(api.neutron.FloatingIpTarget(p_data))
+                targets.append(api.neutron.FloatingIpTarget(
+                    p, ip['ip_address'], server_dict[p.device_id]))
         return targets
 
     @staticmethod
     def _get_target_id(port):
         return '%s_%s' % (port.id, port.fixed_ips[0]['ip_address'])
 
-    @test.create_stubs({api.network: ('floating_ip_target_list',
-                                      'tenant_floating_ip_list',)})
+    @test.create_mocks({api.neutron: ('floating_ip_target_list',
+                                      'tenant_floating_ip_list')})
     def test_associate_with_port_id(self):
         compute_port = self._get_compute_ports()[0]
         associated_fips = [fip.id for fip in self.floating_ips.list()
                            if fip.port_id]
 
-        api.network.floating_ip_target_list(IsA(http.HttpRequest)) \
-            .AndReturn(self._get_fip_targets())
-        api.network.tenant_floating_ip_list(IsA(http.HttpRequest)) \
-            .AndReturn(self.floating_ips.list())
-        self.mox.ReplayAll()
+        self.mock_floating_ip_target_list.return_value = \
+            self._get_fip_targets()
+        self.mock_tenant_floating_ip_list.return_value = \
+            self.floating_ips.list()
 
         base_url = reverse('%s:associate' % NAMESPACE)
         params = urlencode({'port_id': compute_port.id})
@@ -123,23 +120,25 @@ class FloatingIpViewTests(test.TestCase):
         # Verify that our "associated" floating IP isn't in the choices list.
         self.assertFalse(set(associated_fips) & set(choices.keys()))
 
-    @test.create_stubs({api.network: ('floating_ip_associate',
+        self.mock_floating_ip_target_list.assert_called_once_with(
+            test.IsHttpRequest())
+        self.mock_tenant_floating_ip_list.assert_called_once_with(
+            test.IsHttpRequest())
+
+    @test.create_mocks({api.neutron: ('floating_ip_associate',
                                       'floating_ip_target_list',
-                                      'tenant_floating_ip_list',)})
+                                      'tenant_floating_ip_list')})
     def test_associate_post(self):
         floating_ip = [fip for fip in self.floating_ips.list()
                        if not fip.port_id][0]
         compute_port = self._get_compute_ports()[0]
         port_target_id = self._get_target_id(compute_port)
 
-        api.network.tenant_floating_ip_list(IsA(http.HttpRequest)) \
-            .AndReturn(self.floating_ips.list())
-        api.network.floating_ip_target_list(IsA(http.HttpRequest)) \
-            .AndReturn(self._get_fip_targets())
-        api.network.floating_ip_associate(IsA(http.HttpRequest),
-                                          floating_ip.id,
-                                          port_target_id)
-        self.mox.ReplayAll()
+        self.mock_tenant_floating_ip_list.return_value = \
+            self.floating_ips.list()
+        self.mock_floating_ip_target_list.return_value = \
+            self._get_fip_targets()
+        self.mock_floating_ip_associate.return_value = None
 
         form_data = {'instance_id': port_target_id,
                      'ip_id': floating_ip.id}
@@ -147,23 +146,28 @@ class FloatingIpViewTests(test.TestCase):
         res = self.client.post(url, form_data)
         self.assertRedirectsNoFollow(res, INDEX_URL)
 
-    @test.create_stubs({api.network: ('floating_ip_associate',
+        self.mock_tenant_floating_ip_list.assert_called_once_with(
+            test.IsHttpRequest())
+        self.mock_floating_ip_target_list.assert_called_once_with(
+            test.IsHttpRequest())
+        self.mock_floating_ip_associate.assert_called_once_with(
+            test.IsHttpRequest(), floating_ip.id, port_target_id)
+
+    @test.create_mocks({api.neutron: ('floating_ip_associate',
                                       'floating_ip_target_list',
-                                      'tenant_floating_ip_list',)})
+                                      'tenant_floating_ip_list')})
     def test_associate_post_with_redirect(self):
         floating_ip = [fip for fip in self.floating_ips.list()
                        if not fip.port_id][0]
         compute_port = self._get_compute_ports()[0]
         port_target_id = self._get_target_id(compute_port)
 
-        api.network.tenant_floating_ip_list(IsA(http.HttpRequest)) \
-            .AndReturn(self.floating_ips.list())
-        api.network.floating_ip_target_list(IsA(http.HttpRequest)) \
-            .AndReturn(self._get_fip_targets())
-        api.network.floating_ip_associate(IsA(http.HttpRequest),
-                                          floating_ip.id,
-                                          port_target_id)
-        self.mox.ReplayAll()
+        self.mock_tenant_floating_ip_list.return_value = \
+            self.floating_ips.list()
+        self.mock_floating_ip_target_list.return_value = \
+            self._get_fip_targets()
+        self.mock_floating_ip_associate.return_value = None
+
         next = reverse("horizon:project:instances:index")
         form_data = {'instance_id': port_target_id,
                      'next': next,
@@ -172,24 +176,27 @@ class FloatingIpViewTests(test.TestCase):
         res = self.client.post(url, form_data)
         self.assertRedirectsNoFollow(res, next)
 
-    @test.create_stubs({api.network: ('floating_ip_associate',
+        self.mock_tenant_floating_ip_list.assert_called_once_with(
+            test.IsHttpRequest())
+        self.mock_floating_ip_target_list.assert_called_once_with(
+            test.IsHttpRequest())
+        self.mock_floating_ip_associate.assert_called_once_with(
+            test.IsHttpRequest(), floating_ip.id, port_target_id)
+
+    @test.create_mocks({api.neutron: ('floating_ip_associate',
                                       'floating_ip_target_list',
-                                      'tenant_floating_ip_list',)})
+                                      'tenant_floating_ip_list')})
     def test_associate_post_with_exception(self):
         floating_ip = [fip for fip in self.floating_ips.list()
                        if not fip.port_id][0]
         compute_port = self._get_compute_ports()[0]
         port_target_id = self._get_target_id(compute_port)
 
-        api.network.tenant_floating_ip_list(IsA(http.HttpRequest)) \
-            .AndReturn(self.floating_ips.list())
-        api.network.floating_ip_target_list(IsA(http.HttpRequest)) \
-            .AndReturn(self._get_fip_targets())
-        api.network.floating_ip_associate(IsA(http.HttpRequest),
-                                          floating_ip.id,
-                                          port_target_id) \
-            .AndRaise(self.exceptions.nova)
-        self.mox.ReplayAll()
+        self.mock_tenant_floating_ip_list.return_value = \
+            self.floating_ips.list()
+        self.mock_floating_ip_target_list.return_value = \
+            self._get_fip_targets()
+        self.mock_floating_ip_associate.side_effect = self.exceptions.nova
 
         form_data = {'instance_id': port_target_id,
                      'ip_id': floating_ip.id}
@@ -197,80 +204,79 @@ class FloatingIpViewTests(test.TestCase):
         res = self.client.post(url, form_data)
         self.assertRedirectsNoFollow(res, INDEX_URL)
 
-    @test.create_stubs({api.nova: ('server_list',),
-                        api.network: ('floating_ip_disassociate',
-                                      'tenant_floating_ip_get',
-                                      'tenant_floating_ip_list',),
-                        api.neutron: ('is_extension_supported',)})
+        self.mock_tenant_floating_ip_list.assert_called_once_with(
+            test.IsHttpRequest())
+        self.mock_floating_ip_target_list.assert_called_once_with(
+            test.IsHttpRequest())
+        self.mock_floating_ip_associate.assert_called_once_with(
+            test.IsHttpRequest(), floating_ip.id, port_target_id)
+
+    @test.create_mocks({api.nova: ('server_list',),
+                        api.neutron: ('floating_ip_disassociate',
+                                      'floating_ip_pools_list',
+                                      'tenant_floating_ip_list')})
     def test_disassociate_post(self):
         floating_ip = self.floating_ips.first()
 
-        api.nova.server_list(IsA(http.HttpRequest), detailed=False) \
-            .AndReturn([self.servers.list(), False])
-        api.network.tenant_floating_ip_list(IsA(http.HttpRequest)) \
-            .AndReturn(self.floating_ips.list())
-        api.neutron.is_extension_supported(IsA(http.HttpRequest),
-                                           'subnet_allocation')\
-            .AndReturn(True)
-        api.network.floating_ip_disassociate(IsA(http.HttpRequest),
-                                             floating_ip.id)
-        self.mox.ReplayAll()
+        self.mock_server_list.return_value = [self.servers.list(), False]
+        self.mock_tenant_floating_ip_list.return_value = \
+            self.floating_ips.list()
+        self.mock_floating_ip_pools_list.return_value = self.pools.list()
+        self.mock_floating_ip_disassociate.return_value = None
 
         action = "floating_ips__disassociate__%s" % floating_ip.id
         res = self.client.post(INDEX_URL, {"action": action})
         self.assertMessageCount(success=1)
         self.assertRedirectsNoFollow(res, INDEX_URL)
 
-    @test.create_stubs({api.nova: ('server_list',),
-                        api.network: ('floating_ip_disassociate',
-                                      'tenant_floating_ip_get',
-                                      'tenant_floating_ip_list',),
-                        api.neutron: ('is_extension_supported',)})
+        self.mock_server_list.assert_called_once_with(test.IsHttpRequest(),
+                                                      detailed=False)
+        self.mock_tenant_floating_ip_list.assert_called_once_with(
+            test.IsHttpRequest())
+        self.mock_floating_ip_pools_list.assert_called_once_with(
+            test.IsHttpRequest())
+        self.mock_floating_ip_disassociate.assert_called_once_with(
+            test.IsHttpRequest(), floating_ip.id)
+
+    @test.create_mocks({api.nova: ('server_list',),
+                        api.neutron: ('floating_ip_disassociate',
+                                      'floating_ip_pools_list',
+                                      'tenant_floating_ip_list')})
     def test_disassociate_post_with_exception(self):
         floating_ip = self.floating_ips.first()
 
-        api.nova.server_list(IsA(http.HttpRequest), detailed=False) \
-            .AndReturn([self.servers.list(), False])
-        api.network.tenant_floating_ip_list(IsA(http.HttpRequest)) \
-            .AndReturn(self.floating_ips.list())
-        api.neutron.is_extension_supported(IsA(http.HttpRequest),
-                                           'subnet_allocation')\
-            .AndReturn(True)
-
-        api.network.floating_ip_disassociate(IsA(http.HttpRequest),
-                                             floating_ip.id) \
-            .AndRaise(self.exceptions.nova)
-        self.mox.ReplayAll()
+        self.mock_server_list.return_value = [self.servers.list(), False]
+        self.mock_tenant_floating_ip_list.return_value = \
+            self.floating_ips.list()
+        self.mock_floating_ip_pools_list.return_value = self.pools.list()
+        self.mock_floating_ip_disassociate.side_effect = self.exceptions.nova
 
         action = "floating_ips__disassociate__%s" % floating_ip.id
         res = self.client.post(INDEX_URL, {"action": action})
         self.assertRedirectsNoFollow(res, INDEX_URL)
 
-    @test.create_stubs({api.network: ('tenant_floating_ip_list',
-                                      'floating_ip_pools_list',),
+        self.mock_server_list.assert_called_once_with(test.IsHttpRequest(),
+                                                      detailed=False)
+        self.mock_tenant_floating_ip_list.assert_called_once_with(
+            test.IsHttpRequest())
+        self.mock_floating_ip_pools_list.assert_called_once_with(
+            test.IsHttpRequest())
+        self.mock_floating_ip_disassociate.assert_called_once_with(
+            test.IsHttpRequest(), floating_ip.id)
+
+    @test.create_mocks({api.neutron: ('tenant_floating_ip_list',
+                                      'floating_ip_pools_list'),
                         api.nova: ('server_list',),
-                        quotas: ('tenant_quota_usages',),
-                        api.base: ('is_service_enabled',)})
+                        quotas: ('tenant_quota_usages',)})
     def test_allocate_button_attributes(self):
         floating_ips = self.floating_ips.list()
         floating_pools = self.pools.list()
-        quota_data = self.quota_usages.first()
-        quota_data['floating_ips']['available'] = 10
+        quota_data = self.neutron_quota_usages.first()
 
-        api.network.tenant_floating_ip_list(
-            IsA(http.HttpRequest)) \
-            .AndReturn(floating_ips)
-        api.network.floating_ip_pools_list(
-            IsA(http.HttpRequest)) \
-            .AndReturn(floating_pools)
-        api.nova.server_list(
-            IsA(http.HttpRequest), detailed=False) \
-            .AndReturn([self.servers.list(), False])
-        quotas.tenant_quota_usages(
-            IsA(http.HttpRequest)).MultipleTimes() \
-            .AndReturn(quota_data)
-
-        self.mox.ReplayAll()
+        self.mock_tenant_floating_ip_list.return_value = floating_ips
+        self.mock_floating_ip_pools_list.return_value = floating_pools
+        self.mock_server_list.return_value = [self.servers.list(), False]
+        self.mock_tenant_quota_usages.return_value = quota_data
 
         res = self.client.get(INDEX_URL)
 
@@ -284,31 +290,30 @@ class FloatingIpViewTests(test.TestCase):
         url = 'horizon:project:floating_ips:allocate'
         self.assertEqual(url, allocate_action.url)
 
-    @test.create_stubs({api.network: ('tenant_floating_ip_list',
-                                      'floating_ip_pools_list',),
+        self.mock_tenant_floating_ip_list.assert_called_once_with(
+            test.IsHttpRequest())
+        self.mock_floating_ip_pools_list.assert_called_once_with(
+            test.IsHttpRequest())
+        self.mock_server_list.assert_called_once_with(test.IsHttpRequest(),
+                                                      detailed=False)
+        self.assert_mock_multiple_calls_with_same_arguments(
+            self.mock_tenant_quota_usages, 3,
+            mock.call(test.IsHttpRequest(), targets=('floatingip', )))
+
+    @test.create_mocks({api.neutron: ('tenant_floating_ip_list',
+                                      'floating_ip_pools_list'),
                         api.nova: ('server_list',),
-                        quotas: ('tenant_quota_usages',),
-                        api.base: ('is_service_enabled',)})
+                        quotas: ('tenant_quota_usages',)})
     def test_allocate_button_disabled_when_quota_exceeded(self):
         floating_ips = self.floating_ips.list()
         floating_pools = self.pools.list()
-        quota_data = self.quota_usages.first()
-        quota_data['floating_ips']['available'] = 0
+        quota_data = self.neutron_quota_usages.first()
+        quota_data['floatingip']['available'] = 0
 
-        api.network.tenant_floating_ip_list(
-            IsA(http.HttpRequest)) \
-            .AndReturn(floating_ips)
-        api.network.floating_ip_pools_list(
-            IsA(http.HttpRequest)) \
-            .AndReturn(floating_pools)
-        api.nova.server_list(
-            IsA(http.HttpRequest), detailed=False) \
-            .AndReturn([self.servers.list(), False])
-        quotas.tenant_quota_usages(
-            IsA(http.HttpRequest)).MultipleTimes() \
-            .AndReturn(quota_data)
-
-        self.mox.ReplayAll()
+        self.mock_tenant_floating_ip_list.return_value = floating_ips
+        self.mock_floating_ip_pools_list.return_value = floating_pools
+        self.mock_server_list.return_value = [self.servers.list(), False]
+        self.mock_tenant_quota_usages.return_value = quota_data
 
         res = self.client.get(INDEX_URL)
 
@@ -319,66 +324,57 @@ class FloatingIpViewTests(test.TestCase):
         self.assertEqual('Allocate IP To Project (Quota exceeded)',
                          six.text_type(allocate_action.verbose_name))
 
-    @test.create_stubs({api.nova: ('tenant_quota_get', 'flavor_list',
-                                   'server_list'),
-                        api.network: ('floating_ip_pools_list',
-                                      'floating_ip_supported',
-                                      'security_group_list',
-                                      'tenant_floating_ip_list'),
-                        api.neutron: ('is_extension_supported',
+        self.mock_tenant_floating_ip_list.assert_called_once_with(
+            test.IsHttpRequest())
+        self.mock_floating_ip_pools_list.assert_called_once_with(
+            test.IsHttpRequest())
+        self.mock_server_list.assert_called_once_with(test.IsHttpRequest(),
+                                                      detailed=False)
+        self.assert_mock_multiple_calls_with_same_arguments(
+            self.mock_tenant_quota_usages, 3,
+            mock.call(test.IsHttpRequest(), targets=('floatingip', )))
+
+    @test.create_mocks({api.neutron: ('floating_ip_pools_list',
+                                      'tenant_floating_ip_list',
+                                      'is_extension_supported',
                                       'is_router_enabled',
-                                      'tenant_quota_get',
-                                      'network_list',
-                                      'router_list',
-                                      'subnet_list'),
+                                      'tenant_quota_get'),
                         api.base: ('is_service_enabled',),
                         api.cinder: ('is_volume_service_enabled',)})
     @test.update_settings(OPENSTACK_NEUTRON_NETWORK={'enable_quotas': True})
     def test_correct_quotas_displayed(self):
-        servers = [s for s in self.servers.list()
-                   if s.tenant_id == self.request.user.tenant_id]
-
-        api.cinder.is_volume_service_enabled(IsA(http.HttpRequest)) \
-            .AndReturn(False)
-        api.base.is_service_enabled(IsA(http.HttpRequest), 'network') \
-            .MultipleTimes().AndReturn(True)
-        api.base.is_service_enabled(IsA(http.HttpRequest), 'compute') \
-            .MultipleTimes().AndReturn(True)
-        api.nova.tenant_quota_get(IsA(http.HttpRequest), '1') \
-            .AndReturn(self.quotas.first())
-        api.nova.flavor_list(IsA(http.HttpRequest)) \
-            .AndReturn(self.flavors.list())
-        search_opts = {'tenant_id': self.request.user.tenant_id}
-        api.nova.server_list(IsA(http.HttpRequest), search_opts=search_opts) \
-            .AndReturn([servers, False])
-        api.neutron.is_extension_supported(
-            IsA(http.HttpRequest), 'security-group').AndReturn(True)
-        api.neutron.is_extension_supported(IsA(http.HttpRequest), 'quotas') \
-            .AndReturn(True)
-        api.neutron.is_router_enabled(IsA(http.HttpRequest)) \
-            .AndReturn(True)
-        api.neutron.tenant_quota_get(IsA(http.HttpRequest), self.tenant.id) \
-            .AndReturn(self.neutron_quotas.first())
-        api.neutron.router_list(IsA(http.HttpRequest),
-                                tenant_id=self.tenant.id) \
-            .AndReturn(self.routers.list())
-        api.neutron.subnet_list(IsA(http.HttpRequest),
-                                tenant_id=self.tenant.id) \
-            .AndReturn(self.subnets.list())
-        api.neutron.network_list(IsA(http.HttpRequest),
-                                 tenant_id=self.tenant.id) \
-            .AndReturn(self.networks.list())
-        api.network.floating_ip_supported(IsA(http.HttpRequest)) \
-            .AndReturn(True)
-        api.network.tenant_floating_ip_list(IsA(http.HttpRequest)) \
-            .MultipleTimes().AndReturn(self.floating_ips.list())
-        api.network.floating_ip_pools_list(IsA(http.HttpRequest)) \
-            .AndReturn(self.pools.list())
-        api.network.security_group_list(IsA(http.HttpRequest)) \
-            .AndReturn(self.security_groups.list())
-        self.mox.ReplayAll()
+        self.mock_is_volume_service_enabled.return_value = False
+        self.mock_is_service_enabled.side_effect = [True, True]
+        self.mock_is_extension_supported.side_effect = [True, True, False]
+        self.mock_is_router_enabled.return_value = True
+        self.mock_tenant_quota_get.return_value = self.neutron_quotas.first()
+        self.mock_tenant_floating_ip_list.return_value = \
+            self.floating_ips.list()
+        self.mock_floating_ip_pools_list.return_value = self.pools.list()
 
         url = reverse('%s:allocate' % NAMESPACE)
         res = self.client.get(url)
-        self.assertEqual(res.context['usages']['floating_ips']['quota'],
+        self.assertEqual(res.context['usages']['floatingip']['quota'],
                          self.neutron_quotas.first().get('floatingip').limit)
+
+        self.mock_is_volume_service_enabled.assert_called_once_with(
+            test.IsHttpRequest())
+        self.assertEqual(2, self.mock_is_service_enabled.call_count)
+        self.mock_is_service_enabled.assert_has_calls([
+            mock.call(test.IsHttpRequest(), 'network'),
+            mock.call(test.IsHttpRequest(), 'compute'),
+        ])
+        self.assertEqual(3, self.mock_is_extension_supported.call_count)
+        self.mock_is_extension_supported.assert_has_calls([
+            mock.call(test.IsHttpRequest(), 'security-group'),
+            mock.call(test.IsHttpRequest(), 'quotas'),
+            mock.call(test.IsHttpRequest(), 'quota_details'),
+        ])
+        self.mock_is_router_enabled.assert_called_once_with(
+            test.IsHttpRequest())
+        self.mock_tenant_quota_get.assert_called_once_with(
+            test.IsHttpRequest(), self.tenant.id)
+        self.mock_tenant_floating_ip_list.assert_called_once_with(
+            test.IsHttpRequest())
+        self.mock_floating_ip_pools_list.assert_called_once_with(
+            test.IsHttpRequest())

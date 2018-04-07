@@ -23,6 +23,7 @@
       var cinderEnabled = false;
       var neutronEnabled = false;
       var novaExtensionsEnabled = false;
+      var ifAllowedResolve = true;
 
       var novaApi = {
         createServer: function(finalSpec) {
@@ -158,6 +159,7 @@
         beforeEach(function () {
           settings = {
             LAUNCH_INSTANCE_DEFAULTS: {
+              create_volume: true,
               config_drive: false,
               disable_image: false,
               disable_instance_snapshot: false,
@@ -233,6 +235,15 @@
             deferred.resolve({ data: { items: snapshots } });
 
             return deferred.promise;
+          },
+          getAbsoluteLimits: function() {
+            var limits = { maxTotalVolumes: 100,
+                           totalVolumesUsed: 2,
+                           maxTotalVolumeGigabytes: 1000,
+                           totalGigabytesUsed: 10 };
+            var deferred = $q.defer();
+            deferred.resolve({ data: limits });
+            return deferred.promise;
           }
         });
 
@@ -258,8 +269,11 @@
           ifAllowed: function() {
             var deferred = $q.defer();
 
-            deferred.resolve();
-
+            if (ifAllowedResolve) {
+              deferred.resolve();
+            } else {
+              deferred.reject();
+            }
             return deferred.promise;
           },
           check: function() {
@@ -327,6 +341,7 @@
         scope = $injector.get('$rootScope').$new();
         glance = $injector.get('horizon.app.core.openstack-service-api.glance');
         spyOn(glance, 'getNamespaces').and.callThrough();
+        spyOn(novaApi, 'getServerGroups').and.callThrough();
       }));
 
       describe('Initial object (pre-initialize)', function() {
@@ -479,6 +494,22 @@
           expect(model.newInstanceSpec.config_drive).toBe(true);
         });
 
+        it('should default create_volume to true if setting not provided', function() {
+          delete settings.LAUNCH_INSTANCE_DEFAULTS.create_volume;
+          model.initialize(true);
+          scope.$apply();
+
+          expect(model.newInstanceSpec.create_volume_default).toBe(true);
+        });
+
+        it('should default create_volume to false based on setting', function() {
+          settings.LAUNCH_INSTANCE_DEFAULTS.create_volume = false;
+          model.initialize(true);
+          scope.$apply();
+
+          expect(model.newInstanceSpec.create_volume_default).toBe(false);
+        });
+
         it('should not set availability zone if the zone list is empty', function () {
           spyOn(novaApi, 'getAvailabilityZones').and.callFake(function () {
             var deferred = $q.defer();
@@ -551,6 +582,28 @@
           expect(model.newInstanceSpec.networks).toEqual(networks);
         });
 
+        it('getPorts at launch should not return child port', function () {
+          var ports = [ { id: 'parent',
+                          trunk_details:  { trunk_id: 'trunk1',
+                                            sub_ports: [ { port_id: 'child' } ] } },
+                        { id: 'child' },
+                        { id : 'plain' } ];
+          var networks = [ { id: 'net-1', subnets: [ { id: 'subnet1' } ] } ];
+          spyOn(neutronApi, 'getNetworks').and.callFake(function () {
+            var deferred = $q.defer();
+            deferred.resolve({ data: { items: networks } });
+            return deferred.promise;
+          });
+          spyOn(neutronApi, 'getPorts').and.callFake(function () {
+            var deferred = $q.defer();
+            deferred.resolve({ data: { items: ports } });
+            return deferred.promise;
+          });
+          neutronEnabled = true;
+          model.initialize(true);
+          scope.$apply();
+        });
+
         it('should have the proper entries in allowedBootSources', function() {
           model.initialize(true);
           scope.$apply();
@@ -577,6 +630,7 @@
         });
 
         it('should have proper allowedBootSources if specific settings missing', function() {
+          delete settings.LAUNCH_INSTANCE_DEFAULTS.create_volume;
           delete settings.LAUNCH_INSTANCE_DEFAULTS.disable_image;
           delete settings.LAUNCH_INSTANCE_DEFAULTS.disable_instance_snapshot;
           delete settings.LAUNCH_INSTANCE_DEFAULTS.disable_volume;
@@ -589,6 +643,7 @@
           expect(model.allowedBootSources).toContain(INSTANCE_SNAPSHOT);
           expect(model.allowedBootSources).toContain(VOLUME);
           expect(model.allowedBootSources).toContain(VOLUME_SNAPSHOT);
+          expect(model.newInstanceSpec.create_volume_default).toBe(true);
         });
 
         it('should have no images if disable_image is set to true', function() {
@@ -732,6 +787,29 @@
           expect(model.allowedBootSources).toContain(VOLUME_SNAPSHOT);
         });
 
+        it('should have maxTotalVolumes and maxTotalVolumeGigabytes if cinder ' +
+           'is enabled', function() {
+          cinderEnabled = true;
+          model.initialize(true);
+          scope.$apply();
+
+          expect(model.cinderLimits.maxTotalVolumes).toBe(100);
+          expect(model.cinderLimits.maxTotalVolumeGigabytes).toBe(1000);
+        });
+
+        it('should not fetch server groups if the policy does not allow it', function () {
+          ifAllowedResolve = false;
+          model.initialize(true);
+          scope.$apply();
+          expect(novaApi.getServerGroups.calls.count()).toBe(0);
+        });
+
+        it('should fetch server groups if the policy allows it', function () {
+          ifAllowedResolve = true;
+          model.initialize(true);
+          scope.$apply();
+          expect(novaApi.getServerGroups.calls.count()).toBe(1);
+        });
       });
 
       describe('Post Initialization Model - Initializing', function() {
@@ -744,7 +822,7 @@
         // This is here to ensure that as people add/change items, they
         // don't forget to implement tests for them.
         it('has the right number of properties', function() {
-          expect(Object.keys(model.newInstanceSpec).length).toBe(20);
+          expect(Object.keys(model.newInstanceSpec).length).toBe(22);
         });
 
         it('sets availability zone to null', function() {
@@ -755,8 +833,16 @@
           expect(model.newInstanceSpec.admin_pass).toBeNull();
         });
 
+        it('sets description to null', function() {
+          expect(model.newInstanceSpec.description).toBeNull();
+        });
+
         it('sets config drive to false', function() {
           expect(model.newInstanceSpec.config_drive).toBe(false);
+        });
+
+        it('sets create volume to true', function() {
+          expect(model.newInstanceSpec.create_volume_default).toBe(true);
         });
 
         it('sets user data to an empty string', function() {

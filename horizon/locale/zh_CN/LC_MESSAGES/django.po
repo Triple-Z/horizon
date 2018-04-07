@@ -6,32 +6,25 @@
 # maoshuai <fwsakura@163.com>, 2016. #zanata
 # vuuv <froms2008@gmail.com>, 2016. #zanata
 # zzxwill <zzxwill@gmail.com>, 2016. #zanata
+# TigerFang <tigerfun@126.com>, 2017. #zanata
 # Tony <tfu@redhat.com>, 2017. #zanata
+# bkb <bakbad2015@gmail.com>, 2017. #zanata
+# vuuv <froms2008@gmail.com>, 2017. #zanata
+# Tony <tfu@redhat.com>, 2018. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: horizon 12.0.0.0b2.dev85\n"
+"Project-Id-Version: horizon VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2017-05-05 01:36+0000\n"
+"POT-Creation-Date: 2018-03-04 12:29+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2017-02-01 12:56+0000\n"
+"PO-Revision-Date: 2018-03-06 07:25+0000\n"
 "Last-Translator: Tony <tfu@redhat.com>\n"
 "Language-Team: Chinese (China)\n"
-"Language: zh-CN\n"
-"X-Generator: Zanata 3.9.6\n"
+"Language: zh_CN\n"
+"X-Generator: Zanata 4.3.3\n"
 "Plural-Forms: nplurals=1; plural=0\n"
-
-#, python-format
-msgid ""
-"\n"
-"            Displaying %(counter)s item"
-msgid_plural ""
-"\n"
-"            Displaying %(counter)s items"
-msgstr[0] ""
-"\n"
-"           显示 %(counter)s 个项"
 
 #, python-format
 msgid "%(action)s: %(objs)s"
@@ -49,6 +42,19 @@ msgstr "%(name)s: %(error)s"
 msgid "%(size)d Byte"
 msgid_plural "%(size)d Bytes"
 msgstr[0] "%(size)d 字节"
+
+#, python-format
+msgid "%(usedphrase)s <span> %(used)s </span>(No Limit)"
+msgstr "%(usedphrase)s <span> %(used)s </span>(No Limit)"
+
+#, python-format
+msgid "%(usedphrase)s <span> %(used)s </span>of<span> %(available)s </span>"
+msgstr ""
+"%(usedphrase)s <span> %(used)s </span>（共 <span> %(available)s </span>）"
+
+#, python-format
+msgid "%s EB"
+msgstr "%s EB"
 
 #, python-format
 msgid "%s GB"
@@ -71,6 +77,14 @@ msgid "%s TB"
 msgstr "%s TB"
 
 #, python-format
+msgid "%s YB"
+msgstr "%s YB"
+
+#, python-format
+msgid "%s ZB"
+msgstr "%s ZB"
+
+#, python-format
 msgid "%s completed successfully."
 msgstr "%s 成功完成。"
 
@@ -89,14 +103,6 @@ msgstr "-"
 
 msgid "0 Bytes"
 msgstr "0 字节"
-
-#, python-format
-msgid "<label>From:</label> %(start)s"
-msgstr "<label>开始: </label> %(start)s"
-
-#, python-format
-msgid "<label>To:</label>%(end)s"
-msgstr "<label>结束: </label>%(end)s"
 
 #, python-format
 msgid "A %(resource)s with the name \"%(name)s\" already exists."
@@ -145,6 +151,11 @@ msgid_plural "Displaying %(content_items)s items"
 msgstr[0] "正在显示 %(content_items)s 项"
 
 #, python-format
+msgid "Displaying %(counter)s item"
+msgid_plural "Displaying %(counter)s items"
+msgstr[0] "正在显示 %(counter)s 项"
+
+#, python-format
 msgid "Displaying %(nav_items)s item"
 msgid_plural "Displaying %(nav_items)s items"
 msgstr[0] "正在显示 %(nav_items)s 项"
@@ -183,11 +194,21 @@ msgstr "如果您不确定使用哪种认证方式，请联系管理员。"
 msgid "Incorrect format for IP address"
 msgstr "IP地址格式不对"
 
+msgid "Infinity"
+msgstr "无穷大"
+
 msgid "Info: "
 msgstr "信息："
 
+msgid "Invalid MAC Address format"
+msgstr "无效的MAC（硬件地址）地址格式"
+
 msgid "Invalid metadata entry. Use comma-separated key=value pairs"
 msgstr "无效的元数据条目，请使用逗号分隔的 key=value 组合"
+
+#, python-format
+msgid "Invalid service catalog: %s"
+msgstr "无效的服务目录：%s"
 
 msgid "Invalid subnet mask"
 msgstr "无效的子网掩码"
@@ -320,7 +341,7 @@ msgid ""
 msgstr "当前用户没有足够的权限完成请求的任务。"
 
 msgid "The date should be in YYYY-MM-DD format."
-msgstr "日期格式应该是 YYYY-MM-DD。"
+msgstr "日期格式：YYYY-MM-DD。"
 
 msgid "The string may only contain ASCII printable characters."
 msgstr "字符串只能包含 ASCII 可显示（printable）字符."
@@ -335,13 +356,13 @@ msgstr ""
 "\" 或\"https://\"开头。"
 
 msgid "This Period's GB-Hours:"
-msgstr "周期内磁盘GB-小时数:"
+msgstr "周期内磁盘GB-小时数："
 
 msgid "This Period's RAM-Hours:"
-msgstr "周期内内存-小时数"
+msgstr "此周期内的 RAM-小时数："
 
 msgid "This Period's VCPU-Hours:"
-msgstr "周期内VCPU-小时数:"
+msgstr "周期内VCPU-小时数："
 
 msgid "This action cannot be undone."
 msgstr "这个动作不能撤消。"
@@ -378,14 +399,6 @@ msgstr[0] "Upped Item"
 msgid "Usage Summary"
 msgstr "使用情况摘要"
 
-#, python-format
-msgid "Used <span> %(used)s </span>(No Limit)"
-msgstr "使用<span> %(used)s </span>(无限制)"
-
-#, python-format
-msgid "Used <span> %(used)s </span>of<span> %(available)s </span>"
-msgstr "使用<span> %(used)s </span>（共<span> %(available)s </span>）"
-
 msgid "Warning: "
 msgstr "警告："
 
@@ -397,8 +410,14 @@ msgstr "您被禁止执行 %(action)s: %(objs)s"
 msgid "You are not authorized to access %s"
 msgstr "您无权访问 %s"
 
+msgid "You are not authorized to access this page"
+msgstr "您没有访问本页面的权限。"
+
 msgid "You do not have permission to access the resource:"
 msgstr "您没有被授权访问这些资源："
 
 msgid "You have selected: [[selection]]. "
 msgstr "您已选择了 [[selection]]。 "
+
+msgid "to"
+msgstr "到"

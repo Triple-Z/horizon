@@ -10,6 +10,16 @@ from openstack_dashboard.settings import HORIZON_CONFIG
 
 DEBUG = True
 
+# This setting controls whether or not compression is enabled. Disabling
+# compression makes Horizon considerably slower, but makes it much easier
+# to debug JS and CSS changes
+#COMPRESS_ENABLED = not DEBUG
+
+# This setting controls whether compression happens on the fly, or offline
+# with `python manage.py compress`
+# See https://django-compressor.readthedocs.io/en/latest/usage/#offline-compression
+# for more information
+#COMPRESS_OFFLINE = not DEBUG
 
 # WEBROOT is the location relative to Webserver root
 # should end with a slash.
@@ -65,6 +75,20 @@ WEBROOT = '/'
 # for login.
 #OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = False
 
+# Set this to True if you want available domains displayed as a dropdown menu
+# on the login screen. It is strongly advised NOT to enable this for public
+# clouds, as advertising enabled domains to unauthenticated customers
+# irresponsibly exposes private information. This should only be used for
+# private clouds where the dashboard sits behind a corporate firewall.
+#OPENSTACK_KEYSTONE_DOMAIN_DROPDOWN = False
+
+# If OPENSTACK_KEYSTONE_DOMAIN_DROPDOWN is enabled, this option can be used to
+# set the available domains to choose from. This is a list of pairs whose first
+# value is the domain name and the second is the display name.
+#OPENSTACK_KEYSTONE_DOMAIN_CHOICES = (
+#  ('Default', 'Default'),
+#)
+
 # Overrides the default domain used when running on single-domain model
 # with Keystone V3. All entities will be created in the default domain.
 # NOTE: This value must be the name of the default domain, NOT the ID.
@@ -80,9 +104,14 @@ WEBROOT = '/'
 #OPENSTACK_KEYSTONE_FEDERATION_MANAGEMENT = False
 
 # Set Console type:
-# valid options are "AUTO"(default), "VNC", "SPICE", "RDP", "SERIAL" or None
-# Set to None explicitly if you want to deactivate the console.
+# valid options are "AUTO"(default), "VNC", "SPICE", "RDP", "SERIAL", "MKS"
+# or None. Set to None explicitly if you want to deactivate the console.
 #CONSOLE_TYPE = "AUTO"
+
+# Toggle showing the openrc file for Keystone V2.
+# If set to false the link will be removed from the user dropdown menu
+# and the API Access page
+#SHOW_KEYSTONE_V2_RC = True
 
 # If provided, a "Report Bug" link will be displayed in the site header
 # which links to the value of this setting (ideally a URL containing
@@ -154,18 +183,26 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # For multiple regions uncomment this configuration, and add (endpoint, title).
 #AVAILABLE_REGIONS = [
-#    ('http://cluster1.example.com:5000/v2.0', 'cluster1'),
-#    ('http://cluster2.example.com:5000/v2.0', 'cluster2'),
+#    ('http://cluster1.example.com:5000/v3', 'cluster1'),
+#    ('http://cluster2.example.com:5000/v3', 'cluster2'),
 #]
 
 OPENSTACK_HOST = "127.0.0.1"
-OPENSTACK_KEYSTONE_URL = "http://%s:5000/v2.0" % OPENSTACK_HOST
+OPENSTACK_KEYSTONE_URL = "http://%s:5000/v3" % OPENSTACK_HOST
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = "_member_"
+
+# For setting the default service region on a per-endpoint basis. Note that the
+# default value for this setting is {}, and below is just an example of how it
+# should be specified.
+#DEFAULT_SERVICE_REGIONS = {
+#    OPENSTACK_KEYSTONE_URL: 'RegionOne'
+#}
 
 # Enables keystone web single-sign-on if set to True.
 #WEBSSO_ENABLED = False
 
-# Determines which authentication choice to show as default.
+# Authentication mechanism to be selected as default.
+# The value must be a key from WEBSSO_CHOICES.
 #WEBSSO_INITIAL_CHOICE = "credentials"
 
 # The list of authentication mechanisms which include keystone
@@ -229,11 +266,6 @@ OPENSTACK_KEYSTONE_BACKEND = {
 # allowing Admin session password retrieval/decryption.
 #OPENSTACK_ENABLE_PASSWORD_RETRIEVE = False
 
-# This setting allows deployers to control whether a token is deleted on log
-# out. This can be helpful when there are often long running processes being
-# run in the Horizon environment.
-#TOKEN_DELETE_DISABLED = False
-
 # The Launch Instance user experience has been significantly enhanced.
 # You can choose whether to enable the new launch instance experience,
 # the legacy experience, or both. The legacy experience will be removed
@@ -257,6 +289,7 @@ OPENSTACK_KEYSTONE_BACKEND = {
 #    'disable_instance_snapshot': False,
 #    'disable_volume': False,
 #    'disable_volume_snapshot': False,
+#    'create_volume': True,
 #}
 
 # The Xen Hypervisor has the ability to set the mount point for volumes
@@ -269,6 +302,11 @@ OPENSTACK_HYPERVISOR_FEATURES = {
     'requires_keypair': False,
     'enable_quotas': True
 }
+
+# This settings controls whether IP addresses of servers are retrieved from
+# neutron in the project instance table. Setting this to ``False`` may mitigate
+# a performance issue in the project instance table in large deployments.
+#OPENSTACK_INSTANCE_RETRIEVE_IP_ADDRESSES = True
 
 # The OPENSTACK_CINDER_FEATURES settings can be used to enable optional
 # services provided by cinder that is not exposed by its extension API.
@@ -318,8 +356,8 @@ OPENSTACK_NEUTRON_NETWORK = {
     # Set which VNIC types are supported for port binding. Only the VNIC
     # types in this list will be available to choose from when creating a
     # port.
-    # VNIC types include 'normal', 'direct', 'direct-physical', 'macvtap' and
-    # 'baremetal'
+    # VNIC types include 'normal', 'direct', 'direct-physical', 'macvtap',
+    # 'baremetal' and 'virtio-forwarder'
     # Set to empty list or None to disable VNIC type selection.
     'supported_vnic_types': ['*'],
 
@@ -384,6 +422,11 @@ IMAGE_RESERVED_CUSTOM_PROPERTIES = []
 # If using Glance V2, this value should be False unless the Glance
 # configuration and policies allow setting locations.
 #IMAGES_ALLOW_LOCATION = False
+
+# A dictionary of default settings for create image modal.
+#CREATE_IMAGE_DEFAULTS = {
+#    'image_visibility': "public",
+#}
 
 # OPENSTACK_ENDPOINT_TYPE specifies the endpoint type to use for the endpoints
 # in the Keystone service catalog. Use this setting when Horizon is running
@@ -464,19 +507,8 @@ TIME_ZONE = "UTC"
 #    'compute': 'nova_policy.json',
 #    'volume': 'cinder_policy.json',
 #    'image': 'glance_policy.json',
-#    'orchestration': 'heat_policy.json',
 #    'network': 'neutron_policy.json',
 #}
-
-# TODO: (david-lyle) remove when plugins support adding settings.
-# Note: Only used when trove-dashboard plugin is configured to be used by
-# Horizon.
-# Trove user and database extension support. By default support for
-# creating users and databases on database instances is turned on.
-# To disable these extensions set the permission here to something
-# unusable such as ["!"].
-#TROVE_ADD_USER_PERMS = []
-#TROVE_ADD_DATABASE_PERMS = []
 
 # Change this patch to the appropriate list of tuples containing
 # a key, label and static directory containing two files:
@@ -485,30 +517,6 @@ TIME_ZONE = "UTC"
 #    ('default', 'Default', 'themes/default'),
 #    ('material', 'Material', 'themes/material'),
 #]
-
-# By default all languages with translation catalogs are enabled.
-# If you would like to enable a specific set of languages,
-# you can do this by setting LANGUAGES list below.
-# Each entry is a tuple of language code and language name.
-# LANGUAGES = (
-#     ('cs', 'Czech'),
-#     ('de', 'German'),
-#     ('en', 'English'),
-#     ('en-au', 'Australian English'),
-#     ('en-gb', 'British English'),
-#     ('es', 'Spanish'),
-#     ('fr', 'French'),
-#     ('id', 'Indonesian'),
-#     ('it', 'Italian'),
-#     ('ja', 'Japanese'),
-#     ('ko', 'Korean (Korea)'),
-#     ('pl', 'Polish'),
-#     ('pt-br', 'Portuguese (Brazil)'),
-#     ('ru', 'Russian'),
-#     ('tr', 'Turkish'),
-#     ('zh-cn', 'Simplified Chinese'),
-#     ('zh-tw', 'Chinese (Taiwan)'),
-# )
 
 LOGGING = {
     'version': 1,
@@ -549,16 +557,6 @@ LOGGING = {
         },
     },
     'loggers': {
-        # Logging from django.db.backends is VERY verbose, send to null
-        # by default.
-        'django.db.backends': {
-            'handlers': ['null'],
-            'propagate': False,
-        },
-        'requests': {
-            'handlers': ['null'],
-            'propagate': False,
-        },
         'horizon': {
             'handlers': ['console'],
             'level': 'DEBUG',
@@ -584,6 +582,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
+        'keystoneauth': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
         'keystoneclient': {
             'handlers': ['console'],
             'level': 'DEBUG',
@@ -599,12 +602,12 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
-        'heatclient': {
+        'swiftclient': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': False,
         },
-        'swiftclient': {
+        'oslo_policy': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': False,
@@ -622,6 +625,24 @@ LOGGING = {
         'django': {
             'handlers': ['console'],
             'level': 'DEBUG',
+            'propagate': False,
+        },
+        # Logging from django.db.backends is VERY verbose, send to null
+        # by default.
+        'django.db.backends': {
+            'handlers': ['null'],
+            'propagate': False,
+        },
+        'requests': {
+            'handlers': ['null'],
+            'propagate': False,
+        },
+        'urllib3': {
+            'handlers': ['null'],
+            'propagate': False,
+        },
+        'chardet.charsetprober': {
+            'handlers': ['null'],
             'propagate': False,
         },
         'iso8601': {
@@ -754,18 +775,8 @@ SECURITY_GROUP_RULES = {
 #  $glance --os-image-api-version 2 help md-namespace-import
 #  $glance-manage db_load_metadefs <directory_with_definition_files>
 #
-# See Metadata Definitions on: http://docs.openstack.org/developer/glance/
-
-# TODO: (david-lyle) remove when plugins support settings natively
-# Note: This is only used when the Sahara plugin is configured and enabled
-# for use in Horizon.
-# Indicate to the Sahara data processing service whether or not
-# automatic floating IP allocation is in effect.  If it is not
-# in effect, the user will be prompted to choose a floating IP
-# pool for use in their cluster.  False by default.  You would want
-# to set this to True if you were running Nova Networking with
-# auto_assign_floating_ip = True.
-#SAHARA_AUTO_IP_ALLOCATION_ENABLED = False
+# See Metadata Definitions on:
+# https://docs.openstack.org/glance/latest/user/glancemetadefcatalogapi.html
 
 # The hash algorithm to use for authentication tokens. This must
 # match the hash algorithm that the identity server and the
@@ -788,7 +799,9 @@ SECURITY_GROUP_RULES = {
 REST_API_REQUIRED_SETTINGS = ['OPENSTACK_HYPERVISOR_FEATURES',
                               'LAUNCH_INSTANCE_DEFAULTS',
                               'OPENSTACK_IMAGE_FORMATS',
-                              'OPENSTACK_KEYSTONE_DEFAULT_DOMAIN']
+                              'OPENSTACK_KEYSTONE_DEFAULT_DOMAIN',
+                              'CREATE_IMAGE_DEFAULTS',
+                              'ENFORCE_PASSWORD_CHECK']
 
 # Additional settings can be made available to the client side for
 # extensibility by specifying them in REST_API_ADDITIONAL_SETTINGS
@@ -819,6 +832,7 @@ REST_API_REQUIRED_SETTINGS = ['OPENSTACK_HYPERVISOR_FEATURES',
 #OPERATION_LOG_OPTIONS = {
 #    'mask_fields': ['password'],
 #    'target_methods': ['POST'],
+#    'ignored_urls': ['/js/', '/static/', '^/api/'],
 #    'format': ("[%(client_ip)s] [%(domain_name)s]"
 #        " [%(domain_id)s] [%(project_name)s]"
 #        " [%(project_id)s] [%(user_name)s] [%(user_id)s] [%(request_scheme)s]"
@@ -864,10 +878,19 @@ ALLOWED_PRIVATE_SUBNET_CIDR = {'ipv4': [], 'ipv6': []}
 # Horizon has the ability to display these extra attributes via this setting.
 # If you'd like to display extra data in the project or user tables, set the
 # corresponding dict key to the attribute name, followed by the display name.
-# For more information, see horizon's customization (http://docs.openstack.org/developer/horizon/topics/customizing.html#horizon-customization-module-overrides)
+# For more information, see horizon's customization
+# (https://docs.openstack.org/horizon/latest/configuration/customizing.html#horizon-customization-module-overrides)
 #PROJECT_TABLE_EXTRA_INFO = {
 #   'phone_num': _('Phone Number'),
 #}
 #USER_TABLE_EXTRA_INFO = {
 #   'phone_num': _('Phone Number'),
 #}
+
+# Password will have an expiration date when using keystone v3 and enabling the
+# feature.
+# This setting allows you to set the number of days that the user will be alerted
+# prior to the password expiration.
+# Once the password expires keystone will deny the access and users must
+# contact an admin to change their password.
+#PASSWORD_EXPIRES_WARNING_THRESHOLD_DAYS = 0

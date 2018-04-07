@@ -239,9 +239,7 @@ def image_delete(request, image_id):
 
 @profiler.trace
 def image_get(request, image_id):
-    """Returns an Image object populated with metadata for image
-    with supplied identifier.
-    """
+    """Returns an Image object populated with metadata for a given image."""
     image = glanceclient(request).images.get(image_id)
     return Image(image)
 
@@ -379,8 +377,6 @@ def image_update(request, image_id, **kwargs):
 
 
 def get_image_upload_mode():
-    if getattr(settings, 'HORIZON_IMAGES_ALLOW_UPLOAD', None) is False:
-        return 'off'
     mode = getattr(settings, 'HORIZON_IMAGES_UPLOAD_MODE', 'legacy')
     if mode not in ('off', 'legacy', 'direct'):
         LOG.warning('HORIZON_IMAGES_UPLOAD_MODE has an unrecognized value of '
@@ -463,7 +459,16 @@ def image_create(request, **kwargs):
                                     {'data': data})
         else:
             def upload():
-                return glanceclient(request).images.upload(image.id, data)
+                try:
+                    return glanceclient(request).images.upload(image.id, data)
+                finally:
+                    filename = str(data.file.name)
+                    try:
+                        os.remove(filename)
+                    except OSError as e:
+                        LOG.warning('Failed to remove temporary image file '
+                                    '%(file)s (%(e)s)',
+                                    {'file': filename, 'e': e})
             thread.start_new_thread(upload, ())
 
     return Image(image)
@@ -525,8 +530,9 @@ class Namespace(BaseGlanceMetadefAPIResourceWrapper):
 def filter_properties_target(namespaces_iter,
                              resource_types,
                              properties_target):
-    """Filter metadata namespaces based on the given resource types and
-    properties target.
+    """Filter metadata namespaces.
+
+    Filtering is done based ongiven resource types and a properties target.
 
     :param namespaces_iter: Metadata namespaces iterable.
     :param resource_types: List of resource type names.

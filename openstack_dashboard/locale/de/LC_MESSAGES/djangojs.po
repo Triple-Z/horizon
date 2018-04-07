@@ -2,20 +2,24 @@
 # Frank Kloeker <eumel@arcor.de>, 2016. #zanata
 # Monika Wolf <vcomas3@de.ibm.com>, 2016. #zanata
 # Robert Simai <robert.simai@suse.com>, 2016. #zanata
+# Andreas Jaeger <jaegerandi@gmail.com>, 2017. #zanata
+# Frank Kloeker <eumel@arcor.de>, 2017. #zanata
 # Robert Simai <robert.simai@suse.com>, 2017. #zanata
+# Reik Keutterling <spielkind@gmail.com>, 2018. #zanata
+# Robert Simai <robert.simai@suse.com>, 2018. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: horizon 12.0.0.0b2.dev53\n"
+"Project-Id-Version: horizon VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2017-04-27 23:09+0000\n"
+"POT-Creation-Date: 2018-03-20 22:05+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2017-04-11 10:52+0000\n"
+"PO-Revision-Date: 2018-03-20 02:17+0000\n"
 "Last-Translator: Robert Simai <robert.simai@suse.com>\n"
 "Language-Team: German\n"
 "Language: de\n"
-"X-Generator: Zanata 3.9.6\n"
+"X-Generator: Zanata 4.3.3\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 msgid "#"
@@ -97,47 +101,41 @@ msgstr ""
 "bei der Löschung der Instanz zu entfernen. <em>Hinweis: wenn Sie Datenträger "
 "auswählen können Sie nur eine Instanz starten.</em>"
 
+msgid "<small>This line of text is meant to be treated as fine print.</small>"
+msgstr "<small>Diese Textzeile soll wie Kleindruck behandelt werden.</small>"
+
 msgid ""
-"<button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>\n"
-"          <strong>Heads up!</strong>\n"
+"<strong>Heads up!</strong>\n"
 "           This\n"
 "          <a href=\"#\" class=\"alert-link\">alert needs your attention</"
 "a>,\n"
 "           but it's not super important."
 msgstr ""
-"<button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>\n"
-"          <strong>Achtung!</strong>\n"
+"<strong>Achtung!</strong>\n"
 "           Dieser\n"
 "          <a href=\"#\" class=\"alert-link\">Alarm erfordert Aufmerksamkeit</"
 "a>,\n"
 "           ist aber nicht extrem wichtig."
 
 msgid ""
-"<button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>\n"
-"          <strong>Oh snap!</strong>\n"
+"<strong>Oh snap!</strong>\n"
 "          <a href=\"#\" class=\"alert-link\">Change a few things up</a>\n"
 "          and try submitting again."
 msgstr ""
-"<button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>\n"
-"          <strong>Oh nein!</strong>\n"
+"<strong>Oh nein!</strong>\n"
 "          <a href=\"#\" class=\"alert-link\">Ändern Sie ein paar Dinge</a>\n"
-"          und versuchen Sie es nochmal."
+"          und versuchen Sie es noch einmal."
 
 msgid ""
-"<button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>\n"
-"          <strong>Well done!</strong>\n"
+"<strong>Well done!</strong>\n"
 "          You successfully read\n"
 "          <a href=\"#\" class=\"alert-link\">this important alert message</"
 "a>."
 msgstr ""
-"<button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>\n"
-"          <strong>Gut gemacht!</strong>\n"
-"          Sie lasen erfolgreich\n"
-"          <a href=\"#\" class=\"alert-link\">diese wichtige "
-"Benachrichtigung</a>."
-
-msgid "<small>This line of text is meant to be treated as fine print.</small>"
-msgstr "<small>Diese Textzeile soll wie Kleindruck behandelt werden.</small>"
+"<strong>Gut gemacht!</strong>\n"
+"          Sie haben erfolgreich\n"
+"          <a href=\"#\" class=\"alert-link\">diese wichtige Benachrichtigung "
+"gelesen</a>."
 
 msgid "A Confirmation Dialog"
 msgstr "Ein Bestätigungsdialog"
@@ -216,14 +214,6 @@ msgstr ""
 "Sie können ein vorhandenes Schlüsselpaar verwenden, eines importieren oder "
 "neu erzeugen."
 
-msgid ""
-"A key pair named '{$ctrl.createdKeypair.name$}' was successfully created. "
-"This key pair should automatically download."
-msgstr ""
-"Ein Schlüsselpaar mit dem Namen '{$ctrl.createdKeypair.name$}' wurde "
-"erfolgreich erstellt. Dieses Schlüsselpaar sollte automatisch "
-"heruntergeladen werden."
-
 msgid "A local file should be selected."
 msgstr "Eine lokale Datei muss ausgewählt werden."
 
@@ -241,6 +231,20 @@ msgid "A port represents a virtual switch port on a logical network switch."
 msgstr ""
 "Ein Port stellt einen virtuellen Switch-Port in einem logischen Netzswitch "
 "dar."
+
+msgid ""
+"A volume description less than {$createVolumeCtrl.validationRules."
+"fieldMaxLength + 1$} characters is required."
+msgstr ""
+"Es ist eine Datenträgerbeschreibung mit weniger als {$createVolumeCtrl."
+"validationRules.fieldMaxLength + 1$} Zeichen erforderlich."
+
+msgid ""
+"A volume name less than {$createVolumeCtrl.validationRules.fieldMaxLength + "
+"1$} characters is required."
+msgstr ""
+"Es ist ein Datenträgername mit weniger als {$createVolumeCtrl."
+"validationRules.fieldMaxLength + 1$} Zeichen erforderlich."
 
 msgid "AKI"
 msgstr "AKI"
@@ -274,6 +278,9 @@ msgstr "Schnittstelle hinzufügen"
 
 msgid "Add Ons, Required and Feedback"
 msgstr "Zusätze, Erfordernisse und Rückmeldung"
+
+msgid "Admin Password"
+msgstr "Administratorpasswort"
 
 msgid "Admin State"
 msgstr "Admin-Status"
@@ -343,6 +350,12 @@ msgstr ""
 "Festplatte an und legt eine einzelne Partition an. Mit der Option "
 "<b>Manuell</b> können Sie mehrere Partitionen auf der Festplatte erstellen."
 
+msgid "An arbitrary description for the trunk."
+msgstr "Eine beliebige Beschreibung für den Trunk."
+
+msgid "An arbitrary name for the trunk. May not be unique."
+msgstr "Ein beliebiger Name für den Trunk. Muss nicht einmalig sein."
+
 msgid "An external (HTTP) URL is required"
 msgstr "Eine externe (HTTP) URL ist erforderlich"
 
@@ -410,6 +423,9 @@ msgstr "Verfügbare Schedulerhinweise"
 msgid "Badges"
 msgstr "Abzeichen"
 
+msgid "Bare Metal"
+msgstr "Bare Metal"
+
 msgid "Basic"
 msgstr "Basis"
 
@@ -440,6 +456,9 @@ msgstr "Breadcrumbs"
 msgid "Browse..."
 msgstr "Durchsuchen..."
 
+msgid "Build"
+msgstr "Build"
+
 msgid "Button"
 msgstr "Schaltfläche"
 
@@ -454,6 +473,14 @@ msgstr "Dienstkatalog kann nicht von Keystone abgerufen werden."
 
 msgid "Cannot get the extension list."
 msgstr "List der Erweiterungen kann nicht abgerufen werden."
+
+msgid "Change Password"
+msgstr "Passwort ändern"
+
+msgid "Change user's password. We highly recommend you create a strong one."
+msgstr ""
+"Benutzerpasswort ändern. Es wird empfohlen, ein starkes Passwort zu "
+"verwenden."
 
 msgid "Charts"
 msgstr "Diagramme"
@@ -504,6 +531,9 @@ msgstr "Spalteninhalt"
 msgid "Column heading"
 msgstr "Spaltenüberschrift"
 
+msgid "Community"
+msgstr "Community"
+
 msgid "Configuration"
 msgstr "Konfiguration"
 
@@ -523,10 +553,33 @@ msgid_plural "Confirm Delete Images"
 msgstr[0] "Löschen von Abbild bestätigen"
 msgstr[1] "Löschen von Abbildern bestätigen"
 
+msgid "Confirm Delete Key Pair"
+msgid_plural "Confirm Delete Key Pairs"
+msgstr[0] "Schlüsselpaar löschen bestätigen"
+msgstr[1] "Schlüsselpaare löschen bestätigen"
+
 msgid "Confirm Delete Role"
 msgid_plural "Confirm Delete Roles"
 msgstr[0] "Rolle löschen bestätigen"
 msgstr[1] "Rollen löschen bestätigen"
+
+msgid "Confirm Delete Server Group"
+msgid_plural "Confirm Delete Server Groups"
+msgstr[0] "Servergruppe löschen bestätigen"
+msgstr[1] "Servergruppen löschen bestätigen"
+
+msgid "Confirm Delete Trunk"
+msgid_plural "Confirm Delete Trunks"
+msgstr[0] "Trunk löschen bestätigen"
+msgstr[1] "Trunks löschen bestätigen"
+
+msgid "Confirm Delete User"
+msgid_plural "Confirm Delete Users"
+msgstr[0] "Benutzer löschen bestätigen"
+msgstr[1] "Benutzer löschen bestätigen"
+
+msgid "Confirm Password"
+msgstr "Passwort bestätigen"
 
 msgid "Connecting"
 msgstr "Verbindungsaufbau"
@@ -567,8 +620,20 @@ msgstr "Inhaltstyp"
 msgid "Contextual alternatives"
 msgstr "Kontextbezogene Alternativen"
 
+msgid "Copy"
+msgstr "Kopieren"
+
 msgid "Copy Data"
 msgstr "Daten kopieren"
+
+msgid "Copy Object"
+msgstr "Objekt kopieren"
+
+msgid "Copy Private Key to Clipboard"
+msgstr "Kopiere privaten Schlüssel in die Zwischenablage"
+
+msgid "Copying"
+msgstr "Kopiere"
 
 msgid "Could not decrypt the password"
 msgstr "Das Passwort konnte nicht entschlüsselt werden"
@@ -603,16 +668,35 @@ msgstr "Neuen Datenträger erstellen"
 msgid "Create Role"
 msgstr "Rolle erstellen"
 
+msgid "Create Server Group"
+msgstr "Servergruppen erstellen"
+
 msgid "Create Subnet"
 msgstr "Subnetz erstellen"
 
+msgid "Create Trunk"
+msgstr "Trunk erstellen"
+
+msgid "Create User"
+msgstr "Benutzer erstellen"
+
 msgid "Create Volume"
 msgstr "Datenträger erstellen"
+
+msgid ""
+"Create a new user and set related properties including the Primary Project "
+"and Role."
+msgstr ""
+"Erzeugen Sie einen neuen Benutzer und setzen Sie die entsprechenden "
+"Eigenschaften, einschließlich primäres Projekt und primäre Rolle."
 
 msgid "Created"
 msgstr "Erstellt"
 
 msgid "Created At"
+msgstr "Erstellt am"
+
+msgid "Created at"
 msgstr "Erstellt am"
 
 #, python-format
@@ -637,6 +721,9 @@ msgstr ""
 "einem angepassten Skript einen öffentlichen Schlüssel zum Benutzerkonto "
 "hinzufügen."
 
+msgid "Customization Script"
+msgstr "Anpassungsskript"
+
 msgid "DNS Domain"
 msgstr "DNS-Domäne"
 
@@ -648,6 +735,9 @@ msgstr "DNS-Datensatz"
 
 msgid "DNS Records"
 msgstr "DNS-Datensätze"
+
+msgid "DSCP Mark"
+msgstr "DSCP Mark"
 
 msgid "Danger"
 msgstr "Gefahr"
@@ -666,6 +756,9 @@ msgstr "Datum"
 
 msgid "Date Created"
 msgstr "Erstellungsdatum"
+
+msgid "Datepicker"
+msgstr "Datepicker"
 
 msgid "Datetime"
 msgstr "Datum/Uhrzeit"
@@ -688,8 +781,17 @@ msgstr "Standardschaltfläche"
 msgid "Default input"
 msgstr "Standardeingabe"
 
+msgid "Default: Empty string"
+msgstr "Standard: leere Zeichenkette"
+
+msgid "Default: Enabled"
+msgstr "Standard: aktiviert"
+
 msgid "Definition list"
 msgstr "Definitionsliste"
+
+msgid "Degraded"
+msgstr "Degradiert"
 
 msgid "Delete"
 msgstr "Löschen"
@@ -722,6 +824,14 @@ msgstr "Instanz löschen"
 msgid "Delete Interface"
 msgstr "Schnittstelle löschen"
 
+msgid "Delete Key Pair"
+msgid_plural "Delete Key Pairs"
+msgstr[0] "Schlüsselpaar löschen"
+msgstr[1] "Schlüsselpaare löschen"
+
+msgid "Delete Key Pairs"
+msgstr "Schlüsselpaare löschen"
+
 msgid "Delete Network"
 msgstr "Lösche Netzwerk"
 
@@ -736,8 +846,32 @@ msgstr "Rollen löschen"
 msgid "Delete Router"
 msgstr "Router löschen"
 
+msgid "Delete Server Group"
+msgid_plural "Delete Server Groups"
+msgstr[0] "Servergruppe löschen"
+msgstr[1] "Servergruppen löschen"
+
+msgid "Delete Server Groups"
+msgstr "Servergruppen löschen"
+
 msgid "Delete Subnet"
 msgstr "Lösche Subnetz"
+
+msgid "Delete Trunk"
+msgid_plural "Delete Trunks"
+msgstr[0] "Trunk löschen"
+msgstr[1] "Trunks löschen"
+
+msgid "Delete Trunks"
+msgstr "Trunks löschen"
+
+msgid "Delete User"
+msgid_plural "Delete Users"
+msgstr[0] "Benutzer löschen"
+msgstr[1] "Benutzer löschen"
+
+msgid "Delete Users"
+msgstr "Benutzer löschen"
 
 msgid "Delete Volume on Instance Delete"
 msgstr "Lösche Datenträger beim Löschen der Instanz"
@@ -758,10 +892,34 @@ msgstr[0] "Gelöschtes Abbild: %s."
 msgstr[1] "Gelöschte Abbilder: %s."
 
 #, python-format
+msgid "Deleted Key Pair: %s."
+msgid_plural "Deleted Key Pairs: %s."
+msgstr[0] "Gelöschtes Schlüsselpaar: %s."
+msgstr[1] "Gelöschte Schlüsselpaare: %s."
+
+#, python-format
 msgid "Deleted Role: %s."
 msgid_plural "Deleted Roles: %s."
 msgstr[0] "Gelöschte Rolle: %s"
 msgstr[1] "Gelöschte Rollen: %s"
+
+#, python-format
+msgid "Deleted Server Group: %s."
+msgid_plural "Deleted Server Groups: %s."
+msgstr[0] "Gelöschte Servergruppe: %s."
+msgstr[1] "Gelöschte Servergruppen: %s"
+
+#, python-format
+msgid "Deleted Trunk: %s."
+msgid_plural "Deleted Trunks: %s."
+msgstr[0] "Gelöschter Trunk: %s"
+msgstr[1] "Gelöschte Trunks: %s"
+
+#, python-format
+msgid "Deleted User: %s."
+msgid_plural "Deleted Users: %s."
+msgstr[0] "Gelöschter Benutzer: %s"
+msgstr[1] "Gelöschte Benutzer: %s"
 
 msgid "Deleting"
 msgstr "Wird gelöscht"
@@ -775,14 +933,26 @@ msgstr "Beschreibung"
 msgid "Description lists"
 msgstr "Beschreibungsliste"
 
+msgid "Destination Container"
+msgstr "Zielcontainer"
+
+msgid "Destination Object"
+msgstr "Zielobjekt"
+
 msgid "Details"
 msgstr "Details"
 
 msgid "Details Views:"
 msgstr "Detailansichten:"
 
+msgid "Device ID"
+msgstr "Geräte-ID"
+
 msgid "Device Name"
 msgstr "Gerätename"
+
+msgid "Device Owner"
+msgstr "Gerätebesitzer"
 
 msgid "Dialogs"
 msgstr "Dialogfelder"
@@ -790,8 +960,14 @@ msgstr "Dialogfelder"
 msgid "Direct"
 msgstr "Direkt"
 
+msgid "Direct Physical"
+msgstr "Direkt Physisch"
+
 msgid "Direction"
 msgstr "Richtung"
+
+msgid "Disable User"
+msgstr "Benutzer deaktivieren"
 
 msgid "Disabled"
 msgstr "Inaktiviert"
@@ -820,11 +996,17 @@ msgstr "Domäne"
 msgid "Domain ID"
 msgstr "Domänen-ID"
 
+msgid "Domain Id"
+msgstr "Domänen-ID"
+
 msgid "Domain Name"
 msgstr "Domänenname"
 
 msgid "Domains"
 msgstr "Domänen"
+
+msgid "Done"
+msgstr "Fertig"
 
 msgid "Down"
 msgstr "Down"
@@ -859,11 +1041,27 @@ msgstr "Abbild bearbeiten"
 msgid "Edit Role"
 msgstr "Rolle bearbeiten"
 
+msgid "Edit Trunk"
+msgstr "Trunk bearbeiten"
+
+msgid "Edit User"
+msgstr "Benutzer bearbeiten"
+
+msgid "Edit the user's details, including the Primary Project."
+msgstr "Bearbeiten der Benutzerdetails, einschließlich des Primären Projektes."
+
 msgid "Email"
 msgstr "E-Mail"
 
 msgid "Emphasis classes"
 msgstr "Attributklassen"
+
+msgid "Enable User"
+msgstr "Benutzer aktivieren"
+
+msgid "Enable/Disable subport addition, removal and trunk delete."
+msgstr ""
+"Subport hinzfügen, entfernen und Trunk löschen aktivieren/deaktivieren."
 
 msgid "Enabled"
 msgstr "Aktiviert"
@@ -891,6 +1089,13 @@ msgstr "Fehler beim Löschen"
 
 msgid "Ether Type"
 msgstr "Netzwerktyp"
+
+msgid ""
+"Exactly one regular Neutron port. Has to be provided when\n"
+"  the trunk is created. Cannot be changed during the trunk's life."
+msgstr ""
+"Es muss genau ein regulärer Neutron Port bei der Trunk Erstellung zur "
+"Verfügung gestellt werden. Dieser kann nicht nachträglich geändert werden."
 
 msgid "Example body text"
 msgstr "Beispieltext für Hauptteil"
@@ -1064,11 +1269,6 @@ msgstr ""
 "wird, haben Sie nur einen sehr beschränkten Zugang. Sie können auf die "
 "Instanz dann nur mit Hilfe der VNC Konsole zugreifen."
 
-msgid "If not, you can manually download this keypair at the following link:"
-msgstr ""
-"Wenn nicht, können Sie dieses Schlüsselpaar manuell über folgenden Link "
-"herunterladen:"
-
 msgid "If set to 'Yes' then the image cannot be deleted."
 msgstr "Wenn \"Ja\", kann das Abbild nicht gelöscht werden."
 
@@ -1151,6 +1351,9 @@ msgstr "Auswirkung auf Ihr Kontingent"
 msgid "Import Key Pair"
 msgstr "Schlüsselpaar importieren"
 
+msgid "Import Public Key"
+msgstr "Öffentlichen Schlüssel importieren"
+
 msgid "Indicators"
 msgstr "Indikator"
 
@@ -1189,6 +1392,9 @@ msgstr "Eingabewarnung"
 
 msgid "Instance"
 msgstr "Instanz"
+
+msgid "Instance ID"
+msgstr "Instanz-ID"
 
 msgid "Instance Name"
 msgstr "Instanzname"
@@ -1240,12 +1446,8 @@ msgstr "Kernel-ID"
 msgid "Key Pair"
 msgstr "Schlüsselpaar"
 
-msgid ""
-"Key Pair Name\n"
-"        <span class=\"hz-icon-required fa fa-asterisk\"></span>"
-msgstr ""
-"Schlüsselpaar Name\n"
-"        <span class=\"hz-icon-required fa fa-asterisk\"></span>"
+msgid "Key Pair Name"
+msgstr "Schlüsselpaarname"
 
 msgid "Key Pairs"
 msgstr "Schlüsselpaare"
@@ -1272,6 +1474,35 @@ msgstr ""
 "      Wählen Sie einen wiedererkennbaren Schlüsselpaarnamen aus.\n"
 "      Die Namen dürfen nur alphanumerische Zeichen, Leerzeichen und "
 "Bindestriche enthalten."
+
+msgid ""
+"Key Pairs are how you login to your instance after it is launched.\n"
+"  Choose a key pair name you will recognize and paste your SSH public key "
+"into the\n"
+"  space provided."
+msgstr ""
+"Verwenden Sie Schlüsselpaare zum Einloggen nachdem eine Instanz gestartet "
+"wurde.\n"
+" Wählen Sie einen wiedererkennbaren Schlüsselpaarnamen und fügen Sie Ihren "
+"öffentlichen SSH-Schlüssel im vorgegebenen Feld ein."
+
+msgid ""
+"Key Pairs are how you login to your instance after it is launched.\n"
+"  Choose a key pair name you will recognize.\n"
+"  Names may only include alphanumeric characters, spaces, or dashes."
+msgstr ""
+"Mit Schlüsselpaaren erhalten Sie Zugriff auf Ihre Instanz, nachdem sie "
+"gestartet wurde.\n"
+" Wählen Sie einen wiedererkennbaren Schlüsselpaarnamen aus.\n"
+"Die Namen dürfen nur alphanumerische Zeichen, Leerzeichen und Bindestriche "
+"enthalten."
+
+#, python-format
+msgid "Key pair %(name)s was successfully created."
+msgstr "Schlüsselpaar %(name)s wurde erfolgreich erstellt."
+
+msgid "Key pair already exists."
+msgstr "Schlüsselpaar bereits vorhanden."
 
 msgid "Keypair already exists or name contains bad characters."
 msgstr ""
@@ -1344,6 +1575,9 @@ msgstr "Ladefunktion:"
 msgid "Loading"
 msgstr "Wird geladen"
 
+msgid "Loading trunk... Please Wait"
+msgstr "Lade Trunk. Bitte warten ..."
+
 msgid "Location"
 msgstr "Ort"
 
@@ -1356,11 +1590,20 @@ msgstr "Dies ist ein kleiner Container!"
 msgid "Look, I'm in a well!"
 msgstr "Dies ist ein Container!"
 
+msgid "MAC Address"
+msgstr "MAC-Adresse"
+
 msgid "MacVTap"
 msgstr "MacVTap"
 
 msgid "Manual"
 msgstr "Manuell"
+
+msgid "Max Burst Kbits"
+msgstr "Max Burst Kbits"
+
+msgid "Max Kbps"
+msgstr "Max Kbps"
 
 msgid "Max Port"
 msgstr "Max Port"
@@ -1411,6 +1654,9 @@ msgstr "Mitte"
 msgid "Min Disk (GB)"
 msgstr "Min Disk (GB)"
 
+msgid "Min Kbps"
+msgstr "Min Kbps"
+
 msgid "Min Port"
 msgstr "Min Port"
 
@@ -1450,8 +1696,16 @@ msgstr "Modell"
 msgid "Month"
 msgstr "Monat"
 
+msgid ""
+"Must not be the parent or a subport of any other\n"
+"  trunks."
+msgstr "Weder der Elternport noch ein Subport eines anderen Trunks."
+
 msgid "Name"
 msgstr "Name"
+
+msgid "Name/ID"
+msgstr "Name/ID"
 
 msgid "Names:"
 msgstr "Namen:"
@@ -1560,11 +1814,6 @@ msgstr ""
 "Anmerkung: Trennzeichen ('{$ ctrl.model.DELIMETER $}') sind im Ordnernamen\n"
 "          für die Erstellung von tiefen Ordnern zugelassen."
 
-msgid "Note: you will not be able to download this later."
-msgstr ""
-"Hinweis: Sie können diesen Schritt nicht zu einem späteren Zeitpunkt "
-"ausführen."
-
 msgid "Number"
 msgstr "Zahl"
 
@@ -1579,6 +1828,10 @@ msgstr "OVA - Open Virtual Appliance"
 
 msgid "Object"
 msgstr "Objekt"
+
+#, python-format
+msgid "Object %(path)s has copied."
+msgstr "Objekt %(path)s wurde kopiert."
 
 msgid "Object Count"
 msgstr "Objektanzahl"
@@ -1640,6 +1893,9 @@ msgstr "Übersicht"
 msgid "Owner"
 msgstr "Eigentümer"
 
+msgid "Ownership"
+msgstr "Eigentumsrechte"
+
 msgid "PLOOP"
 msgstr "PLOOP"
 
@@ -1679,6 +1935,12 @@ msgstr "Warnungsanzeige"
 msgid "Panels"
 msgstr "Fenster"
 
+msgid "Parent Port"
+msgstr "Eltern-Port"
+
+msgid "Parent port"
+msgstr "Eltern-Port"
+
 msgid "Password"
 msgstr "Passwort"
 
@@ -1690,6 +1952,9 @@ msgstr "Physikalisches Netzwerk"
 
 msgid "Pills"
 msgstr "Pills"
+
+msgid "Please Wait"
+msgstr "Bitte warten"
 
 msgid ""
 "Please provide the initial hostname for the instance, the availability zone "
@@ -1704,11 +1969,23 @@ msgstr ""
 msgid "Policy"
 msgstr "Richtlinie"
 
+msgid "Policy Details"
+msgstr "Richtliniendetails"
+
+msgid "Policy ID"
+msgstr "Richtlinien-ID"
+
+msgid "Policy Name"
+msgstr "Richtlinienname"
+
 msgid "Policy check failed."
 msgstr "Richtlinienüberprüfung fehlgeschlagen."
 
 msgid "Popovers"
 msgstr "Popovers"
+
+msgid "Port ID"
+msgstr "Port ID"
 
 msgid "Ports can be created under a network by administrators."
 msgstr "Ports können von Administratoren in einem Netz erstellt werden."
@@ -1736,6 +2013,9 @@ msgstr "Primärer Anker"
 msgid "Primary Button"
 msgstr "Primäre Schaltfläche"
 
+msgid "Primary Project"
+msgstr "Primäres Projekt"
+
 msgid "Primary Project ID"
 msgstr "Primäre Projekt-ID"
 
@@ -1744,6 +2024,9 @@ msgstr "Primärer Projektname"
 
 msgid "Private"
 msgstr "Privat"
+
+msgid "Private Key"
+msgstr "Privater Schlüssel"
 
 msgid "Profile"
 msgstr "Profil"
@@ -1776,6 +2059,11 @@ msgstr "Geschützt"
 msgid "Protocol"
 msgstr "Protokoll"
 
+msgid "Provide basic properties of the trunk to be created. All optional."
+msgstr ""
+"Geben Sie sie Basiseigenschaften des zu erstellenden Trunks an. Alle Angaben "
+"sind optional."
+
 msgid "Provider Network"
 msgstr "Anbieternetzwerk"
 
@@ -1796,18 +2084,17 @@ msgstr "Öffentlicher Zugriff"
 msgid "Public Key"
 msgstr "Öffentlicher Schlüssel"
 
-msgid ""
-"Public Key\n"
-"        <span class=\"hz-icon-required fa fa-asterisk\"></span>"
-msgstr ""
-"Öffentlicher Schlüssel\n"
-"        <span class=\"hz-icon-required fa fa-asterisk\"></span>"
-
 msgid "QCOW2"
 msgstr "QCOW2"
 
 msgid "QCOW2 - QEMU Emulator"
 msgstr "QCOW2 - QEMU Emulator"
+
+msgid "QoS Policies"
+msgstr "QoS-Richtlinien"
+
+msgid "QoS Policy"
+msgstr "QoS-Richtlinie"
 
 msgid "Queued"
 msgstr "In Warteschlange"
@@ -1848,6 +2135,9 @@ msgstr "Entfernt"
 msgid "Resource ID(s)"
 msgstr "Ressourcen-ID(s)"
 
+msgid "Revision Number"
+msgstr "Revisionsnummer"
+
 msgid "Right"
 msgstr "Rechts"
 
@@ -1866,6 +2156,12 @@ msgstr "Rollen"
 
 msgid "Root Disk"
 msgstr "Root-Festplatte"
+
+msgid "Rule ID"
+msgstr "Regel ID"
+
+msgid "Rules"
+msgstr "Regeln"
 
 msgid "STATUS"
 msgstr "STATUS"
@@ -1931,6 +2227,12 @@ msgstr ""
 msgid "Segmentation ID"
 msgstr "Segmentierungskennung"
 
+msgid "Segmentation Id"
+msgstr "Segmentierungs-ID"
+
+msgid "Segmentation Type"
+msgstr "Segmentierungs-Typ"
+
 msgid "Select Boot Source"
 msgstr "Bootquelle auswählen"
 
@@ -1957,6 +2259,15 @@ msgstr "Wählen Sie einen Eintrag aus den verfügbaren Positionen aus"
 
 msgid "Select at least one network"
 msgstr "Wählen Sie mindestens ein Netzwerk aus"
+
+msgid "Select from the list of available ports below."
+msgstr "Wählen Sie aus den unten stehenden verfügbaren Ports aus."
+
+msgid "Select items from Available items below"
+msgstr "Wählen Sie Einträge aus den verfügbaren Positionen aus"
+
+msgid "Select many"
+msgstr "Mehrere auswählen"
 
 msgid "Select networks from those listed below."
 msgstr "Wählen Sie aus den unten stehenden Netzwerken aus."
@@ -2013,6 +2324,13 @@ msgstr "Sende Einladung"
 msgid "Separated link"
 msgstr "Getrennter Link"
 
+msgid "Server Group"
+msgstr "Servergruppe"
+
+#, python-format
+msgid "Server Group %s was successfully created."
+msgstr "Servergruppe %s wurde erfolgreich erstellt."
+
 msgid "Server Groups"
 msgstr "Servergruppen"
 
@@ -2058,6 +2376,9 @@ msgstr "Mit Projekt geteilt"
 msgid "Size"
 msgstr "Größe"
 
+msgid "Size (GiB)"
+msgstr "Grösse (GiB)"
+
 msgid "Small Modal"
 msgstr "Klein Modal"
 
@@ -2075,6 +2396,9 @@ msgstr "Eine bekannte Person aus"
 
 msgid "Something else here"
 msgstr "Etwas anderes hier"
+
+msgid "Something wrong to change password."
+msgstr "Es war nicht möglich das Passwort zu ändern."
 
 msgid "Source"
 msgstr "Quelle"
@@ -2118,6 +2442,12 @@ msgstr "Subnetze"
 
 msgid "Subnets Associated"
 msgstr "Subnetze zugewiesen"
+
+msgid "Subport Count"
+msgstr "Anzahl Subports"
+
+msgid "Subports"
+msgstr "Subports"
 
 msgid "Success"
 msgstr "Erfolg"
@@ -2165,6 +2495,9 @@ msgstr "Schlagwörter"
 msgid "Tel"
 msgstr "Tel"
 
+msgid "Tenant ID"
+msgstr "Mandanten-ID"
+
 msgid "Text"
 msgstr "Text"
 
@@ -2176,6 +2509,9 @@ msgstr "Textbereich"
 
 msgid "The access permission for the image."
 msgstr "Zugriffsberechtigungen für das Abbild."
+
+msgid "The admin password is incorrect."
+msgstr "Das Administratorpasswort ist nicht richtig"
 
 msgid "The architecture of the image."
 msgstr "Die Architektur des Abbildes."
@@ -2260,6 +2596,15 @@ msgstr "Name des Datenträgers."
 msgid "The name of the image."
 msgstr "Der Name des Abbildes."
 
+msgid ""
+"The parent port is the port you have to add to the instance\n"
+"  at launch. Do not try to add the trunk or any of the subports to the\n"
+"  instance directly."
+msgstr ""
+"Der Elternport ist der Port, den Sie der Instanz beim Start zugewiesen "
+"haben. Versuchen Sie nicht den Trunk oder einen der Subports der Instanz "
+"direkt hinzuzufügen."
+
 #, python-format
 msgid ""
 "The selected %(sourceType)s source requires a flavor with at least "
@@ -2321,12 +2666,11 @@ msgid "There are no Availability Zones."
 msgstr "Es gibt keine Verfügbarkeitszonen."
 
 msgid ""
-"There are no allowed boot sources.\n"
-"      If you think this is wrong please contact your administrator."
+"There are no allowed boot\n"
+"      sources. If you think this is wrong please contact your administrator."
 msgstr ""
-"Es gibt keine erlaubten Boot-Quellen.\n"
-"Wenn Sie dies für einen Fehler halten, kontaktieren Sie bitte Ihren "
-"Administrator."
+"Es gibt keine erlaubten Boot-Quellen. Wenn Sie dies für einen Fehler halten, "
+"kontaktieren Sie bitte den Administrator."
 
 msgid ""
 "There are two ways to generate a key pair. From a Linux system,\n"
@@ -2350,6 +2694,12 @@ msgstr ""
 "Dieses Kommando erzeugt ein Schlüsselpaar: einen privaten Schlüssel (cloud."
 "key)\n"
 " und einen öffentlichen Schlüssel (cloud.key.pub)."
+
+msgid "This container does not exist."
+msgstr "Dieser Container existiert nicht."
+
+msgid "This field is required."
+msgstr "Dieses Feld ist erforderlich."
 
 msgid ""
 "This flavor requires more RAM than your quota allows. Please select a "
@@ -2440,6 +2790,26 @@ msgstr "RAM gesamt"
 msgid "Total VCPUs"
 msgstr "Gesamte Aktive VCPUs"
 
+msgid "Total Volume Storage"
+msgstr "Gesamter Datenträger-Speicher"
+
+msgid "Total Volumes"
+msgstr "Gesamte Datenträger"
+
+msgid "Trunk"
+msgstr "Trunk"
+
+#, python-format
+msgid "Trunk %s was successfully created."
+msgstr "Trunk %s wurde erfolgreich erstellt."
+
+#, python-format
+msgid "Trunk %s was successfully edited."
+msgstr "Trunk %s wurde erfolgreich bearbeitet."
+
+msgid "Trunks"
+msgstr "Trunks"
+
 msgid "Type"
 msgstr "Typ"
 
@@ -2467,6 +2837,9 @@ msgstr "Die Floating-IP-Adresse kann nicht zugeordnet werden."
 msgid "Unable to change the container access."
 msgstr "Der Containerzugriff konnte nicht geändert werden. "
 
+msgid "Unable to check the Nova service feature."
+msgstr "Das Nova-Dienstmerkmal kann nicht überprüft werden."
+
 msgid "Unable to copy the object."
 msgstr "Das Objekt konnte nicht kopiert werden."
 
@@ -2481,6 +2854,9 @@ msgstr "Die Variante kann nicht erstellt werden."
 
 msgid "Unable to create the folder."
 msgstr "Der Ordner konnte nicht erstellt werden."
+
+msgid "Unable to create the group."
+msgstr "Die Gruppe kann nicht erstellt werden."
 
 msgid "Unable to create the image."
 msgstr "Abbild kann nicht erzeugt werden."
@@ -2497,6 +2873,9 @@ msgstr "Das Projekt kann nicht erstellt werden."
 msgid "Unable to create the role."
 msgstr "Die Rolle kann nicht erstellt werden."
 
+msgid "Unable to create the server group."
+msgstr "Die Servergruppe kann nicht erstellt werden."
+
 msgid "Unable to create the server snapshot."
 msgstr "Server-Schattenkopie kann nicht erzeugt werden."
 
@@ -2505,6 +2884,9 @@ msgstr "Der Server kann nicht erstellt werden."
 
 msgid "Unable to create the subnet."
 msgstr "Das Subnetz kann nicht erstellt werden."
+
+msgid "Unable to create the trunk."
+msgstr "Trunk kann nicht erstellt werden."
 
 msgid "Unable to create the user."
 msgstr "Der Benutzer kann nicht erstellt werden."
@@ -2525,10 +2907,34 @@ msgstr[0] "Das folgende Abbild kann nicht gelöscht werden: %s."
 msgstr[1] "Die folgenden Abbilder konnten nicht gelöscht werden: %s."
 
 #, python-format
+msgid "Unable to delete Key Pair: %s."
+msgid_plural "Unable to delete Key Pairs: %s."
+msgstr[0] "Schlüsselpaar kann nicht gelöscht werden: %s"
+msgstr[1] "Schlüsselpaare können nicht gelöscht werden: %s"
+
+#, python-format
 msgid "Unable to delete Role: %s."
 msgid_plural "Unable to delete Roles: %s."
 msgstr[0] "Rolle kann nicht gelöscht werden: %s."
 msgstr[1] "Rollen können nicht gelöscht werden: %s."
+
+#, python-format
+msgid "Unable to delete Server Group: %s."
+msgid_plural "Unable to delete Server Groups: %s."
+msgstr[0] "Servergruppe kann nicht gelöscht werden: %s"
+msgstr[1] "Servergruppen können nicht gelöscht werden: %s"
+
+#, python-format
+msgid "Unable to delete Trunk: %s."
+msgid_plural "Unable to delete Trunks: %s."
+msgstr[0] "Trunk kann nicht gelöscht werden: %s"
+msgstr[1] "Trunks können nicht gelöscht werden: %s"
+
+#, python-format
+msgid "Unable to delete User: %s."
+msgid_plural "Unable to delete Users: %s."
+msgstr[0] "Benutzer kann nicht gelöscht werden: %s"
+msgstr[1] "Benutzer können nicht gelöscht werden: %s"
 
 msgid "Unable to delete the container."
 msgstr "Der Container konnte nicht gelöscht werden."
@@ -2546,9 +2952,19 @@ msgstr "Die Variante mit der folgenden ID kann nicht gelöscht werden: %(id)s"
 msgid "Unable to delete the folder because it is not empty."
 msgstr "Der Ordner konnte nicht gelöscht werden, weil er nicht leer ist."
 
+msgid "Unable to delete the group."
+msgstr "Die Gruppe kann nicht gelöscht werden."
+
+msgid "Unable to delete the groups."
+msgstr "Die Gruppen können nicht gelöscht werden."
+
 #, python-format
 msgid "Unable to delete the image with id: %(id)s"
 msgstr "Das Abbild mit der folgenden ID kann nicht gelöscht werden:  %(id)s"
+
+#, python-format
+msgid "Unable to delete the keypair with name: %(name)s"
+msgstr "Das folgende Schlüsselpaar kann nicht abgerufen werden: %(name)s"
 
 msgid "Unable to delete the object."
 msgstr "Das Objekt konnte nicht gelöscht werden."
@@ -2566,6 +2982,10 @@ msgid "Unable to delete the roles."
 msgstr "Die Rollen können nicht gelöscht werden."
 
 #, python-format
+msgid "Unable to delete the server group with id %(id)s"
+msgstr "Die Servergruppe mit der ID %(id)s kann nicht gelöscht werden."
+
+#, python-format
 msgid "Unable to delete the server with id: %(id)s"
 msgstr "Server mit dieser ID kann nicht gelöscht werden: %(id)s"
 
@@ -2574,6 +2994,10 @@ msgstr "Der Benutzer kann nicht gelöscht werden."
 
 msgid "Unable to delete the users."
 msgstr "Die Benutzer können nicht gelöscht werden."
+
+#, python-format
+msgid "Unable to delete trunk: %(id)s"
+msgstr "Trunks können nicht gelöscht werden: %(id)s"
 
 msgid "Unable to disassociate floating IP address."
 msgstr "Die Floating-IP-Adresse kann nicht getrennt werden."
@@ -2592,6 +3016,9 @@ msgstr "Die Domäne kann nicht bearbeitet werden."
 
 msgid "Unable to edit the flavor extra specs."
 msgstr "Extraspezifikationen zur Variante können nicht bearbeitet werden."
+
+msgid "Unable to edit the group."
+msgstr "Die Gruppe kann nicht bearbeitet werden."
 
 msgid "Unable to edit the image custom properties."
 msgstr "Die Abbildanpassungseigenschaften können nicht bearbeitet werden."
@@ -2619,10 +3046,6 @@ msgstr "Der Dienstkatalog kann nicht abgerufen werden."
 
 msgid "Unable to fetch the services."
 msgstr "Die Dienste können nicht abgerufen werden."
-
-#, python-format
-msgid "Unable to generate \"%s\". Please try again."
-msgstr "\"%s\" konnte nicht erzeugt werden. Bitte versuchen Sie es nochmal."
 
 msgid "Unable to get details of the object."
 msgstr "Die Objektdetails konnten nicht abgerufen werden."
@@ -2719,6 +3142,9 @@ msgstr "Die Cinder-Dienste können nicht abgerufen werden."
 msgid "Unable to retrieve the current user session."
 msgstr "Die aktuelle Benutzersitzung kann nicht abgerufen werden."
 
+msgid "Unable to retrieve the default domain."
+msgstr "Die Standard-Domäne kann nicht abgerufen werden."
+
 msgid "Unable to retrieve the default quotas."
 msgstr "Standard-Kontingente können nicht abgerufen werden."
 
@@ -2746,8 +3172,8 @@ msgstr "Die Variante kann nicht abgerufen werden."
 msgid "Unable to retrieve the flavors."
 msgstr "Die Varianten können nicht abgerufen werden."
 
-msgid "Unable to retrieve the heat services."
-msgstr "Die Heat-Dienste können nicht abgerufen werden."
+msgid "Unable to retrieve the group."
+msgstr "Die Gruppe kann nicht abgerufen werden."
 
 msgid "Unable to retrieve the image custom properties."
 msgstr "Die Abbildanpassungseigenschaften können nicht abgerufen werden."
@@ -2757,6 +3183,9 @@ msgstr "Das Abbild konnte nicht abgerufen werden."
 
 msgid "Unable to retrieve the images."
 msgstr "Die Abbilder konnten nicht aufgerufen werden. "
+
+msgid "Unable to retrieve the keypair."
+msgstr "Das Schlüsselpaar kann nicht abgerufen werden."
 
 msgid "Unable to retrieve the keypairs."
 msgstr "Die Schlüsselpaare können nicht abgerufen werden."
@@ -2782,6 +3211,12 @@ msgstr "Das Projekt kann nicht abgerufen werden."
 msgid "Unable to retrieve the projects."
 msgstr "Die Projekte können nicht abgerufen werden."
 
+msgid "Unable to retrieve the qos policies."
+msgstr "QoS-Richtlinien können nicht abgerufen werden."
+
+msgid "Unable to retrieve the qos policy."
+msgstr "QoS-Richtlinie kann nicht abgerufen werden."
+
 msgid "Unable to retrieve the resource types."
 msgstr "Die Ressourcentypen können nicht abgerufen werden."
 
@@ -2794,6 +3229,9 @@ msgstr "Die Rolle kann nicht abgerufen werden."
 msgid "Unable to retrieve the security groups."
 msgstr "Die Sicherheitsgruppen können nicht abgerufen werden."
 
+msgid "Unable to retrieve the server group."
+msgstr "Die Servergruppe kann nicht abgerufen werden."
+
 msgid "Unable to retrieve the server."
 msgstr "Der Server kann nicht abgerufen werden."
 
@@ -2803,11 +3241,21 @@ msgstr "Schattenkopie-Metadaten können nicht abgerufen werden."
 msgid "Unable to retrieve the subnets."
 msgstr "Die Subnetze können nicht abgerufen werden."
 
+#, python-format
+msgid "Unable to retrieve the trunk with id: %(id)s"
+msgstr "Trunk mit der folgenden ID kann nicht abgerufen werden: %(id)s"
+
+msgid "Unable to retrieve the trunks."
+msgstr "Trunks können nicht abgerufen werden."
+
 msgid "Unable to retrieve the user."
 msgstr "Der Benutzer kann nicht abgerufen werden."
 
 msgid "Unable to retrieve the users."
 msgstr "Die Benutzer können nicht abgerufen werden."
+
+msgid "Unable to retrieve the volume availability zones."
+msgstr "Die Datenträger-Verfügbarkeitszonen können nicht abgerufen werden. "
 
 msgid "Unable to retrieve the volume metadata."
 msgstr "Datenträger-Metadaten können nicht abgerufen werden."
@@ -2868,11 +3316,11 @@ msgstr "Die Variante kann nicht aktualisiert werden."
 msgid "Unable to update the image."
 msgstr "Abbild kann nicht aktualisiert werden."
 
+msgid "Unable to update the trunk."
+msgstr "Trunk kann nicht aktualisiert werden."
+
 msgid "Unable to upload the object."
 msgstr "Das Objekt konnte nicht hochgeladen werden."
-
-msgid "Unable to validate the template."
-msgstr "Vorlage kann nicht validiert werden."
 
 msgid "Unknown"
 msgstr "Unbekannt"
@@ -2919,6 +3367,9 @@ msgstr "Aktualisiert"
 msgid "Updated At"
 msgstr "Aktualisiert am"
 
+msgid "Updated at"
+msgstr "Aktualisiert am"
+
 msgid "Upload File"
 msgstr "Datei hochladen"
 
@@ -2946,8 +3397,8 @@ msgid ""
 "you can use JavaScript in production code, such as <code>gettext</code> for "
 "translation."
 msgstr ""
-"Verwenden Sie die Form zum setzen von Titeln, Beschreibungen und zum "
-"auswählen von bestimmten UI-Elementtypen für jedes Element im Schema. Im "
+"Verwenden Sie die Form zum Setzen von Titeln, Beschreibungen und zum "
+"Auswählen von bestimmten UI-Elementtypen für jedes Element im Schema. Im "
 "Formularersteller muss JSON als Form verwendet werden, aber im "
 "Produktionscode können Sie JavaScript verwenden, wie z.B. <code>gettext</"
 "code>  für Übersetzungen."
@@ -2963,6 +3414,31 @@ msgstr ""
 
 msgid "User"
 msgstr "Benutzer"
+
+#, python-format
+msgid "User %s was successfully created."
+msgstr "Der Benutzer \"%s\" wurde erfolgreich erstellt."
+
+#, python-format
+msgid "User %s was successfully disabled."
+msgstr "Der Benutzer %s wurde erfolgreich deaktiviert."
+
+#, python-format
+msgid "User %s was successfully enabled."
+msgstr "Der Benutzer %s wurde erfolgreich aktiviert."
+
+#, python-format
+msgid "User %s was successfully updated."
+msgstr "Benutzer %s wurde erfolgreich aktualisiert."
+
+msgid "User ID"
+msgstr "Benutzerkennung"
+
+msgid "User Name"
+msgstr "Benutzername"
+
+msgid "User password has been updated successfully."
+msgstr "Das Passwort wurde erfolgreich aktualisiert."
 
 msgid "Users"
 msgstr "Benutzer"
@@ -3009,6 +3485,9 @@ msgstr "Instanzdetails anzeigen"
 msgid "View Router Details"
 msgstr "Routerdetails anzeigen"
 
+msgid "Virtio Forwarder"
+msgstr "Virtio Forwarder"
+
 msgid "Virtual Size"
 msgstr "Virtuelle Grösse"
 
@@ -3037,12 +3516,8 @@ msgstr "Datenträgerdetails"
 msgid "Volume Quota"
 msgstr "Datenträgerkontingent"
 
-msgid ""
-"Volume Size (GB)\n"
-"            <span class=\"hz-icon-required fa fa-asterisk\"></span>"
-msgstr ""
-"Datenträgergröße (GB)\n"
-"            <span class=\"hz-icon-required fa fa-asterisk\"></span>"
+msgid "Volume Size (GB)"
+msgstr "Datenträgergröße (GB)"
 
 msgid "Volume Snapshot"
 msgstr "Datenträger Snapshot"
@@ -3052,6 +3527,9 @@ msgstr "Datenträgerschattenkopie"
 
 msgid "Volume Type Description:"
 msgstr "Beschreibung des Datenträgertyps:"
+
+msgid "Volume and Snapshot Quota (GiB)"
+msgstr "Datenträger- und Schattenkopiekontingent (GiB)"
 
 msgid "Volume size is required and must be an integer"
 msgstr "Datenträgergröße ist erforderlich und muss eine Ganzzahl sein"
@@ -3161,6 +3639,11 @@ msgstr ""
 "Zeichen."
 
 msgid ""
+"You can copy objects. You have to create destination container prior to copy."
+msgstr ""
+"Sie können Objekte kopieren, müssen aber den Zielcontainer vorher erstellen."
+
+msgid ""
 "You can customize your instance after it has launched using the options "
 "available here.\n"
 "    \"Customization Script\" is analogous to \"User Data\" in other systems."
@@ -3180,6 +3663,16 @@ msgstr ""
 "Schedulerhinweisdefinitionen aus dem Glance Metadatenkatalog. Verwenden Sie "
 "die \"Angepasst\" Option um Schedulerhinweise mit dem Schlüssel Ihrer Wahl "
 "hinzuzufügen."
+
+#, python-format
+msgid "You have selected \"%s\". Deleted Trunk is not recoverable."
+msgid_plural "You have selected \"%s\". Deleted Trunks are not recoverable."
+msgstr[0] ""
+"Sie haben \"%s\" ausgewählt. Der gelöschte Trunk kann nicht "
+"wiederhergestellt werden."
+msgstr[1] ""
+"Sie haben \"%s\" ausgewählt. Die gelöschten Trunks können nicht "
+"wiederhergestellt werden."
 
 #, python-format
 msgid "You have selected \"%s\". Deleted flavor is not recoverable."
@@ -3202,6 +3695,16 @@ msgstr[1] ""
 "wiederhergestellt werden."
 
 #, python-format
+msgid "You have selected \"%s\". Deleted key pair is not recoverable."
+msgid_plural "You have selected \"%s\". Deleted key pairs are not recoverable."
+msgstr[0] ""
+"Sie haben \"%s\" ausgewählt. Ein gelöschtes Schlüsselpaar kann nicht "
+"wiederhergestellt werden."
+msgstr[1] ""
+"Sie haben \"%s\" ausgewählt. Gelöschte Schlüsselpaare können nicht "
+"wiederhergestellt werden."
+
+#, python-format
 msgid "You have selected \"%s\". Deleted role is not recoverable."
 msgid_plural "You have selected \"%s\". Deleted roles are not recoverable."
 msgstr[0] ""
@@ -3211,21 +3714,24 @@ msgstr[1] ""
 "Sie haben \"%s\" ausgewählt. Die gelöschten Rollen können nicht "
 "wiederhergestellt werden."
 
+#, python-format
+msgid "You have selected \"%s\". Deleted user is not recoverable."
+msgid_plural "You have selected \"%s\". Deleted users are not recoverable."
+msgstr[0] ""
+"Sie haben \"%s\" ausgewählt. Ein gelöschter Benutzer kann nicht "
+"wiederhergestellt werden."
+msgstr[1] ""
+"Sie haben \"%s\" ausgewählt. Gelöschte Benutzer können nicht "
+"wiederhergestellt werden."
+
 msgid "Your Form as JavaScript"
 msgstr "Ihr Formular als JavaScript"
-
-msgid "error"
-msgid_plural "errors"
-msgstr[0] "Fehler"
-msgstr[1] "Fehler"
 
 msgid "image"
 msgstr "Abbild"
 
-msgid "message"
-msgid_plural "messages"
-msgstr[0] "Nachricht"
-msgstr[1] "Nachrichten"
+msgid "inherit"
+msgstr "vererben"
 
 #, python-format
 msgid "resource load failed: %s"
@@ -3234,20 +3740,11 @@ msgstr "Laden der Ressource fehlgeschlagen: %s"
 msgid "snapshot"
 msgstr "Schattenkopie"
 
-msgid "submit"
-msgid_plural "submits"
-msgstr[0] "Übergabe"
-msgstr[1] "Übergaben"
+msgid "volume"
+msgstr "Datenträger"
 
-msgid "success"
-msgid_plural "successs"
-msgstr[0] "Erfolg"
-msgstr[1] "Erfolge"
-
-msgid "title"
-msgid_plural "titles"
-msgstr[0] "Titel"
-msgstr[1] "Titel"
+msgid "{$ address $} on subnet {$ subnet $}"
+msgstr "{$ address $} in Subnetz {$ subnet $}"
 
 msgid ""
 "{$ ctrl.model.counted.files $} files in\n"
@@ -3255,6 +3752,3 @@ msgid ""
 msgstr ""
 "{$ ctrl.model.counted.files $} Dateien in\n"
 "      {$ ctrl.model.counted.folders $} Ordnern."
-
-msgid "{$ row['provider:network_type'] $}"
-msgstr "{$ row['provider:network_type'] $}"

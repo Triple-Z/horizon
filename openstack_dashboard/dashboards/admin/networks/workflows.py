@@ -12,7 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from openstack_dashboard.dashboards.admin.networks import forms \
     as networks_forms
@@ -44,7 +44,7 @@ class CreateNetworkInfoAction(network_workflows.CreateNetworkInfoAction):
 
 class CreateNetworkInfo(network_workflows.CreateNetworkInfo):
     action_class = CreateNetworkInfoAction
-    contributes = ("net_name", "admin_state", "with_subnet")
+    contributes = ("net_name", "admin_state", "with_subnet", "az_hints")
 
     def __init__(self, workflow):
         self.contributes = tuple(workflow.create_network_form.fields.keys())

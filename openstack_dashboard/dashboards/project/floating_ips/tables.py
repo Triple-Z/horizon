@@ -15,8 +15,8 @@
 
 import logging
 
-from django.core.urlresolvers import reverse
 from django import shortcuts
+from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import pgettext_lazy
 from django.utils.translation import string_concat
@@ -47,8 +47,9 @@ class AllocateIP(tables.LinkAction):
         return shortcuts.redirect('horizon:project:floating_ips:index')
 
     def allowed(self, request, fip=None):
-        usages = quotas.tenant_quota_usages(request)
-        if usages['floating_ips']['available'] <= 0:
+        usages = quotas.tenant_quota_usages(request,
+                                            targets=('floatingip', ))
+        if usages['floatingip']['available'] <= 0:
             if "disabled" not in self.classes:
                 self.classes = [c for c in self.classes] + ['disabled']
                 self.verbose_name = string_concat(self.verbose_name, ' ',
@@ -90,7 +91,7 @@ class ReleaseIPs(tables.BatchAction):
         return policy.check(policy_rules, request)
 
     def action(self, request, obj_id):
-        api.network.tenant_floating_ip_release(request, obj_id)
+        api.neutron.tenant_floating_ip_release(request, obj_id)
 
 
 class AssociateIP(tables.LinkAction):
@@ -124,7 +125,7 @@ class DisassociateIP(tables.Action):
     def single(self, table, request, obj_id):
         try:
             fip = table.get_object_by_id(filters.get_int_or_uuid(obj_id))
-            api.network.floating_ip_disassociate(request, fip.id)
+            api.neutron.floating_ip_disassociate(request, fip.id)
             LOG.info('Disassociating Floating IP "%s".', obj_id)
             messages.success(request,
                              _('Successfully disassociated Floating IP: %s')
@@ -163,6 +164,20 @@ STATUS_DISPLAY_CHOICES = (
 )
 
 
+FLOATING_IPS_FILTER_CHOICES = (
+    ('floating_ip_address', _('Floating IP Address ='), True),
+    ('network_id', _('Network ID ='), True),
+    ('router_id', _('Router ID ='), True),
+    ('port_id', _('Port ID ='), True),
+    ('status', _('Status ='), True, _("e.g. ACTIVE / DOWN / ERROR")),
+)
+
+
+class FloatingIPsFilterAction(tables.FilterAction):
+    filter_type = "server"
+    filter_choices = FLOATING_IPS_FILTER_CHOICES
+
+
 class FloatingIPsTable(tables.DataTable):
     STATUS_CHOICES = (
         ("active", True),
@@ -172,6 +187,8 @@ class FloatingIPsTable(tables.DataTable):
     ip = tables.Column("ip",
                        verbose_name=_("IP Address"),
                        attrs={'data-type': "ip"})
+    description = tables.Column("description",
+                                verbose_name=_("Description"))
     fixed_ip = tables.Column(get_instance_info,
                              link=get_instance_link,
                              verbose_name=_("Mapped Fixed IP Address"))
@@ -197,5 +214,5 @@ class FloatingIPsTable(tables.DataTable):
     class Meta(object):
         name = "floating_ips"
         verbose_name = _("Floating IPs")
-        table_actions = (AllocateIP, ReleaseIPs)
+        table_actions = (AllocateIP, ReleaseIPs, FloatingIPsFilterAction)
         row_actions = (AssociateIP, DisassociateIP, ReleaseIPs)

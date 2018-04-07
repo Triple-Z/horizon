@@ -10,11 +10,11 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 import collections
-import six
 
 from selenium.common import exceptions
 from selenium.webdriver.common import by
 import selenium.webdriver.support.ui as Support
+import six
 
 from openstack_dashboard.test.integration_tests.regions import baseregion
 from openstack_dashboard.test.integration_tests.regions import menus
@@ -283,13 +283,13 @@ class BaseFormRegion(baseregion.BaseRegion):
     """Base class for forms."""
 
     _submit_locator = (by.By.CSS_SELECTOR, '*.btn.btn-primary')
+    _submit_danger_locator = (by.By.CSS_SELECTOR, '*.btn.btn-danger')
     _cancel_locator = (by.By.CSS_SELECTOR, '*.btn.cancel')
     _default_form_locator = (by.By.CSS_SELECTOR, 'div.modal-dialog')
 
     def __init__(self, driver, conf, src_elem=None):
-        """In most cases forms can be located through _default_form_locator,
-        so specifying source element can be skipped.
-        """
+        # In most cases forms can be located through _default_form_locator,
+        # so specifying source element can be skipped.
         if src_elem is None:
             # fake self.src_elem must be set up in order self._get_element work
             self.src_elem = driver
@@ -299,7 +299,11 @@ class BaseFormRegion(baseregion.BaseRegion):
 
     @property
     def _submit_element(self):
-        return self._get_element(*self._submit_locator)
+        try:
+            submit_element = self._get_element(*self._submit_locator)
+        except exceptions.NoSuchElementException:
+            submit_element = self._get_element(*self._submit_danger_locator)
+        return submit_element
 
     def submit(self):
         self._submit_element.click()
@@ -449,9 +453,10 @@ class TabbedFormRegion(FormRegion):
 
 
 class DateFormRegion(BaseFormRegion):
-    """Form that queries data to table that is regularly below the form,
-     typical example is located on Project/Compute/Overview page.
-     """
+    """Form that queries data to table that is regularly below the form.
+
+    A typical example is located on Project/Compute/Overview page.
+    """
 
     _from_field_locator = (by.By.CSS_SELECTOR, 'input#id_start')
     _to_field_locator = (by.By.CSS_SELECTOR, 'input#id_end')

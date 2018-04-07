@@ -35,20 +35,36 @@
    */
   function neutronAPI(apiService, toastService) {
     var service = {
-      getNetworks: getNetworks,
       createNetwork: createNetwork,
-      getSubnets: getSubnets,
       createSubnet: createSubnet,
-      getPorts: getPorts,
+      createTrunk: createTrunk,
+      deleteTrunk: deleteTrunk,
       getAgents: getAgents,
-      getExtensions: getExtensions,
       getDefaultQuotaSets: getDefaultQuotaSets,
-      updateProjectQuota: updateProjectQuota
+      getExtensions: getExtensions,
+      getNetworks: getNetworks,
+      getPorts: getPorts,
+      getQosPolicy: getQosPolicy,
+      getQoSPolicies: getQoSPolicies,
+      getSubnets: getSubnets,
+      getTrunk: getTrunk,
+      getTrunks: getTrunks,
+      updateProjectQuota: updateProjectQuota,
+      updateTrunk: updateTrunk
     };
 
     return service;
 
     /////////////
+
+    // NOTE(bence romsics): Technically we replace ISO 8061 time stamps with
+    // date objects. We do this because the date objects will stringify to human
+    // readable datetimes in local time (ie. in the browser's time zone) when
+    // displayed.
+    function convertDatesHumanReadable(apidict) {
+      apidict.created_at = new Date(apidict.created_at);
+      apidict.updated_at = new Date(apidict.updated_at);
+    }
 
     // Neutron Services
 
@@ -332,6 +348,127 @@
           toastService.add('error', gettext('Unable to update project quota data.'));
         });
     }
-  }
 
+    // QoS policies
+
+    /**
+     * @name horizon.app.core.openstack-service-api.neutron.getQosPolicy
+     * @description get a single qos policy by ID.
+     * @param {string} id
+     * Specifies the id of the policy to request.
+     * @returns {Object} The result of the API call
+     */
+    function getQosPolicy(id) {
+      return apiService.get('/api/neutron/qos_policy/' + id + '/')
+        .error(function () {
+          toastService.add('error', gettext('Unable to retrieve the qos policy.'));
+        });
+    }
+
+    /**
+     * @name horizon.app.core.openstack-service-api.neutron.getQoSPolicies
+     * @description get a list of qos policies.
+     *
+     * The listing result is an object with property "items". Each item is
+     * a QoS policy.
+     */
+    function getQoSPolicies() {
+      return apiService.get('/api/neutron/qos_policies/')
+        .error(function () {
+          toastService.add('error', gettext('Unable to retrieve the qos policies.'));
+        });
+    }
+
+    // Trunks
+
+    /**
+     * @name getTrunk
+     * @description
+     * Get a single trunk by ID
+     *
+     * @param {string} id
+     * Specifies the id of the trunk to request.
+     *
+     * @param {boolean} suppressError (optional)
+     * Suppress the error toast. Default to showing it.
+     *
+     * @returns {Object} The result of the API call
+     */
+    function getTrunk(id, suppressError) {
+      var promise = apiService.get('/api/neutron/trunks/' + id + '/')
+        .success(function(trunk) {
+          convertDatesHumanReadable(trunk);
+        });
+      promise = suppressError ? promise : promise.error(function () {
+        var msg = gettext('Unable to retrieve the trunk with id: %(id)s');
+        toastService.add('error', interpolate(msg, {id: id}, true));
+      });
+      return promise;
+    }
+
+    /**
+     * @name getTrunks
+     * @description
+     * Get a list of trunks for a tenant.
+     *
+     * @returns {Object} An object with property "items". Each item is a trunk.
+     */
+    function getTrunks(params) {
+      var config = params ? {'params' : params} : {};
+      return apiService.get('/api/neutron/trunks/', config)
+        .success(function(trunks) {
+          trunks.items.forEach(function(trunk) {
+            convertDatesHumanReadable(trunk);
+          });
+        })
+        .error(function () {
+          toastService.add('error', gettext('Unable to retrieve the trunks.'));
+        });
+    }
+
+    /**
+     * @name createTrunk
+     * @description
+     * Create a neutron trunk.
+     */
+    function createTrunk(newTrunk) {
+      return apiService.post('/api/neutron/trunks/', newTrunk)
+        .error(function () {
+          toastService.add('error', gettext('Unable to create the trunk.'));
+        });
+    }
+
+    /**
+     * @name deleteTrunk
+     * @description
+     * Delete a single neutron trunk.
+     *
+     * @param {string} trunkId
+     * UUID of a trunk to be deleted.
+     *
+     * @param {boolean} suppressError (optional)
+     * Suppress the error toast. Default to showing it.
+     */
+    function deleteTrunk(trunkId, suppressError) {
+      var promise = apiService.delete('/api/neutron/trunks/' + trunkId + '/');
+      promise = suppressError ? promise : promise.error(function() {
+        var msg = gettext('Unable to delete trunk: %(id)s');
+        toastService.add('error', interpolate(msg, { id: trunkId }, true));
+      });
+      return promise;
+    }
+
+    /**
+     * @name updateTrunk
+     * @description
+     * Update an existing trunk.
+     */
+    function updateTrunk(oldTrunk, newTrunk) {
+      return apiService.patch('/api/neutron/trunks/' + oldTrunk.id + '/', [oldTrunk, newTrunk])
+      .error(function() {
+        toastService.add('error', gettext('Unable to update the trunk.'));
+      });
+    }
+
+  }
 }());

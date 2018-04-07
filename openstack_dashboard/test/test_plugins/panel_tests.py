@@ -37,6 +37,7 @@ HORIZON_CONFIG.pop('default_dashboard', None)
 HORIZON_CONFIG.pop('js_files', None)
 HORIZON_CONFIG.pop('js_spec_files', None)
 HORIZON_CONFIG.pop('scss_files', None)
+HORIZON_CONFIG.pop('xstatic_modules', None)
 
 util_settings.update_dashboards([panel_config,], HORIZON_CONFIG, INSTALLED_APPS)
 
@@ -44,6 +45,8 @@ util_settings.update_dashboards([panel_config,], HORIZON_CONFIG, INSTALLED_APPS)
 @override_settings(HORIZON_CONFIG=HORIZON_CONFIG,
                    INSTALLED_APPS=INSTALLED_APPS)
 class PanelPluginTests(test.PluginTestCase):
+    urls = 'openstack_dashboard.test.extensible_header_urls'
+
     def test_add_panel(self):
         dashboard = horizon.get_dashboard("admin")
         panel_group = dashboard.get_panel_group('admin')
@@ -58,6 +61,15 @@ class PanelPluginTests(test.PluginTestCase):
         self.assertEqual(pc.ADD_JS_FILES, HORIZON_CONFIG['js_files'])
         self.assertEqual(pc.ADD_JS_SPEC_FILES, HORIZON_CONFIG['js_spec_files'])
         self.assertEqual(pc.ADD_SCSS_FILES, HORIZON_CONFIG['scss_files'])
+        self.assertEqual(pc.ADD_XSTATIC_MODULES,
+                         HORIZON_CONFIG['xstatic_modules'])
+        self.assertEqual(pc.ADD_HEADER_SECTIONS,
+                         HORIZON_CONFIG['header_sections'])
+
+    def test_extensible_header(self):
+        with self.settings(ROOT_URLCONF=self.urls):
+            response = self.client.get('/header/')
+            self.assertIn('sample context', response.content.decode('utf-8'))
 
     def test_remove_panel(self):
         dashboard = horizon.get_dashboard("admin")

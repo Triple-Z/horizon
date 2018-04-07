@@ -12,8 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""API over the neutron service.
-"""
+"""API over the neutron service."""
 
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
@@ -72,7 +71,8 @@ class Networks(generic.View):
 
 @urls.register
 class Subnets(generic.View):
-    """API for Neutron SubNets
+    """API for Neutron Subnets
+
     http://developer.openstack.org/api-ref-networking-v2.html#subnets
     """
     url_regex = r'neutron/subnets/$'
@@ -85,7 +85,7 @@ class Subnets(generic.View):
         a subnet.
 
         """
-        result = api.neutron.subnet_list(request, **request.GET)
+        result = api.neutron.subnet_list(request, **request.GET.dict())
         return{'items': [n.to_dict() for n in result]}
 
     @rest_utils.ajax(data_required=True)
@@ -119,6 +119,7 @@ class Subnets(generic.View):
 @urls.register
 class Ports(generic.View):
     """API for Neutron Ports
+
     http://developer.openstack.org/api-ref-networking-v2.html#ports
     """
     url_regex = r'neutron/ports/$'
@@ -128,27 +129,75 @@ class Ports(generic.View):
         """Get a list of ports for a network
 
         The listing result is an object with property "items".  Each item is
-        a subnet.
+        a port.
         """
         # see
         # https://github.com/openstack/neutron/blob/master/neutron/api/v2/attributes.py
-        result = api.neutron.port_list(request, **request.GET)
-        return{'items': [n.to_dict() for n in result]}
+        result = api.neutron.port_list_with_trunk_types(request,
+                                                        **request.GET.dict())
+        return {'items': [n.to_dict() for n in result]}
+
+
+@urls.register
+class Trunk(generic.View):
+    """API for a single neutron Trunk"""
+    url_regex = r'neutron/trunks/(?P<trunk_id>[^/]+)/$'
+
+    @rest_utils.ajax()
+    def delete(self, request, trunk_id):
+        api.neutron.trunk_delete(request, trunk_id)
+
+    @rest_utils.ajax()
+    def get(self, request, trunk_id):
+        """Get a specific trunk"""
+        trunk = api.neutron.trunk_show(request, trunk_id)
+        return trunk.to_dict()
+
+    @rest_utils.ajax(data_required=True)
+    def patch(self, request, trunk_id):
+        """Update a specific trunk"""
+        old_trunk = request.DATA[0]
+        new_trunk = request.DATA[1]
+
+        return api.neutron.trunk_update(
+            request, trunk_id, old_trunk, new_trunk)
+
+
+@urls.register
+class Trunks(generic.View):
+    """API for neutron Trunks"""
+    url_regex = r'neutron/trunks/$'
+
+    @rest_utils.ajax()
+    def get(self, request):
+        """Get a list of trunks
+
+        The listing result is an object with property "items".
+        Each item is a trunk.
+        """
+        result = api.neutron.trunk_list(request, **request.GET.dict())
+        return {'items': [n.to_dict() for n in result]}
+
+    @rest_utils.ajax(data_required=True)
+    def post(self, request):
+        new_trunk = api.neutron.trunk_create(request, **request.DATA)
+        return rest_utils.CreatedResponse(
+            '/api/neutron/trunks/%s' % new_trunk.id,
+            new_trunk.to_dict()
+        )
 
 
 @urls.register
 class Services(generic.View):
-    """API for Neutron agents
-    """
+    """API for Neutron agents"""
     url_regex = r'neutron/agents/$'
 
     @rest_utils.ajax()
     def get(self, request):
-        """Get a list of agents
-        """
+        """Get a list of agents"""
         if api.base.is_service_enabled(request, 'network') and \
            api.neutron.is_extension_supported(request, 'agent'):
-            result = api.neutron.agent_list(request, **request.GET)
+            result = api.neutron.agent_list(request, **request.GET.dict())
             return {'items': [n.to_dict() for n in result]}
         else:
             raise rest_utils.AjaxError(501, '')
@@ -156,8 +205,7 @@ class Services(generic.View):
 
 @urls.register
 class Extensions(generic.View):
-    """API for neutron extensions.
-    """
+    """API for neutron extensions."""
     url_regex = r'neutron/extensions/$'
 
     @rest_utils.ajax()
@@ -175,8 +223,7 @@ class Extensions(generic.View):
 
 
 class DefaultQuotaSets(generic.View):
-    """API for getting default quotas for neutron
-    """
+    """API for getting default quotas for neutron"""
     url_regex = r'neutron/quota-sets/defaults/$'
 
     @rest_utils.ajax()
@@ -201,8 +248,7 @@ class DefaultQuotaSets(generic.View):
 
 @urls.register
 class QuotasSets(generic.View):
-    """API for setting quotas of a given project.
-    """
+    """API for setting quotas of a given project."""
     url_regex = r'neutron/quotas-sets/(?P<project_id>[0-9a-f]+)$'
 
     @rest_utils.ajax(data_required=True)
@@ -231,3 +277,36 @@ class QuotasSets(generic.View):
             message = _('Service Neutron is disabled or quotas extension not '
                         'available.')
             raise rest_utils.AjaxError(501, message)
+
+
+@urls.register
+class QoSPolicies(generic.View):
+    """API for QoS Policy."""
+    url_regex = r'neutron/qos_policies/$'
+
+    @rest_utils.ajax()
+    def get(self, request):
+        """Get a list of QoS policies.
+
+        The listing result is an object with property "items".
+        Each item is a qos policy.
+        """
+        # TODO(amotoki):
+        # project_id=request.user.project_id should be changed to
+        # tenant_id=request.user.project_id once bug 1695954 is
+        # addressed to allow tenant_id to be accepted.
+        result = api.neutron.policy_list(request,
+                                         project_id=request.user.project_id)
+        return {'items': [p.to_dict() for p in result]}
+
+
+@urls.register
+class QoSPolicy(generic.View):
+    """API for a single QoS Policy."""
+    url_regex = r'neutron/qos_policy/(?P<policy_id>[^/]+)/$'
+
+    @rest_utils.ajax()
+    def get(self, request, policy_id):
+        """Get a specific policy"""
+        policy = api.neutron.policy_get(request, policy_id)
+        return policy.to_dict()

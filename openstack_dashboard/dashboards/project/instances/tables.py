@@ -16,12 +16,13 @@
 import logging
 
 from django.conf import settings
-from django.core import urlresolvers
 from django.http import HttpResponse
 from django import shortcuts
 from django import template
 from django.template.defaultfilters import title
+from django import urls
 from django.utils.http import urlencode
+from django.utils.safestring import mark_safe
 from django.utils.translation import npgettext_lazy
 from django.utils.translation import pgettext_lazy
 from django.utils.translation import string_concat
@@ -43,7 +44,7 @@ from openstack_dashboard.dashboards.project.instances.workflows \
 from openstack_dashboard.dashboards.project.instances.workflows \
     import update_instance
 from openstack_dashboard import policy
-
+from openstack_dashboard.views import get_url_with_pagination
 
 LOG = logging.getLogger(__name__)
 
@@ -101,9 +102,6 @@ class DeleteInstance(policy.PolicyTargetMixin, tables.DeleteAction):
         )
 
     def allowed(self, request, instance=None):
-        """Allow delete action if instance is in error state or not currently
-        being deleted.
-        """
         error_state = False
         if instance:
             error_state = (instance.status == 'ERROR')
@@ -431,7 +429,7 @@ class LaunchLinkNG(LaunchLink):
     classes = ("btn-launch", )
 
     def get_default_attrs(self):
-        url = urlresolvers.reverse(self.url)
+        url = urls.reverse(self.url)
         ngclick = "modal.openLaunchInstanceWizard(" \
             "{ successUrl: '%s' })" % url
         self.attrs.update({
@@ -456,7 +454,7 @@ class EditInstance(policy.PolicyTargetMixin, tables.LinkAction):
         return self._get_link_url(project, 'instance_info')
 
     def _get_link_url(self, project, step_slug):
-        base_url = urlresolvers.reverse(self.url, args=[project.id])
+        base_url = urls.reverse(self.url, args=[project.id])
         next_url = self.table.get_full_url()
         params = {"step": step_slug,
                   update_instance.UpdateInstance.redirect_param_name: next_url}
@@ -538,12 +536,13 @@ class ResizeLink(policy.PolicyTargetMixin, tables.LinkAction):
     url = "horizon:project:instances:resize"
     classes = ("ajax-modal", "btn-resize")
     policy_rules = (("compute", "os_compute_api:servers:resize"),)
+    action_type = "danger"
 
     def get_link_url(self, project):
         return self._get_link_url(project, 'flavor_choice')
 
     def _get_link_url(self, project, step_slug):
-        base_url = urlresolvers.reverse(self.url, args=[project.id])
+        base_url = urls.reverse(self.url, args=[project.id])
         next_url = self.table.get_full_url()
         params = {"step": step_slug,
                   resize_instance.ResizeInstance.redirect_param_name: next_url}
@@ -588,6 +587,7 @@ class RebuildInstance(policy.PolicyTargetMixin, tables.LinkAction):
     classes = ("btn-rebuild", "ajax-modal")
     url = "horizon:project:instances:rebuild"
     policy_rules = (("compute", "os_compute_api:servers:rebuild"),)
+    action_type = "danger"
 
     def allowed(self, request, instance):
         return ((instance.status in ACTIVE_STATES
@@ -596,7 +596,7 @@ class RebuildInstance(policy.PolicyTargetMixin, tables.LinkAction):
 
     def get_link_url(self, datum):
         instance_id = self.table.get_object_id(datum)
-        return urlresolvers.reverse(self.url, args=[instance_id])
+        return urls.reverse(self.url, args=[instance_id])
 
 
 class DecryptInstancePassword(tables.LinkAction):
@@ -618,8 +618,8 @@ class DecryptInstancePassword(tables.LinkAction):
     def get_link_url(self, datum):
         instance_id = self.table.get_object_id(datum)
         keypair_name = get_keyname(datum)
-        return urlresolvers.reverse(self.url, args=[instance_id,
-                                                    keypair_name])
+        return urls.reverse(self.url, args=[instance_id,
+                                            keypair_name])
 
 
 class AssociateIP(policy.PolicyTargetMixin, tables.LinkAction):
@@ -633,9 +633,9 @@ class AssociateIP(policy.PolicyTargetMixin, tables.LinkAction):
     def allowed(self, request, instance):
         if not api.base.is_service_enabled(request, 'network'):
             return False
-        if not api.network.floating_ip_supported(request):
+        if not api.neutron.floating_ip_supported(request):
             return False
-        if api.network.floating_ip_simple_associate_supported(request):
+        if api.neutron.floating_ip_simple_associate_supported(request):
             return False
         if instance.status == "ERROR":
             return False
@@ -646,7 +646,7 @@ class AssociateIP(policy.PolicyTargetMixin, tables.LinkAction):
         return not is_deleting(instance)
 
     def get_link_url(self, datum):
-        base_url = urlresolvers.reverse(self.url)
+        base_url = urls.reverse(self.url)
         next_url = self.table.get_full_url()
         params = {
             "instance_id": self.table.get_object_id(datum),
@@ -669,7 +669,7 @@ class SimpleDisassociateIP(policy.PolicyTargetMixin, tables.Action):
     def allowed(self, request, instance):
         if not api.base.is_service_enabled(request, 'network'):
             return False
-        if not api.network.floating_ip_supported(request):
+        if not api.neutron.floating_ip_supported(request):
             return False
         if not conf.HORIZON_CONFIG["simple_ip_management"]:
             return False
@@ -681,20 +681,18 @@ class SimpleDisassociateIP(policy.PolicyTargetMixin, tables.Action):
 
     def single(self, table, request, instance_id):
         try:
-            # target_id is port_id for Neutron and instance_id for Nova Network
-            # (Neutron API wrapper returns a 'portid_fixedip' string)
-            targets = api.network.floating_ip_target_list_by_instance(
+            targets = api.neutron.floating_ip_target_list_by_instance(
                 request, instance_id)
 
-            target_ids = [t.split('_')[0] for t in targets]
+            target_ids = [t.port_id for t in targets]
 
-            fips = [fip for fip in api.network.tenant_floating_ip_list(request)
+            fips = [fip for fip in api.neutron.tenant_floating_ip_list(request)
                     if fip.port_id in target_ids]
             # Removing multiple floating IPs at once doesn't work, so this pops
             # off the first one.
             if fips:
                 fip = fips.pop()
-                api.network.floating_ip_disassociate(request, fip.id)
+                api.neutron.floating_ip_disassociate(request, fip.id)
                 messages.success(request,
                                  _("Successfully disassociated "
                                    "floating IP: %s") % fip.ip)
@@ -918,9 +916,11 @@ class AttachVolume(tables.LinkAction):
 
     # This action should be disabled if the instance
     # is not active, or the instance is being deleted
+    # or cinder is not enabled
     def allowed(self, request, instance=None):
         return instance.status in ("ACTIVE") \
-            and not is_deleting(instance)
+            and not is_deleting(instance) \
+            and api.cinder.is_volume_service_enabled(request)
 
 
 class DetachVolume(AttachVolume):
@@ -931,9 +931,11 @@ class DetachVolume(AttachVolume):
 
     # This action should be disabled if the instance
     # is not active, or the instance is being deleted
+    # or cinder is not enabled
     def allowed(self, request, instance=None):
         return instance.status in ("ACTIVE") \
-            and not is_deleting(instance)
+            and not is_deleting(instance) \
+            and api.cinder.is_volume_service_enabled(request)
 
 
 class AttachInterface(policy.PolicyTargetMixin, tables.LinkAction):
@@ -951,16 +953,15 @@ class AttachInterface(policy.PolicyTargetMixin, tables.LinkAction):
 
     def get_link_url(self, datum):
         instance_id = self.table.get_object_id(datum)
-        return urlresolvers.reverse(self.url, args=[instance_id])
+        return urls.reverse(self.url, args=[instance_id])
 
 
-# TODO(lyj): the policy for detach interface not exists in nova.json,
-#            once it's added, it should be added here.
 class DetachInterface(policy.PolicyTargetMixin, tables.LinkAction):
     name = "detach_interface"
     verbose_name = _("Detach Interface")
     classes = ("btn-confirm", "ajax-modal")
     url = "horizon:project:instances:detach_interface"
+    policy_rules = (("compute", "os_compute_api:os-attach-interfaces:delete"),)
 
     def allowed(self, request, instance):
         if not api.base.is_service_enabled(request, 'network'):
@@ -978,7 +979,7 @@ class DetachInterface(policy.PolicyTargetMixin, tables.LinkAction):
 
     def get_link_url(self, datum):
         instance_id = self.table.get_object_id(datum)
-        return urlresolvers.reverse(self.url, args=[instance_id])
+        return urls.reverse(self.url, args=[instance_id])
 
 
 def get_ips(instance):
@@ -1164,17 +1165,17 @@ POWER_DISPLAY_CHOICES = (
 
 INSTANCE_FILTER_CHOICES = (
     ('uuid', _("Instance ID ="), True),
-    ('name', _("Instance Name"), True),
+    ('name', _("Instance Name ="), True),
     ('image', _("Image ID ="), True),
     ('image_name', _("Image Name ="), True),
-    ('ip', _("IPv4 Address"), True),
-    ('ip6', _("IPv6 Address"), True, None,
+    ('ip', _("IPv4 Address ="), True),
+    ('ip6', _("IPv6 Address ="), True, None,
      api.neutron.is_enabled_by_config('enable_ipv6')),
     ('flavor', _("Flavor ID ="), True),
     ('flavor_name', _("Flavor Name ="), True),
-    ('key_name', _("Key Pair Name"), True),
+    ('key_name', _("Key Pair Name ="), True),
     ('status', _("Status ="), True),
-    ('availability_zone', _("Availability Zone"), True),
+    ('availability_zone', _("Availability Zone ="), True),
     ('changes-since', _("Changes Since"), True,
         _("Filter by an ISO 8061 formatted time, e.g. 2016-06-14T06:27:59Z")),
     ('vcpus', _("vCPUs ="), True),
@@ -1184,6 +1185,31 @@ INSTANCE_FILTER_CHOICES = (
 class InstancesFilterAction(tables.FilterAction):
     filter_type = "server"
     filter_choices = INSTANCE_FILTER_CHOICES
+
+
+def render_locked(instance):
+    if not hasattr(instance, 'locked'):
+        return ""
+    if instance.locked:
+        icon_classes = "fa fa-fw fa-lock"
+        help_tooltip = _("This instance is currently locked. To enable more "
+                         "actions on it, please unlock it by selecting Unlock "
+                         "Instance from the actions menu.")
+    else:
+        icon_classes = "fa fa-fw fa-unlock text-muted"
+        help_tooltip = _("This instance is unlocked.")
+
+    locked_status = ('<span data-toggle="tooltip" title="{}" class="{}">'
+                     '</span>').format(help_tooltip, icon_classes)
+    return mark_safe(locked_status)
+
+
+def get_server_detail_link(obj, request):
+    return get_url_with_pagination(request,
+                                   InstancesTable._meta.pagination_param,
+                                   InstancesTable._meta.prev_pagination_param,
+                                   'horizon:project:instances:detail',
+                                   obj.id)
 
 
 class InstancesTable(tables.DataTable):
@@ -1202,10 +1228,10 @@ class InstancesTable(tables.DataTable):
         ("shelved_offloaded", True),
     )
     name = tables.WrappingColumn("name",
-                                 link="horizon:project:instances:detail",
+                                 link=get_server_detail_link,
                                  verbose_name=_("Instance Name"))
-    image_name = tables.Column("image_name",
-                               verbose_name=_("Image Name"))
+    image_name = tables.WrappingColumn("image_name",
+                                       verbose_name=_("Image Name"))
     ip = tables.Column(get_ips,
                        verbose_name=_("IP Address"),
                        attrs={'data-type': "ip"})
@@ -1219,6 +1245,9 @@ class InstancesTable(tables.DataTable):
                            status=True,
                            status_choices=STATUS_CHOICES,
                            display_choices=STATUS_DISPLAY_CHOICES)
+    locked = tables.Column(render_locked,
+                           verbose_name="",
+                           sortable=False)
     az = tables.Column("availability_zone",
                        verbose_name=_("Availability Zone"))
     task = tables.Column("OS-EXT-STS:task_state",

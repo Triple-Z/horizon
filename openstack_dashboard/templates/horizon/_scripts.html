@@ -27,6 +27,7 @@
 <script src='{{ STATIC_URL }}horizon/js/horizon.loader.js'></script>
 <script src='{{ STATIC_URL }}horizon/js/horizon.messages.js'></script>
 <script src='{{ STATIC_URL }}horizon/js/horizon.modals.js'></script>
+<script src='{{ STATIC_URL }}horizon/js/horizon.hacks.js'></script>
 <script type="text/javascript">
   horizon.modals.MODAL_BACKDROP = "{% firstof HORIZON_CONFIG.modal_backdrop 'static' %}";
 </script>
@@ -44,13 +45,13 @@
 <script src='{{ STATIC_URL }}horizon/js/horizon.d3linechart.js'></script>
 <script src='{{ STATIC_URL }}horizon/js/horizon.d3barchart.js'></script>
 <script src='{{ STATIC_URL }}horizon/js/horizon.sidebar.js'></script>
+<script src='{{ STATIC_URL }}horizon/js/horizon.extensible_header.js'></script>
 <script src='{{ STATIC_URL }}js/horizon.instances.js'></script>
 <script src='{{ STATIC_URL }}js/horizon.quota.js'></script>
 <script src='{{ STATIC_URL }}js/horizon.metering.js'></script>
 <script src='{{ STATIC_URL }}js/horizon.networktopologycommon.js'></script>
 <script src='{{ STATIC_URL }}js/horizon.flatnetworktopology.js'></script>
 <script src='{{ STATIC_URL }}js/horizon.networktopology.js'></script>
-<script src='{{ STATIC_URL }}js/horizon.firewalls.js'></script>
 <script src='{{ STATIC_URL }}js/horizon.volumes.js'></script>
 
 {% for file in HORIZON_CONFIG.js_files %}

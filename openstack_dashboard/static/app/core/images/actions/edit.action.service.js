@@ -29,7 +29,6 @@
     'horizon.app.core.metadata.service',
     'horizon.app.core.openstack-service-api.glance',
     'horizon.app.core.openstack-service-api.policy',
-    'horizon.app.core.openstack-service-api.userSession',
     'horizon.framework.util.actions.action-result.service',
     'horizon.framework.util.q.extensions',
     'horizon.framework.widgets.modal.wizard-modal.service',
@@ -49,7 +48,6 @@
     metadataService,
     glance,
     policy,
-    userSessionService,
     actionResultService,
     $qExtensions,
     wizardModalService,
@@ -58,15 +56,8 @@
     var message = {
       success: gettext('Image %s was successfully updated.')
     };
-    var modifyImagePolicyCheck, scope;
-
-    var model = {
-      image: {},
-      metadata: {}
-    };
 
     var service = {
-      initScope: initScope,
       allowed: allowed,
       perform: perform
     };
@@ -75,16 +66,9 @@
 
     //////////////
 
-    function initScope($scope) {
-      scope = $scope;
-      $scope.$on(events.IMAGE_METADATA_CHANGED, onMetadataChange);
-      modifyImagePolicyCheck = policy.ifAllowed({rules: [['image', 'modify_image']]});
-    }
-
     function allowed(image) {
       return $q.all([
-        modifyImagePolicyCheck,
-        userSessionService.isCurrentProject(image.owner),
+        policy.ifAllowed({rules: [['image', 'modify_image']]}),
         isActive(image)
       ]);
     }
@@ -92,62 +76,59 @@
     function perform(image) {
       var deferred = glance.getImage(image.id);
       deferred.then(onLoad);
-      scope.imagePromise = deferred;
+      var data = {};
+      data.imagePromise = deferred;
 
       function onLoad(response) {
         var localImage = response.data;
-        model.image = localImage;
+        data.image = localImage;
       }
 
       return wizardModalService.modal({
-        scope: scope,
+        data: data,
         workflow: editWorkflow,
         submit: submit
       }).result;
     }
 
-    function onMetadataChange(e, metadata) {
-      model.metadata = metadata;
-      e.stopPropagation();
-    }
-
-    function submit() {
+    function submit(stepModels) {
+      var image = stepModels.imageForm;
+      var metadata = stepModels.updateMetadataForm;
       return updateMetadata().then(updateImage, onUpdateImageFail);
-    }
 
-    function updateImage() {
-      var finalModel = model.image;
-      return glance.updateImage(finalModel).then(onUpdateImageSuccess, onUpdateImageFail);
-    }
-
-    function onUpdateImageSuccess() {
-      toast.add('success', interpolate(message.success, [model.image.name]));
-      return actionResultService.getActionResult()
-        .updated(imageResourceType, model.image.id)
-        .result;
-    }
-
-    function onUpdateImageFail() {
-      return actionResultService.getActionResult()
-        .failed(imageResourceType, model.image.id)
-        .result;
-    }
-
-    function updateMetadata() {
-
-      return metadataService
-        .getMetadata('image', model.image.id)
-        .then(onMetadataGet);
-
-      function onMetadataGet(response) {
-        var updated = model.metadata;
-        var removed = angular.copy(response.data);
-        angular.forEach(updated, function(value, key) {
-          delete removed[key];
-        });
+      function updateMetadata() {
 
         return metadataService
-          .editMetadata('image', model.image.id, updated, Object.keys(removed));
+          .getMetadata('image', image.id)
+          .then(onMetadataGet);
+
+        function onMetadataGet(response) {
+          var updated = metadata;
+          var removed = angular.copy(response.data);
+          angular.forEach(updated, function(value, key) {
+            delete removed[key];
+          });
+
+          return metadataService
+            .editMetadata('image', image.id, updated, Object.keys(removed));
+        }
+      }
+
+      function updateImage() {
+        return glance.updateImage(image).then(onUpdateImageSuccess, onUpdateImageFail);
+      }
+
+      function onUpdateImageSuccess() {
+        toast.add('success', interpolate(message.success, [image.name]));
+        return actionResultService.getActionResult()
+          .updated(imageResourceType, image.id)
+          .result;
+      }
+
+      function onUpdateImageFail() {
+        return actionResultService.getActionResult()
+          .failed(imageResourceType, image.id)
+          .result;
       }
     }
 

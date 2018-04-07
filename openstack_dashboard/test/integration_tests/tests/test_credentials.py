@@ -10,13 +10,13 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from horizon.test import firefox_binary
-from openstack_dashboard.test.integration_tests import decorators
-from openstack_dashboard.test.integration_tests import helpers
-
 from os import listdir
 from os.path import join
 from os import remove
+
+from horizon.test import firefox_binary
+from openstack_dashboard.test.integration_tests import decorators
+from openstack_dashboard.test.integration_tests import helpers
 
 
 class TestDownloadRCFile(helpers.AdminTestCase):
@@ -43,6 +43,7 @@ class TestDownloadRCFile(helpers.AdminTestCase):
 
     def test_download_rc_v2_file(self):
         """This is a basic scenario test:
+
         Steps:
         1) Login to Horizon Dashboard as admin user
         2) Navigate to Project > Compute > Access & Security > API Access tab
@@ -62,6 +63,7 @@ class TestDownloadRCFile(helpers.AdminTestCase):
     @decorators.skip_because(bugs=['1584057'])
     def test_download_rc_v3_file(self):
         """This is a basic scenario test:
+
         Steps:
         1) Login to Horizon Dashboard as admin user
         2) Navigate to Project > Compute > Access & Security > API Access tab

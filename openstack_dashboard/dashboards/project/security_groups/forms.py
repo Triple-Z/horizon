@@ -19,8 +19,8 @@
 import netaddr
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.forms import ValidationError
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 import six
@@ -78,7 +78,7 @@ class CreateGroup(GroupBase):
     error_message = _('Unable to create security group: %s')
 
     def _call_network_api(self, request, data):
-        return api.network.security_group_create(request,
+        return api.neutron.security_group_create(request,
                                                  data['name'],
                                                  data['description'])
 
@@ -90,7 +90,7 @@ class UpdateGroup(GroupBase):
     id = forms.CharField(widget=forms.HiddenInput())
 
     def _call_network_api(self, request, data):
-        return api.network.security_group_update(request,
+        return api.neutron.security_group_update(request,
                                                  data['id'],
                                                  data['name'],
                                                  data['description'])
@@ -147,6 +147,7 @@ class AddRule(forms.SelfHandlingForm):
                                           "between 1 and 65535."),
                               widget=forms.TextInput(attrs={
                                   'class': 'switched',
+                                  'data-required-when-shown': 'true',
                                   'data-switch-on': 'range',
                                   'data-range-port': _('Port')}),
                               validators=[
@@ -158,6 +159,7 @@ class AddRule(forms.SelfHandlingForm):
                                                "between 1 and 65535."),
                                    widget=forms.TextInput(attrs={
                                        'class': 'switched',
+                                       'data-required-when-shown': 'true',
                                        'data-switch-on': 'range',
                                        'data-range-range': _('From Port')}),
                                    validators=[
@@ -169,12 +171,14 @@ class AddRule(forms.SelfHandlingForm):
                                              "between 1 and 65535."),
                                  widget=forms.TextInput(attrs={
                                      'class': 'switched',
+                                     'data-required-when-shown': 'true',
                                      'data-switch-on': 'range',
                                      'data-range-range': _('To Port')}),
                                  validators=[
                                      utils_validators.validate_port_range])
 
     icmp_type = forms.IntegerField(label=_("Type"),
+                                   required=False,
                                    help_text=_("Enter a value for ICMP type "
                                                "in the range (-1: 255)"),
                                    widget=forms.TextInput(attrs={
@@ -186,6 +190,7 @@ class AddRule(forms.SelfHandlingForm):
                                        validate_icmp_type_range])
 
     icmp_code = forms.IntegerField(label=_("Code"),
+                                   required=False,
                                    help_text=_("Enter a value for ICMP code "
                                                "in the range (-1: 255)"),
                                    widget=forms.TextInput(attrs={
@@ -415,7 +420,7 @@ class AddRule(forms.SelfHandlingForm):
         redirect = reverse("horizon:project:security_groups:detail",
                            args=[data['id']])
         try:
-            rule = api.network.security_group_rule_create(
+            rule = api.neutron.security_group_rule_create(
                 request,
                 filters.get_int_or_uuid(data['id']),
                 data['direction'],

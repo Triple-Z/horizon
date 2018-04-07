@@ -11,19 +11,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""API over the nova service.
-"""
+"""API over the nova service."""
 from collections import OrderedDict
 
-from django.http import HttpResponse
-from django.template.defaultfilters import slugify
 from django.utils import http as utils_http
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
+from novaclient import exceptions
 
 from horizon import exceptions as hz_exceptions
-
-from novaclient import exceptions
 
 from openstack_dashboard import api
 from openstack_dashboard.api.rest import json_encoder
@@ -34,8 +30,7 @@ from openstack_dashboard.usage import quotas
 
 @urls.register
 class Snapshots(generic.View):
-    """API for nova snapshots.
-    """
+    """API for nova snapshots."""
     url_regex = r'nova/snapshots/$'
 
     @rest_utils.ajax(data_required=True)
@@ -49,15 +44,24 @@ class Snapshots(generic.View):
 
 
 @urls.register
+class Features(generic.View):
+    """API for check if a specified feature is supported."""
+    url_regex = r'nova/features/(?P<name>[^/]+)/$'
+
+    @rest_utils.ajax()
+    def get(self, request, name):
+        """Check if a specified feature is supported."""
+        return api.nova.is_feature_available(request, (name,))
+
+
+@urls.register
 class Keypairs(generic.View):
-    """API for nova keypairs.
-    """
+    """API for nova keypairs."""
     url_regex = r'nova/keypairs/$'
 
     @rest_utils.ajax()
     def get(self, request):
-        """Get a list of keypairs associated with the current logged-in
-        account.
+        """Get a list of keypairs associated with the current logged-in user.
 
         The listing result is an object with property "items".
         """
@@ -89,54 +93,28 @@ class Keypairs(generic.View):
 
 @urls.register
 class Keypair(generic.View):
-    url_regex = r'nova/keypairs/(?P<keypair_name>.+)/$'
+    """API for retrieving a single keypair."""
+    url_regex = r'nova/keypairs/(?P<name>[^/]+)$'
 
-    def get(self, request, keypair_name):
-        """Creates a new keypair and associates it to the current project.
+    @rest_utils.ajax()
+    def get(self, request, name):
+        """Get a specific keypair."""
+        return api.nova.keypair_get(request, name).to_dict()
 
-        * Since the response for this endpoint creates a new keypair and
-          is not idempotent, it normally would be represented by a POST HTTP
-          request. However, this solution was adopted as it
-          would support automatic file download across browsers.
-
-        :param keypair_name: the name to associate the keypair to
-        :param regenerate: (optional) if set to the string 'true',
-            replaces the existing keypair with a new keypair
-
-        This returns the new keypair object on success.
-        """
-        try:
-            regenerate = request.GET.get('regenerate') == 'true'
-            if regenerate:
-                api.nova.keypair_delete(request, keypair_name)
-
-            keypair = api.nova.keypair_create(request, keypair_name)
-
-        except exceptions.Conflict:
-            return HttpResponse(status=409)
-
-        except Exception:
-            return HttpResponse(status=500)
-
-        else:
-            response = HttpResponse(content_type='application/binary')
-            response['Content-Disposition'] = ('attachment; filename=%s.pem'
-                                               % slugify(keypair_name))
-            response.write(keypair.private_key)
-            response['Content-Length'] = str(len(response.content))
-
-            return response
+    @rest_utils.ajax()
+    def delete(self, request, name):
+        api.nova.keypair_delete(request, name)
 
 
 @urls.register
 class Services(generic.View):
-    """API for nova services.
-    """
+    """API for nova services."""
     url_regex = r'nova/services/$'
 
     @rest_utils.ajax()
     def get(self, request):
         """Get a list of nova services.
+
         Will return HTTP 501 status code if the service_list extension is
         not supported.
         """
@@ -150,8 +128,7 @@ class Services(generic.View):
 
 @urls.register
 class AvailabilityZones(generic.View):
-    """API for nova availability zones.
-    """
+    """API for nova availability zones."""
     url_regex = r'nova/availzones/$'
 
     @rest_utils.ajax()
@@ -173,8 +150,7 @@ class AvailabilityZones(generic.View):
 
 @urls.register
 class Limits(generic.View):
-    """API for nova limits.
-    """
+    """API for nova limits."""
     url_regex = r'nova/limits/$'
 
     @rest_utils.ajax(json_encoder=json_encoder.NaNJSONEncoder)
@@ -199,8 +175,7 @@ class Limits(generic.View):
 
 @urls.register
 class ServerActions(generic.View):
-    """API over all server actions.
-    """
+    """API over all server actions."""
     url_regex = r'nova/servers/(?P<server_id>[^/]+)/actions/$'
 
     @rest_utils.ajax()
@@ -219,8 +194,7 @@ class ServerActions(generic.View):
 
 @urls.register
 class SecurityGroups(generic.View):
-    """API over all server security groups.
-    """
+    """API over all server security groups."""
     url_regex = r'nova/servers/(?P<server_id>[^/]+)/security-groups/$'
 
     @rest_utils.ajax()
@@ -233,14 +207,13 @@ class SecurityGroups(generic.View):
         Example GET:
         http://localhost/api/nova/servers/abcd/security-groups/
         """
-        groups = api.network.server_security_groups(request, server_id)
+        groups = api.neutron.server_security_groups(request, server_id)
         return {'items': [s.to_dict() for s in groups]}
 
 
 @urls.register
 class Volumes(generic.View):
-    """API over all server volumes.
-    """
+    """API over all server volumes."""
     url_regex = r'nova/servers/(?P<server_id>[^/]+)/volumes/$'
 
     @rest_utils.ajax()
@@ -259,14 +232,12 @@ class Volumes(generic.View):
 
 @urls.register
 class RemoteConsoleInfo(generic.View):
-    """API for remote console information.
-    """
+    """API for remote console information."""
     url_regex = r'nova/servers/(?P<server_id>[^/]+)/console-info/$'
 
     @rest_utils.ajax()
     def post(self, request, server_id):
-        """Gets information about an available remote console for the given
-        server.
+        """Gets information of a remote console for the given server.
 
         Example POST:
         http://localhost/api/nova/servers/abcd/console-info/
@@ -275,7 +246,8 @@ class RemoteConsoleInfo(generic.View):
         CONSOLES = OrderedDict([('VNC', api.nova.server_vnc_console),
                                 ('SPICE', api.nova.server_spice_console),
                                 ('RDP', api.nova.server_rdp_console),
-                                ('SERIAL', api.nova.server_serial_console)])
+                                ('SERIAL', api.nova.server_serial_console),
+                                ('MKS', api.nova.server_mks_console)])
 
         """Get a tuple of console url and console type."""
         if console_type == 'AUTO':
@@ -317,8 +289,7 @@ class RemoteConsoleInfo(generic.View):
 
 @urls.register
 class ConsoleOutput(generic.View):
-    """API for console output.
-    """
+    """API for console output."""
     url_regex = r'nova/servers/(?P<server_id>[^/]+)/console-output/$'
 
     @rest_utils.ajax()
@@ -339,14 +310,13 @@ class ConsoleOutput(generic.View):
 
 @urls.register
 class Servers(generic.View):
-    """API over all servers.
-    """
+    """API over all servers."""
     url_regex = r'nova/servers/$'
 
     _optional_create = [
         'block_device_mapping', 'block_device_mapping_v2', 'nics', 'meta',
         'availability_zone', 'instance_count', 'admin_pass', 'disk_config',
-        'config_drive', 'scheduler_hints'
+        'config_drive', 'scheduler_hints', 'description'
     ]
 
     @rest_utils.ajax()
@@ -415,8 +385,7 @@ class Servers(generic.View):
 
 @urls.register
 class Server(generic.View):
-    """API for retrieving a single server
-    """
+    """API for retrieving a single server"""
     url_regex = r'nova/servers/(?P<server_id>[^/]+|default)$'
 
     @rest_utils.ajax()
@@ -429,8 +398,7 @@ class Server(generic.View):
 
     @rest_utils.ajax(data_required=True)
     def post(self, request, server_id):
-        """Perform a change to a server
-        """
+        """Perform a change to a server"""
         operation = request.DATA.get('operation', 'none')
         operations = {
             'stop': api.nova.server_stop,
@@ -451,8 +419,7 @@ class Server(generic.View):
 
 @urls.register
 class ServerGroups(generic.View):
-    """API for nova server groups.
-    """
+    """API for nova server groups."""
     url_regex = r'nova/servergroups/$'
 
     @rest_utils.ajax()
@@ -464,11 +431,47 @@ class ServerGroups(generic.View):
         result = api.nova.server_group_list(request)
         return {'items': [u.to_dict() for u in result]}
 
+    @rest_utils.ajax(data_required=True)
+    def post(self, request):
+        """Create a server group.
+
+        Create a server group using parameters supplied in the POST
+        application/json object. The "name" (string) parameter is required
+        and the "policies" (array) parameter is required.
+
+        This method returns the new server group object on success.
+        """
+        new_servergroup = api.nova.server_group_create(request, **request.DATA)
+        return rest_utils.CreatedResponse(
+            '/api/nova/servergroups/%s' % utils_http.urlquote(
+                new_servergroup.id), new_servergroup.to_dict()
+        )
+
+
+@urls.register
+class ServerGroup(generic.View):
+    url_regex = r'nova/servergroups/(?P<servergroup_id>[^/]+)/$'
+
+    @rest_utils.ajax()
+    def delete(self, request, servergroup_id):
+        """Delete a specific server group
+
+        DELETE http://localhost/api/nova/servergroups/<servergroup_id>
+        """
+        api.nova.server_group_delete(request, servergroup_id)
+
+    @rest_utils.ajax()
+    def get(self, request, servergroup_id):
+        """Get a specific server group
+
+        http://localhost/api/nova/servergroups/1
+        """
+        return api.nova.server_group_get(request, servergroup_id).to_dict()
+
 
 @urls.register
 class ServerMetadata(generic.View):
-    """API for server metadata.
-    """
+    """API for server metadata."""
     url_regex = r'nova/servers/(?P<server_id>[^/]+|default)/metadata$'
 
     @rest_utils.ajax()
@@ -496,8 +499,7 @@ class ServerMetadata(generic.View):
 
 @urls.register
 class Extensions(generic.View):
-    """API for nova extensions.
-    """
+    """API for nova extensions."""
     url_regex = r'nova/extensions/$'
 
     @rest_utils.ajax()
@@ -516,8 +518,7 @@ class Extensions(generic.View):
 
 @urls.register
 class Flavors(generic.View):
-    """API for nova flavors.
-    """
+    """API for nova flavors."""
     url_regex = r'nova/flavors/$'
 
     @rest_utils.ajax()
@@ -580,8 +581,7 @@ class Flavors(generic.View):
 
 @urls.register
 class Flavor(generic.View):
-    """API for retrieving a single flavor
-    """
+    """API for retrieving a single flavor"""
     url_regex = r'nova/flavors/(?P<flavor_id>[^/]+)/$'
 
     @rest_utils.ajax()
@@ -654,8 +654,7 @@ class Flavor(generic.View):
 
 @urls.register
 class FlavorExtraSpecs(generic.View):
-    """API for managing flavor extra specs
-    """
+    """API for managing flavor extra specs"""
     url_regex = r'nova/flavors/(?P<flavor_id>[^/]+)/extra-specs/$'
 
     @rest_utils.ajax()
@@ -684,8 +683,7 @@ class FlavorExtraSpecs(generic.View):
 
 @urls.register
 class AggregateExtraSpecs(generic.View):
-    """API for managing aggregate extra specs
-    """
+    """API for managing aggregate extra specs"""
     url_regex = r'nova/aggregates/(?P<aggregate_id>[^/]+)/extra-specs/$'
 
     @rest_utils.ajax()
@@ -712,8 +710,7 @@ class AggregateExtraSpecs(generic.View):
 
 @urls.register
 class DefaultQuotaSets(generic.View):
-    """API for getting default quotas for nova
-    """
+    """API for getting default quotas for nova"""
     url_regex = r'nova/quota-sets/defaults/$'
 
     @rest_utils.ajax()
@@ -771,8 +768,7 @@ class DefaultQuotaSets(generic.View):
 
 @urls.register
 class EditableQuotaSets(generic.View):
-    """API for editable quotas.
-    """
+    """API for editable quotas."""
     url_regex = r'nova/quota-sets/editable/$'
 
     @rest_utils.ajax()
@@ -791,8 +787,7 @@ class EditableQuotaSets(generic.View):
 
 @urls.register
 class QuotaSets(generic.View):
-    """API for setting quotas for a given project.
-    """
+    """API for setting quotas for a given project."""
     url_regex = r'nova/quota-sets/(?P<project_id>[0-9a-f]+)$'
 
     @rest_utils.ajax(data_required=True)

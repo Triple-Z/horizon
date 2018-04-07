@@ -13,8 +13,10 @@
 import os
 import tempfile
 
+import six
+
 from django.utils.translation import pgettext_lazy
-from horizon.test.settings import *  # noqa
+from horizon.test.settings import *  # noqa: F403,H303
 from horizon.utils import secret_key
 from openstack_dashboard import exceptions
 
@@ -46,8 +48,6 @@ TEMPLATES[0]['OPTIONS']['context_processors'].append(
     'openstack_dashboard.context_processors.openstack'
 )
 
-CUSTOM_THEME_PATH = 'themes/default'
-
 # 'key', 'label', 'path'
 AVAILABLE_THEMES = [
     (
@@ -58,6 +58,14 @@ AVAILABLE_THEMES = [
         'material',
         pgettext_lazy("Google's Material Design style theme", "Material"),
         'themes/material'
+    ),
+]
+
+SELECTABLE_THEMES = [
+    (
+        'default',
+        pgettext_lazy('Default style theme', 'Default'),
+        'themes/default'
     ),
 ]
 
@@ -90,7 +98,7 @@ HORIZON_CONFIG = {
         "help_text": "Password must be between 8 and 18 characters."
     },
     'user_home': None,
-    'help_url': "http://docs.openstack.org",
+    'help_url': "https://docs.openstack.org/",
     'exceptions': {'recoverable': exceptions.RECOVERABLE,
                    'not_found': exceptions.NOT_FOUND,
                    'unauthorized': exceptions.UNAUTHORIZED},
@@ -132,8 +140,8 @@ settings_utils.find_static_files(HORIZON_CONFIG, AVAILABLE_THEMES,
 HORIZON_IMAGES_UPLOAD_MODE = 'legacy'
 
 AVAILABLE_REGIONS = [
-    ('http://localhost:5000/v2.0', 'local'),
-    ('http://remote:5000/v2.0', 'remote'),
+    ('http://localhost:5000/v3', 'local'),
+    ('http://remote:5000/v3', 'remote'),
 ]
 
 OPENSTACK_API_VERSIONS = {
@@ -141,7 +149,7 @@ OPENSTACK_API_VERSIONS = {
     "image": 2
 }
 
-OPENSTACK_KEYSTONE_URL = "http://localhost:5000/v2.0"
+OPENSTACK_KEYSTONE_URL = "http://localhost:5000/v3"
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = "_member_"
 
 OPENSTACK_KEYSTONE_MULTIDOMAIN_SUPPORT = True
@@ -214,6 +222,14 @@ LOGGING['loggers'].update(
             'handlers': ['test'],
             'propagate': False,
         },
+        'oslo_policy': {
+            'handlers': ['test'],
+            'propagate': False,
+        },
+        'stevedore': {
+            'handlers': ['test'],
+            'propagate': False,
+        },
         'iso8601': {
             'handlers': ['null'],
             'propagate': False,
@@ -241,6 +257,20 @@ NOSE_ARGS = ['--nocapture',
              '--cover-package=openstack_dashboard',
              '--cover-inclusive',
              '--all-modules']
+# TODO(amotoki): Need to investigate why --with-html-output
+# is unavailable in python3.
+# NOTE(amotoki): Most horizon plugins import this module in their test
+# settings and they do not necessarily have nosehtmloutput in test-reqs.
+# Assuming nosehtmloutput potentially breaks plugins tests,
+# we check the availability of htmloutput module (from nosehtmloutput).
+try:
+    import htmloutput  # noqa: F401
+    has_html_output = True
+except ImportError:
+    has_html_output = False
+if six.PY2 and has_html_output:
+    NOSE_ARGS += ['--with-html-output',
+                  '--html-out-file=ut_openstack_dashboard_nose_results.html']
 
 POLICY_FILES_PATH = os.path.join(ROOT_PATH, "conf")
 POLICY_FILES = {
@@ -273,14 +303,29 @@ TEST_GLOBAL_MOCKS_ON_PANELS = {
                    '.aggregates.panel.Aggregates.can_access'),
         'return_value': True,
     },
-    'firewalls': {
-        'method': ('openstack_dashboard.dashboards.project'
-                   '.firewalls.panel.Firewall.can_access'),
+    'domains': {
+        'method': ('openstack_dashboard.dashboards.identity'
+                   '.domains.panel.Domains.can_access'),
         'return_value': True,
     },
-    'vpn': {
+    'server_groups': {
         'method': ('openstack_dashboard.dashboards.project'
-                   '.vpn.panel.VPN.can_access'),
+                   '.server_groups.panel.ServerGroups.can_access'),
+        'return_value': True,
+    },
+    'trunk-project': {
+        'method': ('openstack_dashboard.dashboards.project'
+                   '.trunks.panel.Trunks.can_access'),
+        'return_value': True,
+    },
+    'trunk-admin': {
+        'method': ('openstack_dashboard.dashboards.admin'
+                   '.trunks.panel.Trunks.can_access'),
+        'return_value': True,
+    },
+    'qos': {
+        'method': ('openstack_dashboard.dashboards.project'
+                   '.network_qos.panel.NetworkQoS.can_access'),
         'return_value': True,
     },
 }

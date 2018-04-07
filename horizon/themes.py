@@ -17,25 +17,23 @@
 Allows Dynamic Theme Loading.
 """
 
-import io
 import os
 import threading
 
-import django
 from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
-from django.template.engine import Engine
-from django.template.loaders.base import Loader as tLoaderCls
+from django.template.loaders import filesystem as filesystem_loader
+from django.template import Origin
 from django.utils._os import safe_join
-
-if django.VERSION >= (1, 9):
-    from django.template.exceptions import TemplateDoesNotExist
-else:
-    from django.template.base import TemplateDoesNotExist
 
 
 # Local thread storage to retrieve the currently set theme
 _local = threading.local()
+
+
+# Get the themes from settings
+def get_selectable_themes():
+    return getattr(settings, 'SELECTABLE_THEMES', [])
 
 
 # Get the themes from settings
@@ -87,10 +85,21 @@ def offline_context():
 # A piece of middleware that stores the theme cookie value into
 # local thread storage so the template loader can access it
 class ThemeMiddleware(object):
-    """The Theme Middleware component.  The custom template loaders
-       don't have access to the request object, so we need to store
-       the Cookie's theme value for use later in the Django chain.
+    """The Theme Middleware component.
+
+    The custom template loaders
+    don't have access to the request object, so we need to store
+    the Cookie's theme value for use later in the Django chain.
     """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        self.process_request(request)
+        response = self.get_response(request)
+        response = self.process_response(request, response)
+        return response
 
     def process_request(self, request):
 
@@ -110,9 +119,11 @@ class ThemeMiddleware(object):
         return response
 
 
-class ThemeTemplateLoader(tLoaderCls):
-    """Themes can contain template overrides, so we need to check the
-       theme directory first, before loading any of the standard templates.
+class ThemeTemplateLoader(filesystem_loader.Loader):
+    """Theme-aware template loader.
+
+    Themes can contain template overrides, so we need to check the
+    theme directory first, before loading any of the standard templates.
     """
     is_usable = True
 
@@ -144,32 +155,22 @@ class ThemeTemplateLoader(tLoaderCls):
                 this_theme[2],
                 'templates'
             )
+            name = None
             if not template_name.startswith('/'):
                 try:
-                    yield safe_join(template_path, template_name)
+                    name = safe_join(template_path, template_name)
                 except SuspiciousFileOperation:
-                    yield os.path.join(
+                    name = os.path.join(
                         this_theme[2], 'templates', template_name
                     )
             elif template_path in template_name:
-                yield template_name
+                name = template_name
+
+            if name:
+                yield Origin(name=name,
+                             template_name=template_name,
+                             loader=self)
 
         except UnicodeDecodeError:
             # The template dir name wasn't valid UTF-8.
             raise
-        except ValueError:
-            # The joined path was located outside of template_dir.
-            pass
-
-    def load_template_source(self, template_name, template_dirs=None):
-        for path in self.get_template_sources(template_name):
-            try:
-                with io.open(path, encoding=settings.FILE_CHARSET) as file:
-                    return file.read(), path
-            except IOError:
-                pass
-        raise TemplateDoesNotExist(template_name)
-
-
-e = Engine()
-_loader = ThemeTemplateLoader(e)

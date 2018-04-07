@@ -22,7 +22,6 @@
   deleteImageService.$inject = [
     '$q',
     'horizon.app.core.openstack-service-api.glance',
-    'horizon.app.core.openstack-service-api.userSession',
     'horizon.app.core.openstack-service-api.policy',
     'horizon.framework.util.actions.action-result.service',
     'horizon.framework.util.i18n.gettext',
@@ -45,7 +44,6 @@
   function deleteImageService(
     $q,
     glance,
-    userSessionService,
     policy,
     actionResultService,
     gettext,
@@ -54,11 +52,9 @@
     toast,
     imagesResourceType
   ) {
-    var scope, context, deleteImagePromise;
     var notAllowedMessage = gettext("You are not allowed to delete images: %s");
 
     var service = {
-      initScope: initScope,
       allowed: allowed,
       perform: perform
     };
@@ -67,17 +63,29 @@
 
     //////////////
 
-    function initScope(newScope) {
-      scope = newScope;
-      context = { };
-      deleteImagePromise = policy.ifAllowed({rules: [['image', 'delete_image']]});
-    }
-
-    function perform(items) {
+    function perform(items, newScope) {
+      var scope = newScope;
+      var context = { };
       var images = angular.isArray(items) ? items : [items];
       context.labels = labelize(images.length);
       context.deleteEntity = deleteImage;
       return $qExtensions.allSettled(images.map(checkPermission)).then(afterCheck);
+
+      function checkPermission(image) {
+        return {promise: allowed(image), context: image};
+      }
+
+      function afterCheck(result) {
+        var outcome = $q.reject();  // Reject the promise by default
+        if (result.fail.length > 0) {
+          toast.add('error', getMessage(notAllowedMessage, result.fail));
+          outcome = $q.reject(result.fail);
+        }
+        if (result.pass.length > 0) {
+          outcome = deleteModal.open(scope, result.pass.map(getEntity), context).then(createResult);
+        }
+        return outcome;
+      }
     }
 
     function allowed(image) {
@@ -86,29 +94,12 @@
       if (image) {
         return $q.all([
           notProtected(image),
-          deleteImagePromise,
-          userSessionService.isCurrentProject(image.owner),
+          policy.ifAllowed({ rules: [['image', 'delete_image']] }),
           notDeleted(image)
         ]);
       } else {
         return policy.ifAllowed({ rules: [['image', 'delete_image']] });
       }
-    }
-
-    function checkPermission(image) {
-      return {promise: allowed(image), context: image};
-    }
-
-    function afterCheck(result) {
-      var outcome = $q.reject();  // Reject the promise by default
-      if (result.fail.length > 0) {
-        toast.add('error', getMessage(notAllowedMessage, result.fail));
-        outcome = $q.reject(result.fail);
-      }
-      if (result.pass.length > 0) {
-        outcome = deleteModal.open(scope, result.pass.map(getEntity), context).then(createResult);
-      }
-      return outcome;
     }
 
     function createResult(deleteModalResult) {

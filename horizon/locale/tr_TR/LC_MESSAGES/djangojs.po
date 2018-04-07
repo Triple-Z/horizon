@@ -1,28 +1,26 @@
 # Mücahit Büyükyılmaz <mucahit@deltanoc.com>, 2015. #zanata
 # Steve Kowalik <steven@wedontsleep.org>, 2015. #zanata
 # Mücahit Büyükyılmaz <mucahit@deltanoc.com>, 2016. #zanata
+# Mücahit Büyükyılmaz <mucahit@konya.edu.tr>, 2017. #zanata
+# yasemin demiral <yasemin.demiral@tubitak.gov.tr>, 2017. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: horizon 11.0.0.0b3.dev48\n"
+"Project-Id-Version: horizon VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2016-12-23 01:32+0000\n"
+"POT-Creation-Date: 2018-03-01 14:57+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-10-02 09:48+0000\n"
-"Last-Translator: Mücahit Büyükyılmaz <mucahit@deltanoc.com>\n"
+"PO-Revision-Date: 2017-08-16 06:34+0000\n"
+"Last-Translator: yasemin demiral <yasemin.demiral@tubitak.gov.tr>\n"
 "Language-Team: Turkish (Turkey)\n"
-"Language: tr-TR\n"
-"X-Generator: Zanata 3.7.3\n"
+"Language: tr_TR\n"
+"X-Generator: Zanata 4.3.3\n"
 "Plural-Forms: nplurals=2; plural=(n>1)\n"
 
 #, python-format
-msgid "%(total)s Max"
-msgstr "%(total)s Maks."
-
-#, python-format
-msgid "%(total)s Total"
-msgstr "%(total)s Toplam"
+msgid "%(total)s %(type)s"
+msgstr "%(total)s %(type)s"
 
 #, python-format
 msgid "%s GB"
@@ -94,7 +92,7 @@ msgid "Available"
 msgstr "Uygun"
 
 msgid "Available Metadata"
-msgstr "Geçerli üstveri"
+msgstr "Geçerli metaveri"
 
 msgid "Back"
 msgstr "Geri"
@@ -135,9 +133,6 @@ msgstr "Mevcut Kullanım"
 
 msgid "Custom"
 msgstr "Özel"
-
-msgid "Customization Script"
-msgstr "Özelleştirme Scripti"
 
 msgid "Danger"
 msgstr "Tehlike"
@@ -196,7 +191,7 @@ msgid "Example"
 msgstr "Örnek"
 
 msgid "Existing Metadata"
-msgstr "Mevcut üstveri"
+msgstr "Mevcut metaveri"
 
 msgid "Expand to see allocated items"
 msgstr "Ayrılmış öğeleri görmek için genişlet"
@@ -231,9 +226,6 @@ msgstr "Geçersiz tür, beklenen {$schema.type$}"
 msgid "Keyword failed: '{$title$}'"
 msgstr "Anahtar sözcük başarısız: '{$title$}'"
 
-msgid "Load script from a file"
-msgstr "Scripti dosyadan yükle"
-
 msgid "Loading"
 msgstr "Yükleniyor"
 
@@ -265,7 +257,7 @@ msgid "No available items"
 msgstr "Uygun öğe yok"
 
 msgid "No available metadata"
-msgstr "Uygun üstveri mevcut değil"
+msgstr "Uygun metaveri mevcut değil"
 
 msgid "No data available."
 msgstr "Veri yok."
@@ -274,7 +266,7 @@ msgid "No enum match for: {$viewValue$}"
 msgstr "Numara eşleşmedi: {$viewValue$}"
 
 msgid "No existing metadata"
-msgstr "Üstveri mevcut değil"
+msgstr "Metaveri mevcut değil"
 
 msgid "No items to display."
 msgstr "Görüntülenecek öğe yok."
@@ -321,14 +313,6 @@ msgstr "Zorunlu"
 msgid "Roles"
 msgstr "Roller"
 
-#. Strings between {$ and $} should be left untranslated.
-msgid ""
-"Script size: {$ (scriptLength || 0) | bytes $} of {$ config.MAX_SCRIPT_SIZE "
-"| bytes $}"
-msgstr ""
-"Script boyutu: {$ (scriptLength || 0) | bytes $} / {$ config.MAX_SCRIPT_SIZE "
-"| bytes $}"
-
 msgid "Search in current results"
 msgstr "Şu andaki sonuçlar içinde Ara"
 
@@ -368,9 +352,6 @@ msgstr ""
 
 msgid "The data in this field is invalid"
 msgstr "Bu alandaki veri geçersiz"
-
-msgid "The script is larger than the maximum size"
-msgstr "Script maksimum boyuttan büyük"
 
 msgid "There was a problem communicating with the server, please try again."
 msgstr "Sunucu ile iletişimde bir sorun var, lütfen tekrar deneyiniz."
@@ -433,7 +414,7 @@ msgid "m1.small"
 msgstr "m1.küçük"
 
 msgid "m1.tiny"
-msgstr "m1.minik"
+msgstr "m1.mini"
 
 msgid "pool default"
 msgstr "Ön tanımlı havuz"
@@ -441,6 +422,9 @@ msgstr "Ön tanımlı havuz"
 #, python-format
 msgid "selected \"%s\""
 msgstr "seçildi \"%s\""
+
+msgid "{$ 'Please provide a search criteria first.' $}"
+msgstr "{$ 'Lütfen önce bir arama kriteri sağlayın.' $}"
 
 msgid "{$ column.title $}"
 msgstr "{$ column.title $}"

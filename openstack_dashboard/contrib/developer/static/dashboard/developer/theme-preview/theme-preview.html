@@ -677,6 +677,17 @@
           <fieldset>
             <legend translate>Other Input Types</legend>
             <div class="form-group">
+              <label translate class="col-lg-2 control-label" for="datepicker">Datepicker</label>
+              <div class="col-lg-10">
+                <div class='input-group'>
+                  <input type="text" class="form-control" id="datepicker">
+                  <span class="input-group-addon datepicker-addon">
+                    <span class="fa fa-calendar"></span>
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
               <label translate class="col-lg-2 control-label" for="datetime-localInput">Datetime</label>
               <div class="col-lg-10">
                 <input type="datetime-local" class="form-control" id="datetime-localInput">
@@ -1001,32 +1012,38 @@
   <div class="row">
     <div class="col-lg-4">
       <div class="bs-component">
-        <div translate class="alert alert-dismissable alert-danger">
+        <div class="alert alert-dismissable alert-danger">
           <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <translate>
           <strong>Oh snap!</strong>
           <a href="#" class="alert-link">Change a few things up</a>
           and try submitting again.
+          </translate>
         </div>
       </div>
     </div>
     <div class="col-lg-4">
       <div class="bs-component">
-        <div translate class="alert alert-dismissable alert-success">
+        <div class="alert alert-dismissable alert-success">
           <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <translate>
           <strong>Well done!</strong>
           You successfully read
           <a href="#" class="alert-link">this important alert message</a>.
+          </translate>
         </div>
       </div>
     </div>
     <div class="col-lg-4">
       <div class="bs-component">
-        <div translate class="alert alert-dismissable alert-info">
+        <div class="alert alert-dismissable alert-info">
           <button type="button" class="close" data-dismiss="alert">&times;</button>
+          <translate>
           <strong>Heads up!</strong>
            This
           <a href="#" class="alert-link">alert needs your attention</a>,
            but it's not super important.
+          </translate>
         </div>
       </div>
     </div>

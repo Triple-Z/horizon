@@ -132,32 +132,32 @@
     // Mapping for dynamic table headers
     var tableHeadCellsMap = {
       image: [
-        { text: gettext('Name'), sortable: true, sortDefault: true },
-        { text: gettext('Updated'), sortable: true },
-        { text: gettext('Size'), classList: ['number'], sortable: true },
-        { text: gettext('Type'), sortable: true },
-        { text: gettext('Visibility'), sortable: true }
+        { text: gettext('Name') },
+        { text: gettext('Updated') },
+        { text: gettext('Size') },
+        { text: gettext('Type') },
+        { text: gettext('Visibility') }
       ],
       snapshot: [
-        { text: gettext('Name'), sortable: true, sortDefault: true },
-        { text: gettext('Updated'), sortable: true },
-        { text: gettext('Size'), classList: ['number'], sortable: true },
-        { text: gettext('Type'), sortable: true },
-        { text: gettext('Visibility'), sortable: true }
+        { text: gettext('Name') },
+        { text: gettext('Updated') },
+        { text: gettext('Size') },
+        { text: gettext('Type') },
+        { text: gettext('Visibility') }
       ],
       volume: [
-        { text: gettext('Name'), sortable: true, sortDefault: true },
-        { text: gettext('Description'), sortable: true },
-        { text: gettext('Size'), classList: ['number'], sortable: true },
-        { text: gettext('Type'), sortable: true },
-        { text: gettext('Availability Zone'), sortable: true }
+        { text: gettext('Name') },
+        { text: gettext('Description') },
+        { text: gettext('Size') },
+        { text: gettext('Type') },
+        { text: gettext('Availability Zone') }
       ],
       volume_snapshot: [
-        { text: gettext('Name'), sortable: true, sortDefault: true },
-        { text: gettext('Description'), sortable: true },
-        { text: gettext('Size'), classList: ['number'], sortable: true },
-        { text: gettext('Created'), sortable: true },
-        { text: gettext('Status'), sortable: true }
+        { text: gettext('Name') },
+        { text: gettext('Description') },
+        { text: gettext('Size') },
+        { text: gettext('Created') },
+        { text: gettext('Status') }
       ]
     };
 
@@ -195,6 +195,22 @@
         { key: 'status' }
       ]
     };
+
+    /**
+     * Creates a map of functions that sort by the key at a given index for
+     * the selected object
+     */
+    ctrl.sortByField = [];
+
+    var sortFunction = function(columnIndex, comparedObject) {
+      var cell = tableBodyCellsMap[ctrl.currentBootSource];
+      var key = cell[columnIndex].key;
+      return comparedObject[key];
+    };
+
+    for (var i = 0; i < 5; ++i) {
+      ctrl.sortByField.push(sortFunction.bind(null, i));
+    }
 
     /**
      * Filtering - client-side MagicSearch
@@ -318,7 +334,7 @@
       },
       function onBootSourceChange(newValue, oldValue) {
         if (newValue !== oldValue) {
-          $scope.$broadcast(events.AVAIL_CHANGED, {
+          $scope.$broadcast(events.TABLES_CHANGED, {
             'data': bootSources[newValue]
           });
         }
@@ -393,8 +409,7 @@
         return $scope.model.allowedBootSources;
       },
       function changeBootSource(newValue) {
-        if (angular.isArray(newValue) && newValue.length > 0 &&
-          !$scope.model.newInstanceSpec.source_type) {
+        if (angular.isArray(newValue) && newValue.length > 0) {
           updateBootSourceSelection(newValue[0].type);
           $scope.model.newInstanceSpec.source_type = newValue[0];
         }
@@ -429,10 +444,14 @@
     ////////////////////
 
     function updateBootSourceSelection(selectedSource) {
-      ctrl.currentBootSource = selectedSource;
+      if (ctrl.currentBootSource !== selectedSource) {
+        ctrl.selection.length = 0;
+        ctrl.currentBootSource = selectedSource;
+      }
       if ((selectedSource === bootSourceTypes.IMAGE ||
            selectedSource === bootSourceTypes.INSTANCE_SNAPSHOT) && $scope.model.volumeBootable) {
-        $scope.model.newInstanceSpec.vol_create = true;
+        $scope.model.newInstanceSpec.vol_create =
+          $scope.model.newInstanceSpec.create_volume_default;
       } else {
         $scope.model.newInstanceSpec.vol_create = false;
       }
@@ -451,8 +470,8 @@
     }
 
     function updateDataSource(key, preSelection) {
-      selection.length = 0;
       if (preSelection) {
+        ctrl.selection.length = 0;
         push.apply(selection, preSelection);
       }
       angular.extend(ctrl.tableData, bootSources[key]);
@@ -497,7 +516,8 @@
     function checkVolumeForImage() {
       var source = selection[0];
 
-      if (source && ctrl.currentBootSource === bootSourceTypes.IMAGE) {
+      if (source && ctrl.currentBootSource === bootSourceTypes.IMAGE ||
+          source && ctrl.currentBootSource === bootSourceTypes.INSTANCE_SNAPSHOT ) {
         var imageGb = source.size * 1e-9;
         var imageDisk = source.min_disk;
         ctrl.minVolumeSize = Math.ceil(Math.max(imageGb, imageDisk));

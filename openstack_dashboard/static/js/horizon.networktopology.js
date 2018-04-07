@@ -127,35 +127,50 @@ horizon.network_topology = {
       })
       .on('click', 'a.vnc_window', function(e) {
         e.preventDefault();
-        var vncWindow = window.open(angular.element(this).attr('href'), vncWindow,
-                                     'width=760,height=560');
+        var vncWindow = window.open(angular.element(this).attr('href'), vncWindow, 'width=760,height=560');
         self.delete_balloon();
       });
 
-    angular.element('#toggle_labels').click(function() {
-      if (angular.element('.nodeLabel').css('display') == 'none') {
-        angular.element('.nodeLabel').show();
-        horizon.cookies.put('show_labels', true);
-      } else {
-        angular.element('.nodeLabel').hide();
-        horizon.cookies.put('show_labels', false);
-      }
+    angular.element('#toggle_labels').change(function() {
+      horizon.cookies.put('show_labels', this.checked);
+      self.refresh_labels();
     });
 
-    angular.element('#toggle_networks').click(function() {
-      for (var n in self.nodes) {
-        if ({}.hasOwnProperty.call(self.nodes, n)) {
-          if (self.nodes[n].data instanceof Network || self.nodes[n].data instanceof ExternalNetwork) {
-            self.collapse_network(self.nodes[n]);
-          }
-          if (horizon.cookies.get('show_labels')) {
-            angular.element('.nodeLabel').show();
-          }
-        }
-      }
-      var current = horizon.cookies.get('are_networks_collapsed');
-      horizon.cookies.put('are_networks_collapsed', !current);
+    angular.element('#toggle_networks').change(function() {
+      horizon.cookies.put('are_networks_collapsed', this.checked);
+      self.refresh_networks();
+      self.refresh_labels();
     });
+
+    angular.element('#center_topology').click(function() {
+     this.blur(); // remove btn focus after click
+     self.delete_balloon();
+      // move visualization to the center and reset scale
+      self.vis.transition()
+        .duration(1500)
+        .attr('transform', 'translate(0,0)scale(1)');
+
+      // reset internal zoom translate and scale parameters so on next
+      // move the objects do not jump to the old position
+      self.zoom.translate([0,0]);
+      self.zoom.scale(1);
+      self.translate = null;
+    });
+    angular.element(window).on('message', function(e) {
+        var message = angular.element.parseJSON(e.originalEvent.data);
+        if (self.previous_message !== message.message) {
+          horizon.alert(message.type, message.message);
+          self.previous_message = message.message;
+          self.delete_post_message(message.iframe_id);
+          if (message.type == 'success' && self.deleting_device) {
+            self.remove_node_on_delete();
+          }
+          self.retrieve_network_info();
+          setTimeout(function() {
+            self.previous_message = null;
+          },10000);
+        }
+      });
 
     // set up loader first thing
     self.$loading_template.show();
@@ -174,15 +189,64 @@ horizon.network_topology = {
 
     angular.element('#networktopology').on('change', function() {
       self.retrieve_network_info(true);
+      if(angular.equals(self.data.networks,{}) && angular.equals(self.data.routers,{}) &&
+         angular.equals(self.data.servers,{})){
+        $('.loader-inline').remove();
+        angular.element('#topologyCanvasContainer').find('svg').remove();
+        $(self.svg_container).addClass('noinfo');
+        return;
+      }
     });
 
     // register for message notifications
-    horizon.networktopologymessager.addMessageHandler(this.handleMessage, this);
+    horizon.networktopologymessager.addMessageHandler(
+        this.handleMessage, this
+    );
+  },
+
+  // Shows/Hides graph labels
+  refresh_labels: function() {
+    var show_labels = horizon.cookies.get('show_labels') == 'true';
+    angular.element('.nodeLabel').toggle(show_labels);
+  },
+
+  // Collapses/Uncollapses networks in the graph
+  refresh_networks: function() {
+    var self = this;
+    var are_collapsed = horizon.cookies.get('are_networks_collapsed') == 'true';
+    for (var n in self.nodes) {
+      if ({}.hasOwnProperty.call(self.nodes, n)) {
+        if (self.nodes[n].data instanceof Network || self.nodes[n].data instanceof ExternalNetwork) {
+            self.collapse_network(self.nodes[n], are_collapsed);
+        }
+      }
+    }
+  },
+
+  // Load config from cookie
+  load_config: function() {
+    var self = this;
+
+    var labels = horizon.cookies.get('show_labels') == 'true';
+    var networks = horizon.cookies.get('are_networks_collapsed') == 'true';
+
+    if(networks) {
+      angular.element('#toggle_networks_label').addClass('active');
+      angular.element('#toggle_networks').prop('checked', networks);
+      self.refresh_networks();
+    }
+
+    if(labels) {
+      angular.element('#toggle_labels_label').addClass('active');
+      angular.element('#toggle_labels').prop('checked', labels);
+      self.refresh_labels();
+    }
   },
 
   handleMessage:function(message) {
     var self = this;
     var deleteData = horizon.networktopologymessager.delete_data;
+    horizon.modals.spinner.modal('hide');
     if (message.type == 'success') {
       self.remove_node_on_delete(deleteData);
     }
@@ -200,24 +264,6 @@ horizon.network_topology = {
         self.force.tick();
         i++;
       }
-    }
-  },
-
-  // Load config from cookie
-  load_config: function() {
-    var labels = horizon.cookies.get('show_labels');
-    var networks = horizon.cookies.get('are_networks_collapsed');
-    if (labels) {
-      angular.element('.nodeLabel').show();
-      angular.element('#toggle_labels').addClass('active');
-    }
-    if (networks) {
-      for (var n in this.nodes) {
-        if ({}.hasOwnProperty.call(this.nodes, n)) {
-          this.collapse_network(this.nodes[n], true);
-        }
-      }
-      angular.element('#toggle_networks').addClass('active');
     }
   },
 
@@ -850,13 +896,13 @@ horizon.network_topology = {
         self.removeNode(self.data.networks[deviceId]);
         break;
       case 'port':
-        self.removePort(deviceId, deleteData.device_data);
+        self.removePortOrSubnet(deviceId, deleteData.device_data);
         break;
     }
     self.delete_balloon();
   },
 
-  removePort: function(portId, deviceData) {
+  removePortOrSubnet: function(portId, deviceData) {
     var self = this;
     var routerId = deviceData.router_id;
     var networkId = deviceData.network_id;
@@ -881,16 +927,30 @@ horizon.network_topology = {
           }
         }
       }
+    } else {
+      var networkData = self.find_by_id(networkId).data;
+      var subnets = networkData.subnets;
+      for (var subnet in subnets) {
+        if (subnets[subnet].id === portId) {
+          if (subnets.length == 1) {
+            delete(networkData.subnets);
+          } else {
+            subnets.splice(subnet, 1);
+          }
+          self.force.start();
+          break;
+        }
+      }
     }
   },
 
   delete_port: function(routerId, portId, networkId) {
     var message = {id:portId};
-    var data = {network_id:networkId,routerId:routerId};
+    var data = {network_id:networkId,router_id:routerId};
     if (routerId) {
       horizon.networktopologymessager.post_message(portId, 'router/' + routerId + '/', message, 'port', 'delete', data);
     } else {
-      horizon.networktopologymessager.post_message(portId, 'network/' + networkId + '/', message, 'port', 'delete', data);
+      horizon.networktopologymessager.post_message(portId, 'network/' + networkId + '/?tab=network_tabs__subnets_tab', message, 'port', 'delete', data);
     }
   },
 
@@ -919,7 +979,7 @@ horizon.network_topology = {
         object.router_id = port.device_id;
         object.url = port.url;
         object.port_status = port.status;
-        object.port_status_css = (port.original_status === 'ACTIVE') ? 'active' : 'down';
+        object.port_status_class = (port.original_status === 'ACTIVE') ? 'active' : 'down';
         var ipAddress = '';
         try {
           for (var ip in port.fixed_ips) {
@@ -943,7 +1003,11 @@ horizon.network_topology = {
         object.ip_address = ipAddress;
         object.device_owner = deviceOwner;
         object.network_id = networkId;
-        object.is_interface = (deviceOwner === 'router_interface' || deviceOwner === 'router_gateway');
+        object.is_interface = (
+          deviceOwner === 'router_interface' ||
+          deviceOwner === 'router_gateway' ||
+          deviceOwner === 'ha_router_replicated_interface'
+        );
         ports.push(object);
       });
     } else if (d.hasOwnProperty('subnets')) {
@@ -1002,6 +1066,9 @@ horizon.network_topology = {
       htmlData.subnet = subnets;
       if (d instanceof Network) {
         htmlData.delete_label = gettext('Delete Network');
+        if (d.allow_delete_subnet){
+          htmlData.allow_delete_subnet = d.allow_delete_subnet;
+        }
       }
       htmlData.add_subnet_url = 'network/' + d.id + '/subnet/create';
       htmlData.add_subnet_label = gettext('Create Subnet');
@@ -1035,14 +1102,20 @@ horizon.network_topology = {
     }
     _balloon.find('.delete-device').click(function() {
       var _this = angular.element(this);
-      _this.prop('disabled', true);
-      d3.select('#id_' + _this.data('device-id')).classed('loading',true);
-      self.delete_device(_this.data('type'),_this.data('device-id'));
+      var delete_modal = horizon.datatables.confirm(_this);
+      delete_modal.find('.btn.btn-danger').click(function () {
+        _this.prop('disabled', true);
+        d3.select('#id_' + _this.data('device-id')).classed('loading',true);
+        self.delete_device(_this.data('type'),_this.data('device-id'));
+      });
     });
     _balloon.find('.delete-port').click(function() {
       var _this = angular.element(this);
-      self.delete_port(_this.data('router-id'),_this.data('port-id'),_this.data('network-id'));
-      self.delete_balloon();
+      var delete_modal = horizon.datatables.confirm(_this);
+      delete_modal.find('.btn.btn-danger').click(function () {
+        _this.prop('disabled', true);
+        self.delete_port(_this.data('router-id'),_this.data('port-id'),_this.data('network-id'));
+      });
     });
     self.balloonID = balloonID;
   },

@@ -256,11 +256,29 @@ horizon.datatables.confirm = function(action) {
   var help_text = $action.attr("help_text") || "";
   var name_string = "";
 
+  // Assume that we are going from the "Network Topology" tab
+  // If we trying perform an action on a port or subnet
+  var $closest_tr = $action.closest("tr");
+  var $data_display = $closest_tr.find('span[data-display]');
+  if ($data_display.length > 0){
+    name_string = ' "' + $data_display.attr("data-display") + '"';
+    name_array = [name_string];
+  } else {
+    // Else we trying to perform an action on device
+    var $device_window = $('div.topologyBalloon');
+    var $device_table = $device_window.find('table.detailInfoTable').has('caption[data-display]');
+    var $data_display = $device_table.find('caption[data-display]');
+    if ($data_display.length > 0){
+      name_string = ' "' + $data_display.attr("data-display") + '"';
+      name_array = [name_string];
+    }
+  }
+
   // Add the display name defined by table.get_object_display(datum)
   var $closest_table = $action.closest("table");
 
   // Check if data-display attribute is available
-  var $data_display = $closest_table.find('tr[data-display]');
+  $data_display = $closest_table.find('tr[data-display]');
   if ($data_display.length > 0) {
     var $actions_div = $action.closest("div");
     if ($actions_div.hasClass("table_actions") || $actions_div.hasClass("table_actions_menu")) {
@@ -300,8 +318,9 @@ horizon.datatables.confirm = function(action) {
   } catch (e) {
     body = name_string + gettext("Please confirm your selection. ") + help_text;
   }
-
-  var modal = horizon.modals.create(title, body, action_string);
+  var actionNode = action.nodeType ? action: action[0];
+  var confirmCssClass = actionNode.className.indexOf("btn-danger") >= 0 ? "btn-danger" : "btn-primary";
+  var modal = horizon.modals.create(title, body, action_string, "", confirmCssClass);
   modal.modal();
 
   if ($uibModal_parent.length) {
@@ -311,7 +330,7 @@ horizon.datatables.confirm = function(action) {
     modal.css('z-index', child_backdrop.css('z-index')+10);
   }
 
-  modal.find('.btn-primary').click(function () {
+  modal.find('.' + confirmCssClass).click(function () {
     var $form = $action.closest('form');
     var el = document.createElement("input");
     el.type = 'hidden';
@@ -463,7 +482,7 @@ $.tablesorter.addParser({
 
 horizon.datatables.update_footer_count = function (el, modifier) {
   var $el = $(el),
-    $browser, $footer, row_count, footer_text_template, footer_text;
+    $browser, $header, $footer, row_count, footer_text_template, footer_text;
   if (!modifier) {
     modifier = 0;
   }
@@ -473,6 +492,7 @@ horizon.datatables.update_footer_count = function (el, modifier) {
     $footer = $browser.find('.tfoot span.content_table_count');
   }
   else {
+    $header = $el.find('thead span.table_count');
     $footer = $el.find('tfoot span.table_count');
   }
   row_count = $el.find('tbody tr:visible').length + modifier - $el.find('.empty').length;
@@ -481,6 +501,9 @@ horizon.datatables.update_footer_count = function (el, modifier) {
     footer_text = interpolate(footer_text_template, [row_count]);
   } else {
     footer_text = '';
+  }
+  if ($header) {
+    $header.text(footer_text);
   }
   $footer.text(footer_text);
   return row_count;
@@ -599,7 +622,7 @@ horizon.datatables.set_table_query_filter = function (parent) {
       var qs = input.quicksearch(table_selector + ' tbody tr', {
         'delay': 300,
         'loader': 'span.loading',
-        'bind': 'keyup click',
+        'bind': 'keyup',
         'show': this.show,
         'hide': this.hide,
         onBefore: function () {

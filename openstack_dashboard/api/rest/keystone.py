@@ -11,8 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""API over the keystone service.
-"""
+"""API over the keystone service."""
 
 from django.conf import settings
 import django.http
@@ -25,21 +24,18 @@ from openstack_dashboard.api.rest import utils as rest_utils
 
 @urls.register
 class Version(generic.View):
-    """API for active keystone version.
-    """
+    """API for active keystone version."""
     url_regex = r'keystone/version/$'
 
     @rest_utils.ajax()
     def get(self, request):
-        """Get active keystone version.
-        """
+        """Get active keystone version."""
         return {'version': str(api.keystone.get_version())}
 
 
 @urls.register
 class Users(generic.View):
-    """API for keystone users.
-    """
+    """API for keystone users."""
     url_regex = r'keystone/users/$'
     client_keywords = {'project_id', 'domain_id', 'group_id'}
 
@@ -75,20 +71,22 @@ class Users(generic.View):
 
         Create a user using the parameters supplied in the POST
         application/json object. The base parameters are name (string), email
-        (string, optional), password (string, optional), project_id (string,
-        optional), enabled (boolean, defaults to true). The user will be
-        created in the default domain.
+        (string, optional), password (string), project (string,
+        optional), enabled (boolean, defaults to true), description
+        (string, optional). The user will be created in the default domain.
 
         This action returns the new user object on success.
         """
         domain = api.keystone.get_default_domain(request)
+
         new_user = api.keystone.user_create(
             request,
             name=request.DATA['name'],
             email=request.DATA.get('email') or None,
             password=request.DATA.get('password'),
-            project=request.DATA.get('project_id') or None,
-            enabled=True,
+            project=request.DATA.get('project') or None,
+            enabled=request.DATA.get('enabled', True),
+            description=request.DATA.get('description') or None,
             domain=domain.id
         )
 
@@ -113,8 +111,7 @@ class Users(generic.View):
 
 @urls.register
 class User(generic.View):
-    """API for a single keystone user.
-    """
+    """API for a single keystone user."""
     url_regex = r'keystone/users/(?P<id>[0-9a-f]+|current)$'
 
     @rest_utils.ajax()
@@ -156,6 +153,11 @@ class User(generic.View):
         user = api.keystone.user_get(request, id)
 
         if 'password' in keys:
+            if getattr(settings, 'ENFORCE_PASSWORD_CHECK', False):
+                admin_password = request.DATA['admin_password']
+                if not api.keystone.user_verify_admin_password(request,
+                                                               admin_password):
+                    raise rest_utils.AjaxError(400, 'ADMIN_PASSWORD_INCORRECT')
             password = request.DATA['password']
             api.keystone.user_update_password(request, user, password)
 
@@ -172,8 +174,7 @@ class User(generic.View):
 
 @urls.register
 class Roles(generic.View):
-    """API over all roles.
-    """
+    """API over all roles."""
     url_regex = r'keystone/roles/$'
 
     @rest_utils.ajax()
@@ -230,8 +231,7 @@ class Roles(generic.View):
 
 @urls.register
 class Role(generic.View):
-    """API for a single role.
-    """
+    """API for a single role."""
     url_regex = r'keystone/roles/(?P<id>[0-9a-f]+|default)$'
 
     @rest_utils.ajax()
@@ -268,9 +268,19 @@ class Role(generic.View):
 
 
 @urls.register
+class DefaultDomain(generic.View):
+    """API for default domain of the user."""
+    url_regex = r'keystone/default_domain/$'
+
+    @rest_utils.ajax()
+    def get(self, request):
+        """Get a default domain of the user."""
+        return api.keystone.get_default_domain(request).to_dict()
+
+
+@urls.register
 class Domains(generic.View):
-    """API over all domains.
-    """
+    """API over all domains."""
     url_regex = r'keystone/domains/$'
 
     @rest_utils.ajax()
@@ -321,8 +331,7 @@ class Domains(generic.View):
 
 @urls.register
 class Domain(generic.View):
-    """API over a single domains.
-    """
+    """API over a single domains."""
     url_regex = r'keystone/domains/(?P<id>[0-9a-f]+|default)$'
 
     @rest_utils.ajax()
@@ -477,8 +486,7 @@ class Project(generic.View):
 
     @rest_utils.ajax()
     def get(self, request, id):
-        """Get a specific project by id.
-        """
+        """Get a specific project by id."""
         return api.keystone.tenant_get(request, id).to_dict()
 
     @rest_utils.ajax()
@@ -532,16 +540,13 @@ class ServiceCatalog(generic.View):
 
     @rest_utils.ajax()
     def get(self, request):
-        """Return the Keystone service catalog associated with the current
-        user.
-        """
+        """Return the service catalog associated with the current user."""
         return request.user.service_catalog
 
 
 @urls.register
 class UserSession(generic.View):
-    """API for a single keystone user.
-    """
+    """API for a single keystone user."""
     url_regex = r'keystone/user-session/$'
     allowed_fields = {
         'available_services_regions',
@@ -561,8 +566,7 @@ class UserSession(generic.View):
 
     @rest_utils.ajax()
     def get(self, request):
-        """Get the current user session.
-        """
+        """Get the current user session."""
         res = {k: getattr(request.user, k, None) for k in self.allowed_fields}
         if getattr(settings, 'ENABLE_CLIENT_TOKEN', True):
             res['token'] = request.user.token.id
@@ -571,14 +575,12 @@ class UserSession(generic.View):
 
 @urls.register
 class Services(generic.View):
-    """API for keystone services.
-    """
+    """API for keystone services."""
     url_regex = r'keystone/services/$'
 
     @rest_utils.ajax()
     def get(self, request):
-        """Get a list of keystone services.
-        """
+        """Get a list of keystone services."""
         region = request.user.services_region
         services = []
         for i, service in enumerate(request.user.service_catalog):
@@ -591,13 +593,13 @@ class Services(generic.View):
 
 @urls.register
 class Groups(generic.View):
-    """API over all groups.
-    """
+    """API over all groups."""
     url_regex = r'keystone/groups/$'
 
     @rest_utils.ajax()
     def get(self, request):
         """Get a list of groups.
+
         The listing result is an object with property "items".
         """
         domain_context = request.session.get('domain_context')
@@ -605,3 +607,69 @@ class Groups(generic.View):
             request, domain=request.GET.get('domain_id', domain_context))]
 
         return {'items': items}
+
+    @rest_utils.ajax(data_required=True)
+    def post(self, request):
+        """Create a group.
+
+        This action creates a group using parameters supplied in the POST
+        application/json object. The "name" (string) parameter is required,
+        "description" (string) is optional.
+
+        This method returns the new group object on success.
+        """
+        domain_context = request.session.get('domain_context')
+        new_group = api.keystone.group_create(
+            request,
+            request.GET.get('domain_id', domain_context),
+            request.DATA['name'],
+            request.DATA.get("description", None))
+
+        return rest_utils.CreatedResponse(
+            '/api/keystone/groups/%s' % new_group.id,
+            new_group.to_dict()
+        )
+
+    @rest_utils.ajax(data_required=True)
+    def delete(self, request):
+        """Delete multiple groups by id.
+
+        The DELETE data should be an application/json array of group ids to
+        delete.
+
+        This method returns HTTP 204 (no content) on success.
+        """
+        for group_id in request.DATA:
+            api.keystone.group_delete(request, group_id)
+
+
+@urls.register
+class Group(generic.View):
+    """API over a single group."""
+    url_regex = r'keystone/groups/(?P<id>[0-9a-f]+)$'
+
+    @rest_utils.ajax()
+    def get(self, request, id):
+        """Get a specific group by id."""
+        return api.keystone.group_get(request, id).to_dict()
+
+    @rest_utils.ajax()
+    def delete(self, request, id):
+        """Delete a single group by id.
+
+        This method returns HTTP 204 (no content) on success.
+        """
+        api.keystone.group_delete(request, id)
+
+    @rest_utils.ajax(data_required=True)
+    def patch(self, request, id):
+        """Update a single group.
+
+        The PATCH data should be an application/json object with the
+        "name" and "description" attribute to update.
+
+        This method returns HTTP 204 (no content) on success.
+        """
+        api.keystone.group_update(request, id,
+                                  request.DATA['name'],
+                                  request.DATA.get("description", None))

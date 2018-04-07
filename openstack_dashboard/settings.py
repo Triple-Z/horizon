@@ -16,6 +16,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import glob
 import logging
 import os
 import sys
@@ -26,11 +27,14 @@ from django.utils.translation import ugettext_lazy as _
 
 from openstack_dashboard import exceptions
 from openstack_dashboard import theme_settings
+from openstack_dashboard.utils import config
 from openstack_dashboard.utils import settings as settings_utils
 
 from horizon.utils.escape import monkeypatch_escape
 
 monkeypatch_escape()
+
+_LOG = logging.getLogger(__name__)
 
 warnings.formatwarning = lambda message, category, *args, **kwargs: \
     '%s: %s' % (category.__name__, message)
@@ -53,6 +57,7 @@ MEDIA_ROOT = None
 MEDIA_URL = None
 STATIC_ROOT = None
 STATIC_URL = None
+SELECTABLE_THEMES = None
 INTEGRATION_TESTS_SUPPORT = False
 NG_TEMPLATE_CACHE_AGE = 2592000
 
@@ -67,7 +72,7 @@ HORIZON_CONFIG = {
         'types': ['alert-success', 'alert-info']
     },
     'bug_url': None,
-    'help_url': "http://docs.openstack.org",
+    'help_url': "https://docs.openstack.org/",
     'exceptions': {'recoverable': exceptions.RECOVERABLE,
                    'not_found': exceptions.NOT_FOUND,
                    'unauthorized': exceptions.UNAUTHORIZED},
@@ -102,14 +107,13 @@ OPENSTACK_IMAGE_BACKEND = {
     ]
 }
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'horizon.middleware.OperationLogMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'horizon.middleware.HorizonMiddleware',
     'horizon.themes.ThemeMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -209,6 +213,28 @@ SESSION_COOKIE_MAX_SIZE = 4093
 #                https://bugs.launchpad.net/horizon/+bug/1349463
 SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
 
+CSRF_FAILURE_VIEW = 'openstack_dashboard.views.csrf_failure'
+
+LANGUAGES = (
+    ('cs', 'Czech'),
+    ('de', 'German'),
+    ('en', 'English'),
+    ('en-au', 'Australian English'),
+    ('en-gb', 'British English'),
+    ('eo', 'Esperanto'),
+    ('es', 'Spanish'),
+    ('fr', 'French'),
+    ('id', 'Indonesian'),
+    ('it', 'Italian'),
+    ('ja', 'Japanese'),
+    ('ko', 'Korean (Korea)'),
+    ('pl', 'Polish'),
+    ('pt-br', 'Portuguese (Brazil)'),
+    ('ru', 'Russian'),
+    ('tr', 'Turkish'),
+    ('zh-cn', 'Simplified Chinese'),
+    ('zh-tw', 'Chinese (Taiwan)'),
+)
 LANGUAGE_CODE = 'en'
 LANGUAGE_COOKIE_NAME = 'horizon_language'
 USE_I18N = True
@@ -237,8 +263,13 @@ POLICY_FILES = {
     'compute': 'nova_policy.json',
     'volume': 'cinder_policy.json',
     'image': 'glance_policy.json',
-    'orchestration': 'heat_policy.json',
     'network': 'neutron_policy.json',
+}
+# Services for which horizon has extra policies are defined
+# in POLICY_DIRS by default.
+POLICY_DIRS = {
+    'compute': ['nova_policy.d'],
+    'volume': ['cinder_policy.d'],
 }
 
 SECRET_KEY = None
@@ -267,9 +298,16 @@ SECURITY_GROUP_RULES = {
 
 ADD_INSTALLED_APPS = []
 
-# Deprecated Theme Settings
-CUSTOM_THEME_PATH = None
-DEFAULT_THEME_PATH = None
+USER_MENU_LINKS = [
+    {'name': _('OpenStack RC File v2'),
+     'icon_classes': ['fa-download', ],
+     'url': 'horizon:project:api_access:openrcv2'
+     },
+    {'name': _('OpenStack RC File v3'),
+     'icon_classes': ['fa-download', ],
+     'url': 'horizon:project:api_access:openrc'
+     }
+]
 
 # 'key', 'label', 'path'
 AVAILABLE_THEMES = [
@@ -299,13 +337,17 @@ CSRF_COOKIE_AGE = None
 
 COMPRESS_OFFLINE_CONTEXT = 'horizon.themes.offline_context'
 
+SHOW_KEYSTONE_V2_RC = True
+
 # Dictionary of currently available angular features
 ANGULAR_FEATURES = {
     'images_panel': True,
+    'key_pairs_panel': True,
     'flavors_panel': False,
+    'domains_panel': False,
     'users_panel': False,
-    'roles_panel': False,
-    'domains_panel': False
+    'groups_panel': False,
+    'roles_panel': True
 }
 
 # Notice all customizable configurations should be above this line
@@ -315,10 +357,26 @@ OPENSTACK_PROFILER = {
     'enabled': False
 }
 
+if not LOCAL_PATH:
+    LOCAL_PATH = os.path.join(ROOT_PATH, 'local')
+LOCAL_SETTINGS_DIR_PATH = os.path.join(LOCAL_PATH, "local_settings.d")
+
+_files = glob.glob(os.path.join(LOCAL_PATH, 'local_settings.conf'))
+_files.extend(
+    sorted(glob.glob(os.path.join(LOCAL_SETTINGS_DIR_PATH, '*.conf'))))
+_config = config.load_config(_files, ROOT_PATH, LOCAL_PATH)
+
+# Apply the general configuration.
+config.apply_config(_config, globals())
+
 try:
-    from local.local_settings import *  # noqa
+    from local.local_settings import *  # noqa: F403,H303
 except ImportError:
-    logging.warning("No local_settings file found.")
+    _LOG.warning("No local_settings file found.")
+
+# configure templates
+if not TEMPLATES[0]['DIRS']:
+    TEMPLATES[0]['DIRS'] = [os.path.join(ROOT_PATH, 'templates')]
 
 # configure template debugging
 TEMPLATES[0]['OPTIONS']['debug'] = DEBUG
@@ -334,8 +392,6 @@ else:
         ADD_TEMPLATE_LOADERS
     )
 
-NG_TEMPLATE_CACHE_AGE = NG_TEMPLATE_CACHE_AGE if not DEBUG else 0
-
 # allow to drop settings snippets into a local_settings_dir
 LOCAL_SETTINGS_DIR_PATH = os.path.join(ROOT_PATH, "local", "local_settings.d")
 if os.path.exists(LOCAL_SETTINGS_DIR_PATH):
@@ -346,7 +402,7 @@ if os.path.exists(LOCAL_SETTINGS_DIR_PATH):
                     with open(os.path.join(dirpath, filename)) as f:
                         exec(f.read())
                 except Exception as e:
-                    logging.exception(
+                    _LOG.exception(
                         "Can not exec settings snippet %s", filename)
 
 # The purpose of OPENSTACK_IMAGE_FORMATS is to provide a simple object
@@ -376,26 +432,16 @@ if STATIC_ROOT is None:
 if STATIC_URL is None:
     STATIC_URL = WEBROOT + 'static/'
 
-AVAILABLE_THEMES, DEFAULT_THEME = theme_settings.get_available_themes(
-    AVAILABLE_THEMES,
-    CUSTOM_THEME_PATH,
-    DEFAULT_THEME_PATH,
-    DEFAULT_THEME
+AVAILABLE_THEMES, SELECTABLE_THEMES, DEFAULT_THEME = (
+    theme_settings.get_available_themes(
+        AVAILABLE_THEMES,
+        DEFAULT_THEME,
+        SELECTABLE_THEMES
+    )
 )
 
-if CUSTOM_THEME_PATH is not None:
-    logging.warning("CUSTOM_THEME_PATH has been deprecated.  Please convert "
-                    "your settings to make use of AVAILABLE_THEMES.")
-
-if DEFAULT_THEME_PATH is not None:
-    logging.warning("DEFAULT_THEME_PATH has been deprecated.  Please convert "
-                    "your settings to make use of AVAILABLE_THEMES.")
-
-# Discover all the directories that contain static files; at the same time
-# discover all the xstatic module entry points to embed in our HTML
-STATICFILES_DIRS = settings_utils.get_xstatic_dirs(
-    XSTATIC_MODULES, HORIZON_CONFIG)
-STATICFILES_DIRS += theme_settings.get_theme_static_dirs(
+# Discover all the directories that contain static files
+STATICFILES_DIRS = theme_settings.get_theme_static_dirs(
     AVAILABLE_THEMES, THEME_COLLECTION_DIR, ROOT_PATH)
 
 # Ensure that we always have a SECRET_KEY set, even when no local_settings.py
@@ -433,6 +479,13 @@ INSTALLED_APPS[0:0] = ADD_INSTALLED_APPS
 
 NG_TEMPLATE_CACHE_AGE = NG_TEMPLATE_CACHE_AGE if not DEBUG else 0
 
+# Include xstatic_modules specified in plugin
+XSTATIC_MODULES += HORIZON_CONFIG['xstatic_modules']
+
+# Discover all the xstatic module entry points to embed in our HTML
+STATICFILES_DIRS += settings_utils.get_xstatic_dirs(
+    XSTATIC_MODULES, HORIZON_CONFIG)
+
 # This base context objects gets added to the offline context generator
 # for each theme configured.
 HORIZON_COMPRESS_OFFLINE_CONTEXT_BASE = {
@@ -449,11 +502,3 @@ if DEBUG:
 # Here comes the Django settings deprecation section. Being at the very end
 # of settings.py allows it to catch the settings defined in local_settings.py
 # or inside one of local_settings.d/ snippets.
-if 'HORIZON_IMAGES_ALLOW_UPLOAD' in globals():
-    message = 'The setting HORIZON_IMAGES_ALLOW_UPLOAD is deprecated in ' \
-              'Newton and will be removed in P release. Use the setting ' \
-              'HORIZON_IMAGES_UPLOAD_MODE instead.'
-    if not HORIZON_IMAGES_ALLOW_UPLOAD:
-        message += ' Keep in mind that HORIZON_IMAGES_ALLOW_UPLOAD set to ' \
-                   'False overrides the value of HORIZON_IMAGES_UPLOAD_MODE.'
-    logging.warning(message)

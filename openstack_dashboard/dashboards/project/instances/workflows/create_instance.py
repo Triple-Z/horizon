@@ -207,7 +207,9 @@ class SetInstanceDetailsAction(workflows.Action):
         count = cleaned_data.get('count', 1)
 
         # Prevent launching more instances than the quota allows
-        usages = quotas.tenant_quota_usages(self.request)
+        usages = quotas.tenant_quota_usages(
+            self.request,
+            targets=('instances', 'cores', 'ram', 'volumes', ))
         available_count = usages['instances']['available']
         if available_count < count:
             msg = (_('The requested instance(s) cannot be launched '
@@ -265,8 +267,9 @@ class SetInstanceDetailsAction(workflows.Action):
             return
         props_mapping = (("min_ram", "ram"), ("min_disk", "disk"))
         for iprop, fprop in props_mapping:
-            if getattr(image, iprop) > 0 and \
-                    getattr(image, iprop) > getattr(flavor, fprop):
+            if (getattr(image, iprop) > 0 and
+                    getattr(flavor, fprop) > 0 and
+                    getattr(image, iprop) > getattr(flavor, fprop)):
                 msg = (_("The flavor '%(flavor)s' is too small "
                          "for requested image.\n"
                          "Minimum requirements: "
@@ -580,7 +583,7 @@ class SetAccessControlsAction(workflows.Action):
 
     def populate_groups_choices(self, request, context):
         try:
-            groups = api.network.security_group_list(request)
+            groups = api.neutron.security_group_list(request)
             security_group_list = [(sg.id, sg.name) for sg in groups]
         except Exception:
             exceptions.handle(request,
@@ -682,6 +685,8 @@ class CustomizeAction(workflows.Action):
                 script = upload_file.read()
                 if script != "":
                     try:
+                        if not isinstance(script, six.text_type):
+                            script = script.decode()
                         normalize_newlines(script)
                     except Exception as e:
                         msg = _('There was a problem parsing the'
@@ -712,6 +717,13 @@ class SetNetworkAction(workflows.Action):
 
     def __init__(self, request, *args, **kwargs):
         super(SetNetworkAction, self).__init__(request, *args, **kwargs)
+
+        # NOTE(e0ne): we don't need 'required attribute for networks
+        # checkboxes to be able to select only one network
+        # NOTE(e0ne): we need it for compatibility with different
+        # Django versions (prior to 1.11)
+        self.use_required_attribute = False
+
         network_list = self.fields["network"].choices
         if len(network_list) == 1:
             self.fields['network'].initial = [network_list[0][0]]

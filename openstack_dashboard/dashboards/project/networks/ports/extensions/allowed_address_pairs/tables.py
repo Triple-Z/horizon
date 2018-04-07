@@ -15,16 +15,14 @@
 
 import logging
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ungettext_lazy
 
+from horizon import tables
+
 from openstack_dashboard import api
 from openstack_dashboard import policy
-
-
-from horizon import exceptions
-from horizon import tables
 
 
 LOG = logging.getLogger(__name__)
@@ -36,7 +34,10 @@ class AddAllowedAddressPair(policy.PolicyTargetMixin, tables.LinkAction):
     url = "horizon:project:networks:ports:addallowedaddresspairs"
     classes = ("ajax-modal",)
     icon = "plus"
-    policy_rules = (("network", "update_port"),)
+    policy_rules = (
+        ("network", "update_port"),
+        ("network", "update_port:allowed_address_pairs"),
+    )
 
     def get_link_url(self, port=None):
         if port:
@@ -62,6 +63,11 @@ class DeleteAllowedAddressPair(tables.DeleteAction):
             count
         )
 
+    policy_rules = (
+        ("network", "update_port"),
+        ("network", "update_port:allowed_address_pairs"),
+    )
+
     def delete(self, request, ip_address):
         try:
             port_id = self.table.kwargs['port_id']
@@ -75,10 +81,10 @@ class DeleteAllowedAddressPair(tables.DeleteAction):
         except Exception as e:
             LOG.error('Failed to update port %(port_id)s: %(reason)s',
                       {'port_id': port_id, 'reason': e})
-            redirect = reverse("horizon:project:networks:ports:detail",
-                               args=(port_id,))
-            exceptions.handle(request, _('Failed to update port %s') % port_id,
-                              redirect=redirect)
+            # NOTE: No exception handling is required here because
+            # BatchAction.handle() does it. What we need to do is
+            # just to re-raise the exception.
+            raise
 
 
 class AllowedAddressPairsTable(tables.DataTable):

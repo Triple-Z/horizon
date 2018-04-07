@@ -13,10 +13,8 @@
 #    under the License.
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.utils import html
+from django.urls import reverse
 from django.utils.http import urlencode
-from django.utils import safestring
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ungettext_lazy
 
@@ -112,6 +110,11 @@ class EditVolumeSnapshot(policy.PolicyTargetMixin, tables.LinkAction):
     def allowed(self, request, snapshot=None):
         return snapshot.status == "available"
 
+    def get_link_url(self, datum):
+        params = urlencode({"success_url": self.table.get_full_url()})
+        snapshot_id = self.table.get_object_id(datum)
+        return "?".join([reverse(self.url, args=(snapshot_id,)), params])
+
 
 class CreateVolumeFromSnapshot(tables.LinkAction):
     name = "create_from_snapshot"
@@ -162,12 +165,7 @@ class UpdateRow(tables.Row):
 class SnapshotVolumeNameColumn(tables.WrappingColumn):
     def get_raw_data(self, snapshot):
         volume = snapshot._volume
-        if volume:
-            volume_name = volume.name
-            volume_name = html.escape(volume_name)
-        else:
-            volume_name = _("Unknown")
-        return safestring.mark_safe(volume_name)
+        return volume.name if volume else _("Unknown")
 
     def get_link_url(self, snapshot):
         volume = snapshot._volume
@@ -185,15 +183,11 @@ class VolumeSnapshotsFilterAction(tables.FilterAction):
                 if query in snapshot.name.lower()]
 
 
-class VolumeSnapshotsTable(volume_tables.VolumesTableBase):
+class VolumeDetailsSnapshotsTable(volume_tables.VolumesTableBase):
     name = tables.WrappingColumn(
         "name",
         verbose_name=_("Name"),
         link="horizon:project:snapshots:detail")
-    volume_name = SnapshotVolumeNameColumn(
-        "name",
-        verbose_name=_("Volume Name"),
-        link="horizon:project:volumes:detail")
 
     class Meta(object):
         name = "volume_snapshots"
@@ -214,5 +208,16 @@ class VolumeSnapshotsTable(volume_tables.VolumesTableBase):
         row_class = UpdateRow
         status_columns = ("status",)
         permissions = [
-            ('openstack.services.volume', 'openstack.services.volumev2'),
+            ('openstack.services.volume', 'openstack.services.volumev2',
+             'openstack.services.volumev3'),
         ]
+
+
+class VolumeSnapshotsTable(VolumeDetailsSnapshotsTable):
+    volume_name = SnapshotVolumeNameColumn(
+        "name",
+        verbose_name=_("Volume Name"),
+        link="horizon:project:volumes:detail")
+
+    class Meta(VolumeDetailsSnapshotsTable.Meta):
+        pass

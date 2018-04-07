@@ -39,7 +39,7 @@
    * retrieved from a service API. Other types might include Nova servers or
    * Swift objects. The HEAT type names are listed:
    *
-   *   http://docs.openstack.org/developer/heat/template_guide/openstack.html
+   *   https://docs.openstack.org/heat/latest/template_guide/openstack.html
    *
    * Each resource type is a singleton; to create or retrieve the type use:
    *
@@ -139,6 +139,10 @@
       self.summaryTemplateUrl = false;
       self.setSummaryTemplateUrl = setSummaryTemplateUrl;
 
+      self.defaultIndexUrl = false;
+      self.setDefaultIndexUrl = setDefaultIndexUrl;
+      self.getDefaultIndexUrl = getDefaultIndexUrl;
+
       // Function declarations
 
       /*
@@ -149,7 +153,7 @@
        *
        * If an action does not have an initAction() function, it is ignored.
        */
-      function initActions(scope) {
+      function initActions() {
         angular.forEach(self.itemActions, setActionScope);
         angular.forEach(self.batchActions, setActionScope);
         angular.forEach(self.globalActions, setActionScope);
@@ -157,14 +161,6 @@
         function setActionScope(action) {
           if (action.service.initAction) {
             action.service.initAction();
-          } else if (action.service.initScope) {
-            // The use of scope in action services breaks the singleton nature
-            // of the services, and should be stopped. State should be held on
-            // controllers instead; scope is now passed into allow() and perform()
-            // methods.
-            $log.warn('The initScope() method is deprecated. ' +
-              'Invocation of it will stop in Queens.');
-            action.service.initScope(scope.$new());
           }
         }
       }
@@ -509,6 +505,35 @@
       function setSummaryTemplateUrl(url) {
         self.summaryTemplateUrl = url;
         return self;
+      }
+
+      /**
+       * @ngdoc function
+       * @name setDefaultIndexUrl
+       * @param url
+       * @description
+       * This sets the defaultIndexUrl property on the resourceType.
+       *
+       * That URL points to a index view that shows table view for the
+       * resource type. The defaultIndexUrl will be used when details view
+       * should redirect to index view (e.g. after deletion of the resource
+       * itself) or should reset navigations (e.g. after refreshing details
+       * view by browser).
+       */
+      function setDefaultIndexUrl(url) {
+        self.defaultIndexUrl = url;
+        return self;
+      }
+
+      /**
+       * @ngdoc function
+       * @name setDefaultIndexUrl
+       * @param url
+       * @description
+       * This returns the defaultIndexUrl property on the resourceType.
+       */
+      function getDefaultIndexUrl() {
+        return self.defaultIndexUrl;
       }
 
       /**

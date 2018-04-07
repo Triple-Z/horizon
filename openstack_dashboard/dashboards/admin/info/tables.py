@@ -11,14 +11,15 @@
 # under the License.
 
 from django.conf import settings
-from django.core import urlresolvers
 from django import template
 from django.template import defaultfilters as filters
+from django import urls
 from django.utils.translation import pgettext_lazy
 from django.utils.translation import ugettext_lazy as _
 
 from horizon import tables
 from horizon.utils import filters as utils_filters
+from openstack_dashboard import api
 
 
 SERVICE_ENABLED = "enabled"
@@ -161,6 +162,13 @@ class NetworkAgentsFilterAction(tables.FilterAction):
         return filter(comp, agents)
 
 
+def get_network_agent_zone(agent):
+    if agent.availability_zone:
+        return agent.availability_zone
+
+    return _('-')
+
+
 def get_network_agent_status(agent):
     if agent.admin_state_up:
         return _('Enabled')
@@ -188,14 +196,15 @@ class NetworkL3AgentRoutersLinkAction(tables.LinkAction):
 
     def get_link_url(self, datum=None):
         obj_id = datum.id
-        return urlresolvers.reverse("horizon:admin:routers:l3_agent_list",
-                                    args=(obj_id,))
+        return urls.reverse("horizon:admin:routers:l3_agent_list",
+                            args=(obj_id,))
 
 
 class NetworkAgentsTable(tables.DataTable):
     agent_type = tables.Column('agent_type', verbose_name=_('Type'))
     binary = tables.Column("binary", verbose_name=_('Name'))
     host = tables.Column('host', verbose_name=_('Host'))
+    zone = tables.Column(get_network_agent_zone, verbose_name=_('Zone'))
     status = tables.Column(get_network_agent_status, verbose_name=_('Status'))
     state = tables.Column(get_network_agent_state, verbose_name=_('State'))
     heartbeat_timestamp = tables.Column('heartbeat_timestamp',
@@ -205,6 +214,19 @@ class NetworkAgentsTable(tables.DataTable):
                                         filters=(utils_filters.parse_isotime,
                                                  filters.timesince))
 
+    def __init__(self, request, data=None, needs_form_wrapper=None, **kwargs):
+        super(NetworkAgentsTable, self).__init__(
+            request,
+            data=data,
+            needs_form_wrapper=needs_form_wrapper,
+            **kwargs)
+
+        availability_zone_supported = api.neutron.is_extension_supported(
+            request,
+            "availability_zone")
+        if not availability_zone_supported:
+            del self.columns["zone"]
+
     def get_object_id(self, obj):
         return "%s-%s" % (obj.binary, obj.host)
 
@@ -213,46 +235,4 @@ class NetworkAgentsTable(tables.DataTable):
         verbose_name = _("Network Agents")
         table_actions = (NetworkAgentsFilterAction, )
         row_actions = (NetworkL3AgentRoutersLinkAction, )
-        multi_select = False
-
-
-class HeatServiceFilterAction(tables.FilterAction):
-    filter_field = 'type'
-
-    def filter(self, table, services, filter_string):
-        q = filter_string.lower()
-
-        def comp(service):
-            attr = getattr(service, self.filter_field, '')
-            if attr is not None and q in attr.lower():
-                return True
-            return False
-
-        return filter(comp, services)
-
-
-class HeatServiceTable(tables.DataTable):
-    hostname = tables.Column('hostname', verbose_name=_('Hostname'))
-    binary = tables.Column("binary", verbose_name=_('Name'))
-    engine_id = tables.Column('engine_id', verbose_name=_('Engine Id'))
-    host = tables.Column('host', verbose_name=_('Host'))
-    topic = tables.Column('topic', verbose_name=_('Topic'))
-    # For consistent with other tables in system info, set column name to
-    # 'state'
-    state = tables.Column('status', verbose_name=_('State'),
-                          display_choices=SERVICE_STATE_DISPLAY_CHOICES)
-    updated_at = tables.Column('updated_at',
-                               verbose_name=pgettext_lazy(
-                                   'Time since the last update',
-                                   u'Last Updated'),
-                               filters=(utils_filters.parse_isotime,
-                                        filters.timesince))
-
-    def get_object_id(self, obj):
-        return "%s" % obj.engine_id
-
-    class Meta(object):
-        name = "heat_services"
-        verbose_name = _("Orchestration Services")
-        table_actions = (HeatServiceFilterAction,)
         multi_select = False

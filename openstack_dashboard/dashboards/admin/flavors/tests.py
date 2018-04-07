@@ -12,18 +12,16 @@
 
 import django
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django import http
+from django.urls import reverse
 from mox3.mox import IsA
-
-from openstack_dashboard import api
-from openstack_dashboard.test import helpers as test
-
 from novaclient.v2 import flavors
 
+from openstack_dashboard import api
 from openstack_dashboard.dashboards.admin.flavors import constants
 from openstack_dashboard.dashboards.admin.flavors import tables
 from openstack_dashboard.dashboards.admin.flavors import workflows
+from openstack_dashboard.test import helpers as test
 
 
 class FlavorsViewTests(test.BaseAdminViewTests):
@@ -794,11 +792,11 @@ class UpdateFlavorWorkflowTests(BaseFlavorWorkflowTests):
     @test.create_stubs({api.keystone: ('tenant_list',),
                         api.nova: ('flavor_get',
                                    'flavor_list',)})
-    def test_update_flavor_set_invalid_name(self):
+    def test_update_flavor_set_invalid_name_length(self):
         flavor = self.flavors.first()
         projects = self.tenants.list()
         eph = getattr(flavor, 'OS-FLV-EXT-DATA:ephemeral')
-        invalid_flavor_name = "m1.tiny()"
+        invalid_flavor_name = "a" * 256
 
         # init
         api.nova.flavor_get(IsA(http.HttpRequest), flavor.id) \
@@ -827,8 +825,9 @@ class UpdateFlavorWorkflowTests(BaseFlavorWorkflowTests):
                          'eph_gb': eph,
                          'is_public': True}
         resp = self.client.post(url, workflow_data)
-        self.assertFormErrors(resp, 1, 'Name may only contain letters, '
-                              'numbers, underscores, periods and hyphens.')
+        self.assertFormErrors(resp)
+        self.assertContains(resp,
+                            "Ensure this value has at most 255 characters")
 
     @test.create_stubs({api.keystone: ('tenant_list',),
                         api.nova: ('flavor_get',

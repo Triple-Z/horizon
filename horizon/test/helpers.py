@@ -16,12 +16,15 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import collections
+import copy
 import logging
 import os
 import socket
 import time
 import unittest
 
+from django.conf import settings
 from django.contrib.auth.middleware import AuthenticationMiddleware
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import User
@@ -32,6 +35,7 @@ from django.core.handlers import wsgi
 from django import http
 from django import test as django_test
 from django.test.client import RequestFactory
+from django.test import utils as django_test_utils
 from django.utils.encoding import force_text
 import six
 
@@ -55,8 +59,14 @@ except ImportError as e:
     LOG.warning("%s, force WITH_SELENIUM=False", e)
     os.environ['WITH_SELENIUM'] = ''
 
-
-from mox3 import mox
+# As of Rocky, we are in the process of removing mox usage.
+# To allow mox-free horizon plugins to consume the test helper,
+# mox import is now optional. If tests depends on mox,
+# mox (or mox3) must be declared in test-requirements.txt.
+try:
+    from mox3 import mox
+except ImportError:
+    pass
 
 from horizon import middleware
 
@@ -115,23 +125,32 @@ class RequestFactoryWithMessages(RequestFactory):
 @unittest.skipIf(os.environ.get('SKIP_UNITTESTS', False),
                  "The SKIP_UNITTESTS env variable is set.")
 class TestCase(django_test.TestCase):
-    """Specialized base test case class for Horizon which gives access to
-    numerous additional features:
+    """Base test case class for Horizon with numerous additional features.
 
-      * The ``mox`` mocking framework via ``self.mox``.
+      * The ``mox`` mocking framework via ``self.mox``
+        if ``use_mox`` attribute is set to True.
+        Note that ``use_mox`` defaults to False.
       * A ``RequestFactory`` class which supports Django's ``contrib.messages``
         framework via ``self.factory``.
       * A ready-to-go request object via ``self.request``.
     """
+
+    use_mox = False
+
     def setUp(self):
         super(TestCase, self).setUp()
-        self.mox = mox.Mox()
+        if self.use_mox:
+            self.mox = mox.Mox()
         self._setup_test_data()
         self._setup_factory()
         self._setup_user()
         self._setup_request()
-        middleware.HorizonMiddleware().process_request(self.request)
-        AuthenticationMiddleware().process_request(self.request)
+        # A dummy get_response function (which is not callable) is passed
+        # because middlewares below are used only to populate request attrs.
+        middleware.HorizonMiddleware('dummy_get_response') \
+            .process_request(self.request)
+        AuthenticationMiddleware('dummy_get_response') \
+            .process_request(self.request)
         os.environ["HORIZON_TEST_RUN"] = "True"
 
     def _setup_test_data(self):
@@ -146,12 +165,13 @@ class TestCase(django_test.TestCase):
 
     def _setup_request(self):
         self.request = http.HttpRequest()
-        self.request.session = self.client._session()
+        self.request.session = self.client.session
 
     def tearDown(self):
         super(TestCase, self).tearDown()
-        self.mox.UnsetStubs()
-        self.mox.VerifyAll()
+        if self.use_mox:
+            self.mox.UnsetStubs()
+            self.mox.VerifyAll()
         del os.environ["HORIZON_TEST_RUN"]
 
     def set_permissions(self, permissions=None):
@@ -176,15 +196,17 @@ class TestCase(django_test.TestCase):
             self.assertNotRegex(text, unexpected_regexp, msg)
 
     def assertNoMessages(self, response=None):
-        """Asserts that no messages have been attached by the
-        ``contrib.messages`` framework.
+        """Asserts no messages have been attached by the messages framework.
+
+        The expected messages framework is ``django.contrib.messages``.
         """
         self.assertMessageCount(response, success=0, warn=0, info=0, error=0)
 
     def assertMessageCount(self, response=None, **kwargs):
-        """Asserts that the specified number of messages have been attached
-        for various message types. Usage would look like
-        ``self.assertMessageCount(success=1)``.
+        """Asserts that the expected number of messages have been attached.
+
+        The expected number of messages can be specified per message type.
+        Usage would look like ``self.assertMessageCount(success=1)``.
         """
         temp_req = self.client.request(**{'wsgi.input': None})
         temp_req.COOKIES = self.client.cookies
@@ -255,9 +277,9 @@ class SeleniumTestCase(LiveServerTestCase):
 
 
 class JasmineTests(SeleniumTestCase):
-    """Helper class which allows you to create a simple Jasmine test running
-    through Selenium
+    """Helper class which allows you to create a simple Jasmine test.
 
+    Jasmine tests are run through Selenium.
     To run a jasmine test suite, create a class which extends JasmineTests in
     the :file:`horizon/test/jasmine/jasmine_tests.py` and define two class
     attributes
@@ -313,3 +335,43 @@ class JasmineTests(SeleniumTestCase):
         if self.__class__ == JasmineTests:
             return
         self.run_jasmine()
+
+
+class update_settings(django_test_utils.override_settings):
+    """override_settings which allows override an item in dict.
+
+    django original override_settings replaces a dict completely,
+    however OpenStack dashboard setting has many dictionary configuration
+    and there are test case where we want to override only one item in
+    a dictionary and keep other items in the dictionary.
+    This version of override_settings allows this if keep_dict is True.
+
+    If keep_dict False is specified, the original behavior of
+    Django override_settings is used.
+    """
+
+    def __init__(self, keep_dict=True, **kwargs):
+        if keep_dict:
+            for key, new_value in kwargs.items():
+                value = getattr(settings, key, None)
+                if (isinstance(new_value, collections.Mapping) and
+                        isinstance(value, collections.Mapping)):
+                    copied = copy.copy(value)
+                    copied.update(new_value)
+                    kwargs[key] = copied
+        super(update_settings, self).__init__(**kwargs)
+
+
+class IsA(object):
+    """Class to compare param is a specified class."""
+    def __init__(self, cls):
+        self.cls = cls
+
+    def __eq__(self, other):
+        return isinstance(other, self.cls)
+
+
+class IsHttpRequest(IsA):
+    """Class to compare param is django.http.HttpRequest."""
+    def __init__(self):
+        super(IsHttpRequest, self).__init__(http.HttpRequest)

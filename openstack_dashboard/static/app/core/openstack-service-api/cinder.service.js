@@ -46,6 +46,7 @@
       getVolumeSnapshots: getVolumeSnapshots,
       getExtensions: getExtensions,
       getQoSSpecs: getQoSSpecs,
+      getAvailabilityZones:getAvailabilityZones,
       createVolume: createVolume,
       getAbsoluteLimits: getAbsoluteLimits,
       getServices: getServices,
@@ -283,12 +284,11 @@
      *  {
      *    "items": [
      *      {
-     *        "alias": "NMN",
-     *        "description": "Multiple network support.",
+     *        "alias": "OS-SCH-HNT",
+     *        "description": "Pass arbitrary key/value pairs to the scheduler.",
      *        "links": [],
-     *        "name": "Multinic",
-     *        "namespace": "http://docs.openstack.org/compute/ext/multinic/api/v1.1",
-     *        "updated": "2011-06-09T00:00:00Z"
+     *        "name": "SchedulerHints",
+     *        "updated": "2013-04-18T00:00:00+00:00"
      *      }
      *    ]
      *  }
@@ -401,6 +401,25 @@
       return apiService.patch(url, quota)
         .error(function() {
           toastService.add('error', gettext('Unable to update project quota data.'));
+        });
+    }
+
+    // Availability Zones
+
+    /**
+     * @name getAvailabilityZones
+     * @description
+     * Get a list of Availability Zones.
+     *
+     * The listing result is an object with property "items". Each item is
+     * an availability zone.
+     * @returns {Object} The result of the API call
+     */
+    function getAvailabilityZones() {
+      return apiService.get('/api/cinder/availzones/')
+        .error(function () {
+          toastService.add('error',
+                        gettext('Unable to retrieve the volume availability zones.'));
         });
     }
   }

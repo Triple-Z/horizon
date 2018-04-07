@@ -10,8 +10,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from django.core.urlresolvers import reverse
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse
+from django.urls import reverse_lazy
+from django.utils.http import urlencode
 from django.utils.translation import ugettext_lazy as _
 
 from horizon import exceptions
@@ -20,7 +21,7 @@ from horizon import tables
 from horizon import tabs
 from horizon.utils import memoized
 
-from openstack_dashboard import api
+from openstack_dashboard.api import cinder
 
 from openstack_dashboard.dashboards.project.snapshots \
     import forms as vol_snapshot_forms
@@ -30,21 +31,21 @@ from openstack_dashboard.dashboards.project.snapshots \
     import tabs as vol_snapshot_tabs
 
 
-class SnapshotsView(tables.DataTableView, tables.PagedTableMixin):
+class SnapshotsView(tables.PagedTableMixin, tables.DataTableView):
     table_class = vol_snapshot_tables.VolumeSnapshotsTable
     page_title = _("Volume Snapshots")
 
     def get_data(self):
         snapshots = []
         volumes = {}
-        if api.base.is_service_enabled(self.request, 'volumev2'):
+        if cinder.is_volume_service_enabled(self.request):
             try:
                 marker, sort_dir = self._get_marker()
                 snapshots, self._has_more_data, self._has_prev_data = \
-                    api.cinder.volume_snapshot_list_paged(
+                    cinder.volume_snapshot_list_paged(
                         self.request, paginate=True, marker=marker,
                         sort_dir=sort_dir)
-                volumes = api.cinder.volume_list(self.request)
+                volumes = cinder.volume_list(self.request)
                 volumes = dict((v.id, v) for v in volumes)
             except Exception:
                 exceptions.handle(self.request, _("Unable to retrieve "
@@ -70,8 +71,8 @@ class UpdateView(forms.ModalFormView):
     def get_object(self):
         snap_id = self.kwargs['snapshot_id']
         try:
-            self._object = api.cinder.volume_snapshot_get(self.request,
-                                                          snap_id)
+            self._object = cinder.volume_snapshot_get(self.request,
+                                                      snap_id)
         except Exception:
             msg = _('Unable to retrieve volume snapshot.')
             url = reverse('horizon:project:snapshots:index')
@@ -81,8 +82,11 @@ class UpdateView(forms.ModalFormView):
     def get_context_data(self, **kwargs):
         context = super(UpdateView, self).get_context_data(**kwargs)
         context['snapshot'] = self.get_object()
+        success_url = self.request.GET.get('success_url', "")
         args = (self.kwargs['snapshot_id'],)
-        context['submit_url'] = reverse(self.submit_url, args=args)
+        params = urlencode({"success_url": success_url})
+        context['submit_url'] = "?".join([reverse(self.submit_url, args=args),
+                                          params])
         return context
 
     def get_initial(self):
@@ -90,6 +94,12 @@ class UpdateView(forms.ModalFormView):
         return {'snapshot_id': self.kwargs["snapshot_id"],
                 'name': snapshot.name,
                 'description': snapshot.description}
+
+    def get_success_url(self):
+        success_url = self.request.GET.get(
+            "success_url",
+            reverse_lazy("horizon:project:snapshots:index"))
+        return success_url
 
 
 class DetailView(tabs.TabView):
@@ -113,8 +123,10 @@ class DetailView(tabs.TabView):
     def get_data(self):
         try:
             snapshot_id = self.kwargs['snapshot_id']
-            snapshot = api.cinder.volume_snapshot_get(self.request,
-                                                      snapshot_id)
+            snapshot = cinder.volume_snapshot_get(self.request,
+                                                  snapshot_id)
+            snapshot._volume = cinder.volume_get(self.request,
+                                                 snapshot.volume_id)
         except Exception:
             redirect = self.get_redirect_url()
             exceptions.handle(self.request,

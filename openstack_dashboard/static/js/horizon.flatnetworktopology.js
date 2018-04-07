@@ -102,6 +102,7 @@ horizon.flat_network_topology = {
       })
       .on('click', 'a.vnc_window', function(e) {
         e.preventDefault();
+        e.stopImmediatePropagation();
         var vnc_window = window.open($(this).attr('href'), vnc_window, 'width=760,height=560');
         self.delete_balloon();
       })
@@ -523,7 +524,7 @@ horizon.flat_network_topology = {
       object.router_id = port.device_id;
       object.url = port.url;
       object.port_status = port.status;
-      object.port_status_css = (port.status === "ACTIVE")? 'active' : 'down';
+      object.port_status_class = (port.original_status === "ACTIVE")? 'active' : 'down';
       var ip_address = '';
       try {
         ip_address = port.fixed_ips[0].ip_address;
@@ -545,7 +546,12 @@ horizon.flat_network_topology = {
       object.network_id = network_id;
       object.ip_address = ip_address;
       object.device_owner = device_owner;
-      object.is_interface = (device_owner === 'router_interface' || device_owner === 'router_gateway');
+      object.is_interface = (
+        device_owner === 'router_interface' ||
+        device_owner === 'router_gateway' ||
+        device_owner === 'ha_router_replicated_interface'
+      );
+      // (device_owner === 'router_interface' || device_owner === 'router_gateway');
       ports.push(object);
     });
     var html;
@@ -557,7 +563,7 @@ horizon.flat_network_topology = {
       type:d.type,
       delete_label: gettext("Delete"),
       status:d.status,
-      status_class:(d.status === "ACTIVE")? 'active' : 'down',
+      status_class:(d.original_status === "ACTIVE")? 'active' : 'down',
       status_label: gettext("STATUS"),
       id_label: gettext("ID"),
       interfaces_label: gettext("Interfaces"),
@@ -617,13 +623,22 @@ horizon.flat_network_topology = {
 
     $balloon.find('.delete-device').click(function(){
       var $this = $(this);
-      $this.prop('disabled', true);
-      d3.select('#id_' + $this.data('device-id')).classed('loading',true);
-      self.delete_device($this.data('type'),$this.data('device-id'));
+      var delete_modal = horizon.datatables.confirm($this);
+      delete_modal.find('.btn-primary').click(function () {
+        $this.prop('disabled', true);
+        d3.select('#id_' + $this.data('device-id')).classed('loading',true);
+        self.delete_device($this.data('type'),$this.data('device-id'));
+        horizon.modals.spinner.modal('hide');
+      });
     });
     $balloon.find('.delete-port').click(function(){
       var $this = $(this);
-      self.delete_port($this.data('router-id'),$this.data('port-id'),$this.data('network-id'));
+      var delete_modal = horizon.datatables.confirm($this);
+      delete_modal.find('.btn-primary').click(function () {
+        $this.prop('disabled', true);
+        self.delete_port($this.data('router-id'),$this.data('port-id'),$this.data('network-id'));
+        horizon.modals.spinner.modal('hide');
+      });
     });
     self.balloon_id = balloon_id;
   },

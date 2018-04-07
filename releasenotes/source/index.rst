@@ -6,6 +6,8 @@
    :maxdepth: 1
 
    unreleased
+   queens
+   pike
    ocata
    newton
    mitaka
@@ -17,3 +19,8 @@
    grizzly
    folsom
    essex
+
+.. toctree::
+   :maxdepth: 1
+
+   Release Notes Howto <https://docs.openstack.org/horizon/latest/contributor/contributing.html#release-notes>

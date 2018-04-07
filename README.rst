@@ -12,23 +12,24 @@ web-based interactions with the various OpenStack projects.
 * Blueprints and feature specifications: https://blueprints.launchpad.net/horizon
 * Issue tracking: https://bugs.launchpad.net/horizon
 
-.. image:: http://governance.openstack.org/badges/horizon.svg
-    :target: http://governance.openstack.org/reference/tags/index.html
+.. image:: https://governance.openstack.org/tc/badges/horizon.svg
+    :target: https://governance.openstack.org/tc/reference/tags/index.html
 
 Using Horizon
 =============
 
-See ``doc/source/topics/install.rst`` about how to install Horizon
+See ``doc/source/install/index.rst`` about how to install Horizon
 in your OpenStack setup. It describes the example steps and
 has pointers for more detailed settings and configurations.
 
-It is also available at http://docs.openstack.org/developer/horizon/topics/install.html.
+It is also available at
+`Installation Guide <https://docs.openstack.org/horizon/latest/install/index.html>`_.
 
 Getting Started for Developers
 ==============================
 
 ``doc/source/quickstart.rst`` or
-http://docs.openstack.org/developer/horizon/quickstart.html
+`Quickstart Guide <https://docs.openstack.org/horizon/latest/contributor/quickstart.html>`_
 describes how to setup Horizon development environment and start development.
 
 Building Contributor Documentation
@@ -42,12 +43,8 @@ The source is maintained in the ``doc/source`` directory using
 .. _reStructuredText: http://docutils.sourceforge.net/rst.html
 .. _Sphinx: http://sphinx-doc.org/
 
-* Building Automatically::
+To build the docs, use::
 
-    $ ./run_tests.sh --docs
-
-* Building Manually::
-
-    $ tools/with_venv.sh sphinx-build doc/source doc/build/html
+  $ tox -e docs
 
 Results are in the ``doc/build/html`` directory

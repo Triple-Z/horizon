@@ -32,15 +32,6 @@ from openstack_dashboard.utils import filters
 LOG = logging.getLogger(__name__)
 
 
-class FloatingIPFilterAction(tables.FilterAction):
-
-    def filter(self, table, fips, filter_string):
-        """Naive case-insensitive search."""
-        q = filter_string.lower()
-        return [ip for ip in fips
-                if q in ip.ip.lower()]
-
-
 class AdminAllocateFloatingIP(project_tables.AllocateIP):
     url = "horizon:admin:floating_ips:allocate"
 
@@ -61,7 +52,7 @@ class AdminSimpleDisassociateIP(project_tables.DisassociateIP):
     def single(self, table, request, obj_id):
         try:
             fip = table.get_object_by_id(filters.get_int_or_uuid(obj_id))
-            api.network.floating_ip_disassociate(request, fip.id)
+            api.neutron.floating_ip_disassociate(request, fip.id)
             LOG.info('Disassociating Floating IP "%s".', obj_id)
             messages.success(request,
                              _('Successfully disassociated Floating IP: %s')
@@ -70,6 +61,13 @@ class AdminSimpleDisassociateIP(project_tables.DisassociateIP):
             exceptions.handle(request,
                               _('Unable to disassociate floating IP.'))
         return shortcuts.redirect('horizon:admin:floating_ips:index')
+
+
+class AdminFloatingIPsFilterAction(tables.FilterAction):
+    filter_type = "server"
+    filter_choices = (
+        ('project_id', _('Project ID'), True), ) + \
+        project_tables.FLOATING_IPS_FILTER_CHOICES
 
 
 class FloatingIPsTable(project_tables.FloatingIPsTable):
@@ -83,9 +81,9 @@ class FloatingIPsTable(project_tables.FloatingIPsTable):
         name = "floating_ips"
         verbose_name = _("Floating IPs")
         status_columns = ["status"]
-        table_actions = (FloatingIPFilterAction,
-                         AdminAllocateFloatingIP,
-                         AdminReleaseFloatingIP)
+        table_actions = (AdminAllocateFloatingIP,
+                         AdminReleaseFloatingIP,
+                         AdminFloatingIPsFilterAction)
         row_actions = (AdminSimpleDisassociateIP,
                        AdminReleaseFloatingIP)
-        columns = ('tenant', 'ip', 'fixed_ip', 'pool', 'status')
+        columns = ('tenant', 'ip', 'description', 'fixed_ip', 'pool', 'status')

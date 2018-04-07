@@ -16,10 +16,11 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+import abc
 import logging
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from openstack_auth import utils
@@ -48,59 +49,23 @@ PROJECT_GROUP_MEMBER_SLUG = "update_group_members"
 COMMON_HORIZONTAL_TEMPLATE = "identity/projects/_common_horizontal_form.html"
 
 
-class ProjectQuotaAction(workflows.Action):
-    ifcb_label = _("Injected File Content (Bytes)")
-    ifpb_label = _("Length of Injected File Path")
-    metadata_items = forms.IntegerField(min_value=-1,
-                                        label=_("Metadata Items"))
-    cores = forms.IntegerField(min_value=-1, label=_("VCPUs"))
-    instances = forms.IntegerField(min_value=-1, label=_("Instances"))
-    injected_files = forms.IntegerField(min_value=-1,
-                                        label=_("Injected Files"))
-    injected_file_content_bytes = forms.IntegerField(min_value=-1,
-                                                     label=ifcb_label)
-    key_pairs = forms.IntegerField(min_value=-1, label=_("Key Pairs"))
-    injected_file_path_bytes = forms.IntegerField(min_value=-1,
-                                                  label=ifpb_label)
-    volumes = forms.IntegerField(min_value=-1, label=_("Volumes"))
-    snapshots = forms.IntegerField(min_value=-1, label=_("Volume Snapshots"))
-    gigabytes = forms.IntegerField(
-        min_value=-1, label=_("Total Size of Volumes and Snapshots (GiB)"))
-    ram = forms.IntegerField(min_value=-1, label=_("RAM (MB)"))
-    floating_ips = forms.IntegerField(min_value=-1, label=_("Floating IPs"))
-    fixed_ips = forms.IntegerField(min_value=-1, label=_("Fixed IPs"))
-    security_groups = forms.IntegerField(min_value=-1,
-                                         label=_("Security Groups"))
-    security_group_rules = forms.IntegerField(min_value=-1,
-                                              label=_("Security Group Rules"))
+class CommonQuotaAction(workflows.Action):
 
-    # Neutron
-    security_group = forms.IntegerField(min_value=-1,
-                                        label=_("Security Groups"))
-    security_group_rule = forms.IntegerField(min_value=-1,
-                                             label=_("Security Group Rules"))
-    floatingip = forms.IntegerField(min_value=-1, label=_("Floating IPs"))
-    network = forms.IntegerField(min_value=-1, label=_("Networks"))
-    port = forms.IntegerField(min_value=-1, label=_("Ports"))
-    router = forms.IntegerField(min_value=-1, label=_("Routers"))
-    subnet = forms.IntegerField(min_value=-1, label=_("Subnets"))
+    _quota_fields = None
 
     def __init__(self, request, *args, **kwargs):
-        super(ProjectQuotaAction, self).__init__(request,
-                                                 *args,
-                                                 **kwargs)
-        disabled_quotas = quotas.get_disabled_quotas(request)
+        super(CommonQuotaAction, self).__init__(request, *args, **kwargs)
+        disabled_quotas = self.initial['disabled_quotas']
         for field in disabled_quotas:
             if field in self.fields:
                 self.fields[field].required = False
                 self.fields[field].widget = forms.HiddenInput()
 
-
-class UpdateProjectQuotaAction(ProjectQuotaAction):
     def clean(self):
-        cleaned_data = super(UpdateProjectQuotaAction, self).clean()
+        cleaned_data = super(CommonQuotaAction, self).clean()
         usages = quotas.tenant_quota_usages(
-            self.request, tenant_id=self.initial['project_id'])
+            self.request, tenant_id=self.initial['project_id'],
+            targets=tuple(self._quota_fields))
         # Validate the quota values before updating quotas.
         bad_values = []
         for key, value in cleaned_data.items():
@@ -117,33 +82,129 @@ class UpdateProjectQuotaAction(ProjectQuotaAction):
             raise forms.ValidationError(msg)
         return cleaned_data
 
+    def handle(self, request, context):
+        project_id = context['project_id']
+        disabled_quotas = context['disabled_quotas']
+        data = {key: context[key] for key in
+                self._quota_fields - disabled_quotas}
+        if data:
+            self._tenant_quota_update(request, project_id, data)
+
+    @abc.abstractmethod
+    def _tenant_quota_update(self, request, project_id, data):
+        pass
+
+
+class ComputeQuotaAction(CommonQuotaAction):
+    instances = forms.IntegerField(min_value=-1, label=_("Instances"))
+    cores = forms.IntegerField(min_value=-1, label=_("VCPUs"))
+    ram = forms.IntegerField(min_value=-1, label=_("RAM (MB)"))
+    metadata_items = forms.IntegerField(min_value=-1,
+                                        label=_("Metadata Items"))
+    key_pairs = forms.IntegerField(min_value=-1, label=_("Key Pairs"))
+    injected_files = forms.IntegerField(min_value=-1,
+                                        label=_("Injected Files"))
+    injected_file_content_bytes = forms.IntegerField(
+        min_value=-1,
+        label=_("Injected File Content (Bytes)"))
+    injected_file_path_bytes = forms.IntegerField(
+        min_value=-1,
+        label=_("Length of Injected File Path"))
+
+    _quota_fields = quotas.NOVA_QUOTA_FIELDS
+
+    def _tenant_quota_update(self, request, project_id, data):
+        nova.tenant_quota_update(request, project_id, **data)
+
     class Meta(object):
-        name = _("Quotas")
-        slug = 'update_quotas'
+        name = _("Compute")
+        slug = 'update_compute_quotas'
         help_text = _("Set maximum quotas for the project.")
         permissions = ('openstack.roles.admin', 'openstack.services.compute')
 
 
-class CreateProjectQuotaAction(ProjectQuotaAction):
+class VolumeQuotaAction(CommonQuotaAction):
+    volumes = forms.IntegerField(min_value=-1, label=_("Volumes"))
+    snapshots = forms.IntegerField(min_value=-1, label=_("Volume Snapshots"))
+    gigabytes = forms.IntegerField(
+        min_value=-1, label=_("Total Size of Volumes and Snapshots (GiB)"))
+
+    _quota_fields = quotas.CINDER_QUOTA_FIELDS
+
+    def _tenant_quota_update(self, request, project_id, data):
+        cinder.tenant_quota_update(request, project_id, **data)
+
     class Meta(object):
-        name = _("Quotas")
-        slug = 'create_quotas'
+        name = _("Volume")
+        slug = 'update_volume_quotas'
         help_text = _("Set maximum quotas for the project.")
         permissions = ('openstack.roles.admin', 'openstack.services.compute')
 
 
-class UpdateProjectQuota(workflows.Step):
-    action_class = UpdateProjectQuotaAction
-    template_name = COMMON_HORIZONTAL_TEMPLATE
-    depends_on = ("project_id",)
-    contributes = quotas.QUOTA_FIELDS
+class NetworkQuotaAction(CommonQuotaAction):
+    network = forms.IntegerField(min_value=-1, label=_("Networks"))
+    subnet = forms.IntegerField(min_value=-1, label=_("Subnets"))
+    port = forms.IntegerField(min_value=-1, label=_("Ports"))
+    router = forms.IntegerField(min_value=-1, label=_("Routers"))
+    floatingip = forms.IntegerField(min_value=-1, label=_("Floating IPs"))
+    security_group = forms.IntegerField(min_value=-1,
+                                        label=_("Security Groups"))
+    security_group_rule = forms.IntegerField(min_value=-1,
+                                             label=_("Security Group Rules"))
+
+    _quota_fields = quotas.NEUTRON_QUOTA_FIELDS
+
+    def _tenant_quota_update(self, request, project_id, data):
+        api.neutron.tenant_quota_update(request, project_id, **data)
+
+    class Meta(object):
+        name = _("Network")
+        slug = 'update_network_quotas'
+        help_text = _("Set maximum quotas for the project.")
+        permissions = ('openstack.roles.admin', 'openstack.services.compute')
 
 
-class CreateProjectQuota(workflows.Step):
-    action_class = CreateProjectQuotaAction
+class UpdateComputeQuota(workflows.Step):
+    action_class = ComputeQuotaAction
     template_name = COMMON_HORIZONTAL_TEMPLATE
-    depends_on = ("project_id",)
-    contributes = quotas.QUOTA_FIELDS
+    depends_on = ("project_id", "disabled_quotas")
+    contributes = quotas.NOVA_QUOTA_FIELDS
+
+    def allowed(self, request):
+        return api.base.is_service_enabled(request, 'compute')
+
+
+class UpdateVolumeQuota(workflows.Step):
+    action_class = VolumeQuotaAction
+    template_name = COMMON_HORIZONTAL_TEMPLATE
+    depends_on = ("project_id", "disabled_quotas")
+    contributes = quotas.CINDER_QUOTA_FIELDS
+
+    def allowed(self, request):
+        return cinder.is_volume_service_enabled(request)
+
+
+class UpdateNetworkQuota(workflows.Step):
+    action_class = NetworkQuotaAction
+    template_name = COMMON_HORIZONTAL_TEMPLATE
+    depends_on = ("project_id", "disabled_quotas")
+    contributes = quotas.NEUTRON_QUOTA_FIELDS
+
+    def allowed(self, request):
+        return (api.base.is_service_enabled(request, 'network') and
+                api.neutron.is_quotas_extension_supported(request))
+
+
+class UpdateQuota(workflows.Workflow):
+    slug = "update_quotas"
+    name = _("Edit Quotas")
+    finalize_button_name = _("Save")
+    success_message = _('Modified quotas of project')
+    failure_message = _('Unable to modify quotas of project')
+    success_url = "horizon:identity:projects:index"
+    default_steps = (UpdateComputeQuota,
+                     UpdateVolumeQuota,
+                     UpdateNetworkQuota)
 
 
 class CreateProjectInfoAction(workflows.Action):
@@ -404,33 +465,7 @@ class UpdateProjectGroups(workflows.UpdateMembersStep):
         return context
 
 
-class CommonQuotaWorkflow(workflows.Workflow):
-    def _update_project_quota(self, request, data, project_id):
-        disabled_quotas = quotas.get_disabled_quotas(request)
-
-        # Update the project quotas.
-        if api.base.is_service_enabled(request, 'compute'):
-            nova_data = {key: data[key] for key in
-                         quotas.NOVA_QUOTA_FIELDS - disabled_quotas}
-            if nova_data:
-                nova.tenant_quota_update(request, project_id, **nova_data)
-
-        if cinder.is_volume_service_enabled(request):
-            cinder_data = {key: data[key] for key in
-                           quotas.CINDER_QUOTA_FIELDS - disabled_quotas}
-            if cinder_data:
-                cinder.tenant_quota_update(request, project_id, **cinder_data)
-
-        if (api.base.is_service_enabled(request, 'network') and
-                api.neutron.is_quotas_extension_supported(request)):
-            neutron_data = {key: data[key] for key in
-                            quotas.NEUTRON_QUOTA_FIELDS - disabled_quotas}
-            if neutron_data:
-                api.neutron.tenant_quota_update(request, project_id,
-                                                **neutron_data)
-
-
-class CreateProject(CommonQuotaWorkflow):
+class CreateProject(workflows.Workflow):
     slug = "create_project"
     name = _("Create Project")
     finalize_button_name = _("Create Project")
@@ -438,16 +473,14 @@ class CreateProject(CommonQuotaWorkflow):
     failure_message = _('Unable to create project "%s".')
     success_url = "horizon:identity:projects:index"
     default_steps = (CreateProjectInfo,
-                     UpdateProjectMembers,
-                     CreateProjectQuota)
+                     UpdateProjectMembers)
 
     def __init__(self, request=None, context_seed=None, entry_point=None,
                  *args, **kwargs):
         if PROJECT_GROUP_ENABLED:
             self.default_steps = (CreateProjectInfo,
                                   UpdateProjectMembers,
-                                  UpdateProjectGroups,
-                                  CreateProjectQuota)
+                                  UpdateProjectGroups)
         super(CreateProject, self).__init__(request=request,
                                             context_seed=context_seed,
                                             entry_point=entry_point,
@@ -551,13 +584,6 @@ class CreateProject(CommonQuotaWorkflow):
                                 'and update project quotas.')
                               % groups_to_add)
 
-    def _update_project_quota(self, request, data, project_id):
-        try:
-            super(CreateProject, self)._update_project_quota(
-                request, data, project_id)
-        except Exception:
-            exceptions.handle(request, _('Unable to set project quotas.'))
-
     def handle(self, request, data):
         project = self._create_project(request, data)
         if not project:
@@ -566,31 +592,7 @@ class CreateProject(CommonQuotaWorkflow):
         self._update_project_members(request, data, project_id)
         if PROJECT_GROUP_ENABLED:
             self._update_project_groups(request, data, project_id)
-        if keystone.is_cloud_admin(request):
-            self._update_project_quota(request, data, project_id)
         return True
-
-
-class CreateProjectNoQuota(CreateProject):
-    slug = "create_project"
-    name = _("Create Project")
-    finalize_button_name = _("Create Project")
-    success_message = _('Created new project "%s".')
-    failure_message = _('Unable to create project "%s".')
-    success_url = "horizon:identity:projects:index"
-    default_steps = (CreateProjectInfo, UpdateProjectMembers)
-
-    def __init__(self, request=None, context_seed=None, entry_point=None,
-                 *args, **kwargs):
-        if PROJECT_GROUP_ENABLED:
-            self.default_steps = (CreateProjectInfo,
-                                  UpdateProjectMembers,
-                                  UpdateProjectGroups,)
-        super(CreateProject, self).__init__(request=request,
-                                            context_seed=context_seed,
-                                            entry_point=entry_point,
-                                            *args,
-                                            **kwargs)
 
 
 class UpdateProjectInfoAction(CreateProjectInfoAction):
@@ -642,7 +644,7 @@ class UpdateProjectInfo(workflows.Step):
             self.contributes += tuple(EXTRA_INFO.keys())
 
 
-class UpdateProject(CommonQuotaWorkflow):
+class UpdateProject(workflows.Workflow):
     slug = "update_project"
     name = _("Edit Project")
     finalize_button_name = _("Save")
@@ -650,16 +652,14 @@ class UpdateProject(CommonQuotaWorkflow):
     failure_message = _('Unable to modify project "%s".')
     success_url = "horizon:identity:projects:index"
     default_steps = (UpdateProjectInfo,
-                     UpdateProjectMembers,
-                     UpdateProjectQuota)
+                     UpdateProjectMembers)
 
     def __init__(self, request=None, context_seed=None, entry_point=None,
                  *args, **kwargs):
         if PROJECT_GROUP_ENABLED:
             self.default_steps = (UpdateProjectInfo,
                                   UpdateProjectMembers,
-                                  UpdateProjectGroups,
-                                  UpdateProjectQuota)
+                                  UpdateProjectGroups)
 
         super(UpdateProject, self).__init__(request=request,
                                             context_seed=context_seed,
@@ -917,17 +917,6 @@ class UpdateProject(CommonQuotaWorkflow):
                               % groups_to_modify)
             return False
 
-    def _update_project_quota(self, request, data, project_id):
-        try:
-            super(UpdateProject, self)._update_project_quota(
-                request, data, project_id)
-            return True
-        except Exception:
-            exceptions.handle(request, _('Modified project information and '
-                                         'members, but unable to modify '
-                                         'project quotas.'))
-            return False
-
     def handle(self, request, data):
         # FIXME(gabriel): This should be refactored to use Python's built-in
         # sets and do this all in a single "roles to add" and "roles to remove"
@@ -951,32 +940,4 @@ class UpdateProject(CommonQuotaWorkflow):
             if not ret:
                 return False
 
-        if api.keystone.is_cloud_admin(request):
-            ret = self._update_project_quota(request, data, project_id)
-            if not ret:
-                return False
-
         return True
-
-
-class UpdateProjectNoQuota(UpdateProject):
-    slug = "update_project"
-    name = _("Edit Project")
-    finalize_button_name = _("Save")
-    success_message = _('Modified project "%s".')
-    failure_message = _('Unable to modify project "%s".')
-    success_url = "horizon:identity:projects:index"
-    default_steps = (UpdateProjectInfo, UpdateProjectMembers)
-
-    def __init__(self, request=None, context_seed=None, entry_point=None,
-                 *args, **kwargs):
-        if PROJECT_GROUP_ENABLED:
-            self.default_steps = (UpdateProjectInfo,
-                                  UpdateProjectMembers,
-                                  UpdateProjectGroups)
-
-        super(UpdateProject, self).__init__(request=request,
-                                            context_seed=context_seed,
-                                            entry_point=entry_point,
-                                            *args,
-                                            **kwargs)

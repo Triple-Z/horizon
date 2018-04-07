@@ -10,8 +10,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from django.core.urlresolvers import reverse
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse
+from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
 from horizon import exceptions
@@ -32,7 +32,7 @@ from openstack_dashboard.dashboards.project.snapshots \
     import views
 
 
-class SnapshotsView(tables.DataTableView, tables.PagedTableMixin):
+class SnapshotsView(tables.PagedTableMixin, tables.DataTableView):
     table_class = vol_snapshot_tables.VolumeSnapshotsTable
     page_title = _("Volume Snapshots")
 
@@ -122,7 +122,9 @@ class DetailView(views.DetailView):
         snapshot = self.get_data()
         snapshot.volume_url = reverse(self.volume_url,
                                       args=(snapshot.volume_id,))
+        table = vol_snapshot_tables.VolumeSnapshotsTable(self.request)
         context["snapshot"] = snapshot
+        context["actions"] = table.render_row_actions(snapshot)
         return context
 
     @staticmethod

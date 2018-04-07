@@ -13,8 +13,8 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-from django.core.urlresolvers import reverse
 from django import http
+from django.urls import reverse
 from mox3.mox import IsA
 
 from horizon.workflows import views
@@ -22,6 +22,7 @@ from horizon.workflows import views
 from openstack_dashboard import api
 from openstack_dashboard.dashboards.project.networks import tests
 from openstack_dashboard.test import helpers as test
+from openstack_dashboard.usage import quotas
 
 DETAIL_URL = 'horizon:admin:networks:subnets:detail'
 
@@ -308,7 +309,8 @@ class NetworkSubnetTests(test.BaseAdminViewTests):
                                       'port_list',
                                       'is_extension_supported',
                                       'show_network_ip_availability',
-                                      'list_dhcp_agent_hosting_networks',)})
+                                      'list_dhcp_agent_hosting_networks',),
+                        quotas: ('tenant_quota_usages',)})
     def test_subnet_delete_with_mac_learning(self):
         self._test_subnet_delete(mac_learning=True)
 
@@ -390,7 +392,8 @@ class NetworkSubnetTests(test.BaseAdminViewTests):
                                       'port_list',
                                       'is_extension_supported',
                                       'show_network_ip_availability',
-                                      'list_dhcp_agent_hosting_networks',)})
+                                      'list_dhcp_agent_hosting_networks',),
+                        quotas: ('tenant_quota_usages',)})
     def test_network_detail_ip_availability_exception(self):
         self._test_network_detail_ip_availability_exception()
 
@@ -399,23 +402,25 @@ class NetworkSubnetTests(test.BaseAdminViewTests):
                                       'port_list',
                                       'is_extension_supported',
                                       'show_network_ip_availability',
-                                      'list_dhcp_agent_hosting_networks',)})
+                                      'list_dhcp_agent_hosting_networks',),
+                        quotas: ('tenant_quota_usages',)})
     def test_network_detail_ip_availability_exception_with_mac_learning(self):
         self._test_network_detail_ip_availability_exception(mac_learning=True)
 
     def _test_network_detail_ip_availability_exception(self,
                                                        mac_learning=False):
-        network_id = self.networks.first().id
+        network = self.networks.first()
+        quota_data = self.neutron_quota_usages.first()
         api.neutron.is_extension_supported(
             IsA(http.HttpRequest),
             'network-ip-availability').AndReturn(True)
         api.neutron.show_network_ip_availability(IsA(http.HttpRequest),
-                                                 network_id).\
+                                                 network.id).\
             MultipleTimes().AndRaise(self.exceptions.neutron)
-        api.neutron.network_get(IsA(http.HttpRequest), network_id).\
-            AndReturn(self.networks.first())
+        api.neutron.network_get(IsA(http.HttpRequest), network.id).\
+            MultipleTimes().AndReturn(self.networks.first())
 
-        api.neutron.subnet_list(IsA(http.HttpRequest), network_id=network_id).\
+        api.neutron.subnet_list(IsA(http.HttpRequest), network_id=network.id).\
             AndReturn([self.subnets.first()])
         api.neutron.is_extension_supported(IsA(http.HttpRequest),
                                            'mac-learning') \
@@ -424,12 +429,18 @@ class NetworkSubnetTests(test.BaseAdminViewTests):
             IsA(http.HttpRequest),
             'network-ip-availability').AndReturn(True)
         api.neutron.is_extension_supported(IsA(http.HttpRequest),
+                                           'network_availability_zone')\
+            .MultipleTimes().AndReturn(True)
+        api.neutron.is_extension_supported(IsA(http.HttpRequest),
                                            'dhcp_agent_scheduler')\
             .MultipleTimes().AndReturn(True)
+        quotas.tenant_quota_usages(
+            IsA(http.HttpRequest), tenant_id=network.tenant_id,
+            targets=('subnet',)).MultipleTimes().AndReturn(quota_data)
         self.mox.ReplayAll()
         from django.utils.http import urlunquote
         url = urlunquote(reverse('horizon:admin:networks:subnets_tab',
-                                 args=[network_id]))
+                                 args=[network.id]))
         res = self.client.get(url)
         self.assertTemplateUsed(res, 'horizon/common/_detail.html')
         subnets = res.context['subnets_table'].data

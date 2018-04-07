@@ -119,8 +119,11 @@ class ResourceBrowser(html.HTMLElement):
                              % (attr_name, self.__class__.__name__))
 
     def set_tables(self, tables):
-        """Sets the table instances on the browser from a dictionary mapping
-        table names to table instances (as constructed by MultiTableView).
+        """Sets the table instances on the browser.
+
+        ``tables`` argument specifies tables to be set.
+        It is a dictionary mapping table names to table instances
+        (as constructed by MultiTableView).
         """
         self.navigation_table = tables[self.navigation_table_class._meta.name]
         self.content_table = tables[self.content_table_class._meta.name]
@@ -141,5 +144,4 @@ class ResourceBrowser(html.HTMLElement):
     def render(self):
         browser_template = template.loader.get_template(self.template)
         extra_context = {self.context_var_name: self}
-        context = template.RequestContext(self.request, extra_context)
-        return browser_template.render(context)
+        return browser_template.render(extra_context, self.request)

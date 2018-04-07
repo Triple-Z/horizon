@@ -15,6 +15,7 @@
 coverage.xml
 coverage-karma
 nosetests.xml
+*nose_results.html
 pep8.txt
 pylint.txt
 # Files created by releasenotes build
@@ -33,7 +34,6 @@ openstack_dashboard/wsgi/horizon.wsgi
 doc/build/
 /static/
 integration_tests_screenshots/
-.venv
 .tox
 node_modules
 npm-debug.log
@@ -43,5 +43,4 @@ AUTHORS
 ChangeLog
 tags
 ghostdriver.log
-.testrepository
 .idea

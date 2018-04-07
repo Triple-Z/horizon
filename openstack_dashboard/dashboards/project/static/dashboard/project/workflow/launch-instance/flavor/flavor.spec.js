@@ -35,6 +35,7 @@
 
         model = { newInstanceSpec: { },
                   novaLimits: { },
+                  cinderLimits: { },
                   flavors: []
                 };
         defaults = { usageLabel: "label",
@@ -54,7 +55,10 @@
       it('defines expected labels', function () {
         var props = [
           'chartTotalInstancesLabel',
-          'chartTotalVcpusLabel', 'chartTotalRamLabel'
+          'chartTotalVcpusLabel',
+          'chartTotalRamLabel',
+          'chartTotalVolumeLabel',
+          'chartTotalVolumeStorageLabel'
         ];
 
         props.forEach(function (prop) {
@@ -75,6 +79,11 @@
         });
       });
 
+      it('includes the unit if it is provided', function () {
+        var data = ctrl.getChartData('fakeTitle', 1, 2, 3, "MB");
+        expect(data.unit).toBe('MB');
+      });
+
       describe("watches", function () {
 
         beforeEach(function() {
@@ -93,14 +102,14 @@
           ctrl.validateFlavor.calls.reset();
         });
 
-        it("establishes five watches", function () {
+        it("establishes seven watches", function () {
           // Count calls to $watch (note: $watchCollection
           // also calls $watch)
-          expect(scope.$watch.calls.count()).toBe(5);
+          expect(scope.$watch.calls.count()).toBe(7);
         });
 
-        it("establishes three watch collections", function () {
-          expect(scope.$watchCollection.calls.count()).toBe(3);
+        it("establishes four watch collections", function () {
+          expect(scope.$watchCollection.calls.count()).toBe(4);
         });
 
         describe("novaLimits watch", function () {
@@ -245,6 +254,40 @@
           });
         });
 
+        describe("cinderLimits watcher", function () {
+
+          it("initializes cinderLimits", function () {
+            expect(ctrl.cinderLimits).toEqual({});
+          });
+
+          it("should call updateFlavorFacades", function () {
+            model.cinderLimits = {test: "test"};
+            scope.$apply();
+            expect(ctrl.cinderLimits).toEqual({test: "test"});
+            expect(ctrl.updateFlavorFacades.calls.count()).toBe(1);
+          });
+        });
+
+        describe("volume size watcher", function () {
+
+          it("should call updateFlavorFacades when source type is changed", function () {
+            model.newInstanceSpec.source_type = "image";
+            scope.$apply();
+            expect(ctrl.updateFlavorFacades.calls.count()).toBe(1);
+          });
+
+          it("should call updateFlavorFacades when volume size is changed", function () {
+            model.newInstanceSpec.vol_size = 10;
+            scope.$apply();
+            expect(ctrl.updateFlavorFacades.calls.count()).toBe(1);
+          });
+
+          it("should call updateFlavorFacades when volume create is changed", function () {
+            model.newInstanceSpec.vol_create = true;
+            scope.$apply();
+            expect(ctrl.updateFlavorFacades.calls.count()).toBe(1);
+          });
+        });
       });
 
       describe("when having allocated flavors", function () {
@@ -337,7 +380,6 @@
         });
 
         describe("when min disk is less than zero", function () {
-
           beforeEach(function () {
             ctrl.flavors = [{
               name: "flava",
@@ -355,8 +397,25 @@
           it("doesn't create ram errors", function () {
             expect(ctrl.getErrors(ctrl.flavors[0]).ram).not.toBeDefined();
           });
-
         });
+
+        describe("when flavor disk has value of zero", function () {
+          beforeEach(function () {
+            ctrl.flavors = [{
+              name: "flava",
+              vcpus: "1",
+              ram: 100,
+              disk: 0
+            }];
+            ctrl.source = { min_disk:100, min_ram:100};
+            model.newInstanceSpec.source_type = {type: 'volume'};
+          });
+
+          it("doesn't create disk errors", function () {
+            expect(ctrl.getErrors(ctrl.flavors[0]).disk).not.toBeDefined();
+          });
+        });
+
       });
 
       it('initializes empty facades', function () {
@@ -409,6 +468,36 @@
           it('returns the value if defined', function () {
             expect(ctrl.defaultIfUndefined('myVal', 'defValue')).toBe('myVal');
           });
+        });
+      });
+
+      describe("test updateFlavorFacades", function () {
+
+        beforeEach(function () {
+          ctrl.flavors = [{name: "tiny"}];
+        });
+
+        it("should set volumeChartData and volumeStorageChartData", function () {
+          ctrl.updateFlavorFacades();
+          expect(ctrl.availableFlavorFacades.length).toBe(1);
+          expect(ctrl.availableFlavorFacades[0].volumeChartData).toBeDefined();
+          expect(ctrl.availableFlavorFacades[0].volumeStorageChartData).toBeDefined();
+        });
+
+        it("should call getChartData", function() {
+          spyOn(ctrl, 'getChartData');
+          ctrl.updateFlavorFacades();
+          expect(ctrl.getChartData.calls.count()).toBe(5);
+        });
+      });
+
+      describe("test validateFlavor", function () {
+
+        it("should call validateFlavor when source type is changed", function () {
+          spyOn(ctrl, 'validateFlavor');
+          model.newInstanceSpec.source_type = "image";
+          scope.$apply();
+          expect(ctrl.validateFlavor.calls.count()).toBe(1);
         });
       });
 

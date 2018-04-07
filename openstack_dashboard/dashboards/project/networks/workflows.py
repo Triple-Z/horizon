@@ -16,7 +16,7 @@
 import logging
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 import netaddr
 
@@ -58,12 +58,31 @@ class CreateNetworkInfoAction(workflows.Action):
                                      }),
                                      initial=True,
                                      required=False)
+    az_hints = forms.MultipleChoiceField(
+        label=_("Availability Zone Hints"),
+        required=False,
+        help_text=_("Availability zones where the DHCP agents may be "
+                    "scheduled. Leaving this unset is equivalent to "
+                    "selecting all availability zones"))
 
     def __init__(self, request, *args, **kwargs):
         super(CreateNetworkInfoAction, self).__init__(request,
                                                       *args, **kwargs)
         if not policy.check((("network", "create_network:shared"),), request):
             self.fields['shared'].widget = forms.HiddenInput()
+        try:
+            if api.neutron.is_extension_supported(request,
+                                                  'network_availability_zone'):
+                zones = api.neutron.list_availability_zones(
+                    self.request, 'network', 'available')
+                self.fields['az_hints'].choices = [(zone['name'], zone['name'])
+                                                   for zone in zones]
+            else:
+                del self.fields['az_hints']
+        except Exception:
+            msg = _('Failed to get availability zone list.')
+            messages.warning(request, msg)
+            del self.fields['az_hints']
 
     class Meta(object):
         name = _("Network")
@@ -74,7 +93,8 @@ class CreateNetworkInfoAction(workflows.Action):
 
 class CreateNetworkInfo(workflows.Step):
     action_class = CreateNetworkInfoAction
-    contributes = ("net_name", "admin_state", "with_subnet", "shared")
+    contributes = ("net_name", "admin_state", "with_subnet", "shared",
+                   "az_hints")
 
 
 class CreateSubnetInfoAction(workflows.Action):
@@ -98,6 +118,7 @@ class CreateSubnetInfoAction(workflows.Action):
         label=_("Address pool"),
         widget=forms.ThemableSelectWidget(attrs={
             'class': 'switched switchable',
+            'data-required-when-shown': 'true',
             'data-slug': 'subnetpool',
             'data-switch-on': 'source',
             'data-source-subnetpool': _('Address pool')},
@@ -122,6 +143,7 @@ class CreateSubnetInfoAction(workflows.Action):
                          initial="",
                          widget=forms.TextInput(attrs={
                              'class': 'switched',
+                             'data-required-when-shown': 'true',
                              'data-switch-on': 'source',
                              'data-source-manual': _("Network Address"),
                          }),
@@ -463,6 +485,8 @@ class CreateNetwork(workflows.Workflow):
             params = {'name': data['net_name'],
                       'admin_state_up': data['admin_state'],
                       'shared': data['shared']}
+            if 'az_hints' in data and data['az_hints']:
+                params['availability_zone_hints'] = data['az_hints']
             network = api.neutron.network_create(request, **params)
             self.context['net_id'] = network.id
             LOG.debug('Network "%s" was successfully created.',

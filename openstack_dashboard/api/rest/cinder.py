@@ -11,13 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""API over the cinder service.
-"""
+"""API over the cinder service."""
 
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
 
 from openstack_dashboard import api
+from openstack_dashboard.api.rest import json_encoder
 from openstack_dashboard.api.rest import urls
 from openstack_dashboard.api.rest import utils as rest_utils
 from openstack_dashboard.usage import quotas
@@ -28,14 +28,12 @@ CLIENT_KEYWORDS = {'marker', 'sort_dir', 'paginate'}
 
 @urls.register
 class Volumes(generic.View):
-    """API for cinder volumes.
-    """
+    """API for cinder volumes."""
     url_regex = r'cinder/volumes/$'
 
     @rest_utils.ajax()
     def get(self, request):
-        """Get a detailed list of volumes associated with the current user's
-        project.
+        """Get a detailed list of volumes associated with the current project.
 
         Example GET:
         http://localhost/api/cinder/volumes?paginate=true&sort_dir=asc
@@ -71,7 +69,7 @@ class Volumes(generic.View):
                 search_opts=search_opts, **kwargs
             )
         return {
-            'items': [u.to_dict() for u in result],
+            'items': [api.cinder.Volume(u).to_dict() for u in result],
             'has_more_data': has_more,
             'has_prev_data': has_prev
         }
@@ -99,8 +97,7 @@ class Volumes(generic.View):
 
 @urls.register
 class Volume(generic.View):
-    """API for cinder volume.
-    """
+    """API for cinder volume."""
     url_regex = r'cinder/volumes/(?P<volume_id>[^/]+)/$'
 
     @rest_utils.ajax()
@@ -118,8 +115,7 @@ class Volume(generic.View):
 
 @urls.register
 class VolumeTypes(generic.View):
-    """API for volume types.
-    """
+    """API for volume types."""
     url_regex = r'cinder/volumetypes/$'
 
     @rest_utils.ajax()
@@ -162,8 +158,7 @@ class VolumeMetadata(generic.View):
 
 @urls.register
 class VolumeType(generic.View):
-    """API for getting a volume type.
-    """
+    """API for getting a volume type."""
     url_regex = r'cinder/volumetypes/(?P<volumetype_id>[^/]+)/$'
 
     @rest_utils.ajax()
@@ -189,14 +184,12 @@ class VolumeType(generic.View):
 
 @urls.register
 class VolumeSnapshots(generic.View):
-    """API for cinder volume snapshots.
-    """
+    """API for cinder volume snapshots."""
     url_regex = r'cinder/volumesnapshots/$'
 
     @rest_utils.ajax()
     def get(self, request):
-        """Get a detailed list of volume snapshots associated with the current
-        user's project.
+        """Get a list of volume snapshots associated with the current project.
 
         The listing result is an object with property "items".
         """
@@ -277,8 +270,7 @@ class VolumeTypeMetadata(generic.View):
 
 @urls.register
 class Extensions(generic.View):
-    """API for cinder extensions.
-    """
+    # API for cinder extensions.
     url_regex = r'cinder/extensions/$'
 
     @rest_utils.ajax()
@@ -317,20 +309,20 @@ class QoSSpecs(generic.View):
 class TenantAbsoluteLimits(generic.View):
     url_regex = r'cinder/tenantabsolutelimits/$'
 
-    @rest_utils.ajax()
+    @rest_utils.ajax(json_encoder=json_encoder.NaNJSONEncoder)
     def get(self, request):
         return api.cinder.tenant_absolute_limits(request)
 
 
 @urls.register
 class Services(generic.View):
-    """API for cinder services.
-    """
+    """API for cinder services."""
     url_regex = r'cinder/services/$'
 
     @rest_utils.ajax()
     def get(self, request):
         """Get a list of cinder services.
+
         Will return HTTP 501 status code if the service_list extension is
         not supported.
         """
@@ -352,8 +344,7 @@ class Services(generic.View):
 
 @urls.register
 class DefaultQuotaSets(generic.View):
-    """API for getting default quotas for cinder
-    """
+    """API for getting default quotas for cinder"""
     url_regex = r'cinder/quota-sets/defaults/$'
 
     @rest_utils.ajax()
@@ -400,8 +391,7 @@ class DefaultQuotaSets(generic.View):
 
 @urls.register
 class QuotaSets(generic.View):
-    """API for setting quotas for a given project.
-    """
+    """API for setting quotas for a given project."""
     url_regex = r'cinder/quota-sets/(?P<project_id>[0-9a-f]+)$'
 
     @rest_utils.ajax(data_required=True)
@@ -425,3 +415,25 @@ class QuotaSets(generic.View):
             api.cinder.tenant_quota_update(request, project_id, **cinder_data)
         else:
             raise rest_utils.AjaxError(501, _('Service Cinder is disabled.'))
+
+
+@urls.register
+class AvailabilityZones(generic.View):
+    """API for cinder availability zones."""
+    url_regex = r'cinder/availzones/$'
+
+    @rest_utils.ajax()
+    def get(self, request):
+        """Get a list of availability zones.
+
+        The following get parameters may be passed in the GET
+        request:
+
+        :param detailed: If this equals "true" then the result will
+            include more detail.
+
+        The listing result is an object with property "items".
+        """
+        detailed = request.GET.get('detailed') == 'true'
+        result = api.cinder.availability_zone_list(request, detailed)
+        return {'items': [u.to_dict() for u in result]}

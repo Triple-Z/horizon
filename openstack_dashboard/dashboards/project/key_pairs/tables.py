@@ -12,6 +12,7 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
+from django import urls
 from django.utils.translation import string_concat
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ungettext_lazy
@@ -48,36 +49,59 @@ class DeleteKeyPairs(tables.DeleteAction):
         api.nova.keypair_delete(request, obj_id)
 
 
-class ImportKeyPair(tables.LinkAction):
+class QuotaKeypairMixin(object):
+    def allowed(self, request, datum=None):
+        usages = quotas.tenant_quota_usages(request, targets=('key_pairs', ))
+        usages.tally('key_pairs', len(self.table.data))
+        if usages['key_pairs']['available'] <= 0:
+            if "disabled" not in self.classes:
+                self.classes = [c for c in self.classes] + ['disabled']
+                self.verbose_name = string_concat(self.verbose_name, ' ',
+                                                  _("(Quota exceeded)"))
+            return False
+        else:
+            classes = [c for c in self.classes if c != "disabled"]
+            self.classes = classes
+            return True
+
+
+class ImportKeyPair(QuotaKeypairMixin, tables.LinkAction):
     name = "import"
-    verbose_name = _("Import Key Pair")
+    verbose_name = _("Import Public Key")
     url = "horizon:project:key_pairs:import"
     classes = ("ajax-modal",)
     icon = "upload"
     policy_rules = (("compute", "os_compute_api:os-keypairs:create"),)
 
+    def allowed(self, request, keypair=None):
+        if super(ImportKeyPair, self).allowed(request, keypair):
+            self.verbose_name = _("Import Public Key")
+        return True
 
-class CreateKeyPair(tables.LinkAction):
-    name = "create"
+
+class CreateLinkNG(QuotaKeypairMixin, tables.LinkAction):
+    name = "create-keypair-ng"
     verbose_name = _("Create Key Pair")
-    url = "horizon:project:key_pairs:create"
-    classes = ("ajax-modal",)
+    url = "horizon:project:key_pairs:index"
+    classes = ("btn-launch",)
     icon = "plus"
     policy_rules = (("compute", "os_compute_api:os-keypairs:create"),)
 
+    def get_default_attrs(self):
+        url = urls.reverse(self.url)
+        ngclick = "modal.createKeyPair({ successUrl: '%s' })" % url
+        self.attrs.update({
+            'ng-controller': 'KeypairController as modal',
+            'ng-click': ngclick
+        })
+        return super(CreateLinkNG, self).get_default_attrs()
+
+    def get_link_url(self, datum=None):
+        return "javascript:void(0);"
+
     def allowed(self, request, keypair=None):
-        usages = quotas.tenant_quota_usages(request)
-        count = len(self.table.data)
-        if (usages.get('key_pairs')
-                and usages['key_pairs']['quota'] <= count):
-            if "disabled" not in self.classes:
-                self.classes = [c for c in self.classes] + ['disabled']
-                self.verbose_name = string_concat(self.verbose_name, ' ',
-                                                  _("(Quota exceeded)"))
-        else:
+        if super(CreateLinkNG, self).allowed(request, keypair):
             self.verbose_name = _("Create Key Pair")
-            classes = [c for c in self.classes if c != "disabled"]
-            self.classes = classes
         return True
 
 
@@ -102,6 +126,6 @@ class KeyPairsTable(tables.DataTable):
     class Meta(object):
         name = "keypairs"
         verbose_name = _("Key Pairs")
-        table_actions = (CreateKeyPair, ImportKeyPair, DeleteKeyPairs,
+        table_actions = (CreateLinkNG, ImportKeyPair, DeleteKeyPairs,
                          KeypairsFilterAction,)
         row_actions = (DeleteKeyPairs,)

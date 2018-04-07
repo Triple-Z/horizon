@@ -19,6 +19,8 @@
 import os
 import socket
 
+import six
+
 from openstack_dashboard.utils import settings as settings_utils
 
 socket.setdefaulttimeout(1)
@@ -60,13 +62,12 @@ INSTALLED_APPS = (
     'openstack_auth'
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'horizon.middleware.HorizonMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -112,6 +113,16 @@ NOSE_ARGS = ['--nocapture',
              '--cover-package=horizon',
              '--cover-inclusive',
              '--all-modules']
+# TODO(amotoki): Need to investigate why --with-html-output
+# is unavailable in python3.
+try:
+    import htmloutput  # noqa: F401
+    has_html_output = True
+except ImportError:
+    has_html_output = False
+if six.PY2 and has_html_output:
+    NOSE_ARGS += ['--with-html-output',
+                  '--html-out-file=ut_horizon_nose_results.html']
 
 EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'

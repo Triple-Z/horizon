@@ -10,8 +10,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from django.core.urlresolvers import reverse
 from django.template import defaultfilters as filters
+from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ungettext_lazy
@@ -143,7 +143,7 @@ class UpdateProject(policy.PolicyTargetMixin, tables.LinkAction):
 class ModifyQuotas(tables.LinkAction):
     name = "quotas"
     verbose_name = _("Modify Quotas")
-    url = "horizon:identity:projects:update"
+    url = "horizon:identity:projects:update_quotas"
     classes = ("ajax-modal",)
     icon = "pencil"
     policy_rules = (('compute', "os_compute_api:os-quota-sets:update"),)

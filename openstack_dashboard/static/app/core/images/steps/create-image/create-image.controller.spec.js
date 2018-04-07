@@ -32,7 +32,15 @@
       };
     }
 
-    var controller, glanceAPI, $scope, events, $q, settingsCall, $timeout;
+    function policyIfAllowed() {
+      return {
+        then: function(callback) {
+          callback({allowed: true});
+        }
+      };
+    }
+
+    var controller, glanceAPI, $scope, events, $q, settingsCall, $timeout, policyAPI;
 
     ///////////////////////
 
@@ -41,6 +49,7 @@
 
     beforeEach(inject(function ($injector, _$rootScope_, _$q_, _$timeout_) {
       $scope = _$rootScope_.$new();
+      $scope.stepModels = {imageForm: {}, updateMetadataForm: {}};
       $q = _$q_;
       $timeout = _$timeout_;
 
@@ -50,6 +59,9 @@
       controller = $injector.get('$controller');
 
       spyOn(glanceAPI, 'getImages').and.callFake(fakeGlance);
+
+      policyAPI = $injector.get('horizon.app.core.openstack-service-api.policy');
+      spyOn(policyAPI, 'ifAllowed').and.callFake(policyIfAllowed);
     }));
 
     function createController() {
@@ -80,19 +92,6 @@
       expect(glanceAPI.getImages).toHaveBeenCalledWith({paginate: false});
       expect(ctrl.kernelImages).toEqual([{disk_format: 'aki'}]);
       expect(ctrl.ramdiskImages).toEqual([{disk_format: 'ari'}]);
-    });
-
-    it('should emit events on image change', function() {
-      spyOn($scope, '$emit').and.callThrough();
-
-      var ctrl = createController();
-      ctrl.image = 1;
-      $scope.$apply();
-
-      ctrl.image = 2;
-      $scope.$apply();
-
-      expect($scope.$emit).toHaveBeenCalledWith('horizon.app.core.images.IMAGE_CHANGED', 2);
     });
 
     it('should have options for visibility, protected and copying', function() {

@@ -20,11 +20,10 @@ from collections import Sequence
 import functools
 
 from django.conf import settings
-
-from horizon import exceptions
-
 import semantic_version
 import six
+
+from horizon import exceptions
 
 
 __all__ = ('APIResourceWrapper', 'APIDictWrapper',
@@ -134,7 +133,7 @@ class APIResourceWrapper(object):
     def to_dict(self):
         obj = {}
         for key in self._attrs:
-            obj[key] = getattr(self._apiresource, key, None)
+            obj[key] = getattr(self, key, None)
         return obj
 
 
@@ -199,8 +198,10 @@ class Quota(object):
 
 
 class QuotaSet(Sequence):
-    """Wrapper for client QuotaSet objects which turns the individual quotas
-    into Quota objects for easier handling/iteration.
+    """Wrapper for client QuotaSet objects.
+
+    This turns the individual quotas into Quota objects
+    for easier handling/iteration.
 
     `QuotaSet` objects support a mix of `list` and `dict` methods; you can use
     the bracket notation (`qs["my_quota"] = 0`) to add new quota values, and
@@ -229,8 +230,9 @@ class QuotaSet(Sequence):
         return self.items[index]
 
     def __add__(self, other):
-        """Merge another QuotaSet into this one. Existing quotas are
-        not overridden.
+        """Merge another QuotaSet into this one.
+
+        Existing quotas are not overridden.
         """
         if not isinstance(other, QuotaSet):
             msg = "Can only add QuotaSet to QuotaSet, " \

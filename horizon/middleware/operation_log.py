@@ -14,6 +14,7 @@
 
 import json
 import logging
+import re
 
 from django.conf import settings
 from django.contrib import messages as django_messages
@@ -51,25 +52,37 @@ class OperationLogMiddleware(object):
         # In order to allow to access from mock in test cases.
         return self._logger
 
-    def __init__(self):
+    def __init__(self, get_response):
         if not getattr(settings, "OPERATION_LOG_ENABLED", False):
             raise MiddlewareNotUsed
+
+        self.get_response = get_response
 
         # set configurations
         _log_option = getattr(settings, "OPERATION_LOG_OPTIONS", {})
         _available_methods = ['POST', 'GET', 'PUT', 'DELETE']
         _methods = _log_option.get("target_methods", ['POST'])
-        _default_format = (
+        self._default_format = (
             "[%(client_ip)s] [%(domain_name)s]"
             " [%(domain_id)s] [%(project_name)s]"
             " [%(project_id)s] [%(user_name)s] [%(user_id)s]"
             " [%(request_scheme)s] [%(referer_url)s] [%(request_url)s]"
             " [%(message)s] [%(method)s] [%(http_status)s] [%(param)s]")
+        _default_ignored_urls = ['/js/', '/static/', '^/api/']
+        _default_mask_fields = ['password', 'current_password',
+                                'new_password', 'confirm_password']
         self.target_methods = [x for x in _methods if x in _available_methods]
-        self.mask_fields = _log_option.get("mask_fields", ['password'])
-        self.format = _log_option.get("format", _default_format)
-        self.static_rule = ['/js/', '/static/']
+        self.mask_fields = _log_option.get("mask_fields", _default_mask_fields)
+        self.format = _log_option.get("format", self._default_format)
         self._logger = logging.getLogger('horizon.operation_log')
+
+        ignored_urls = _log_option.get("ignore_urls", _default_ignored_urls)
+        self._ignored_urls = [re.compile(url) for url in ignored_urls]
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        response = self.process_response(request, response)
+        return response
 
     def process_response(self, request, response):
         """Log user operation."""
@@ -107,17 +120,18 @@ class OperationLogMiddleware(object):
 
     def _get_log_format(self, request):
         """Return operation log format."""
-        if not (hasattr(request, 'user') and
-                request.user.is_authenticated()):
+        user = getattr(request, 'user', None)
+        if not user:
+            return
+        if not request.user.is_authenticated:
             return
         method = request.method.upper()
         if not (method in self.target_methods):
             return
-        if method == 'GET':
-            request_url = urlparse.unquote(request.path)
-            for rule in self.static_rule:
-                if rule in request_url:
-                    return
+        request_url = urlparse.unquote(request.path)
+        for rule in self._ignored_urls:
+            if rule.search(request_url):
+                return
         return self.format
 
     def _get_parameters_from_request(self, request, exception=False):
@@ -134,6 +148,9 @@ class OperationLogMiddleware(object):
                 referer_url = referer_url.decode('utf-8')
         except Exception:
             pass
+        request_url = urlparse.unquote(request.path)
+        if request.META['QUERY_STRING']:
+            request_url += '?' + request.META['QUERY_STRING']
         return {
             'client_ip': request.META.get('REMOTE_ADDR', None),
             'domain_name': getattr(user, 'domain_name', None),
@@ -144,7 +161,7 @@ class OperationLogMiddleware(object):
             'user_id': request.session.get('user_id', None),
             'request_scheme': request.scheme,
             'referer_url': referer_url,
-            'request_url': urlparse.unquote(request.path),
+            'request_url': request_url,
             'method': request.method if not exception else None,
             'param': self._get_request_param(request),
         }

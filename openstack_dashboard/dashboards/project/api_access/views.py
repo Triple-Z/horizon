@@ -18,10 +18,10 @@ import tempfile
 import zipfile
 
 from django.conf import settings
-from django.core.urlresolvers import reverse_lazy
 from django import http
 from django import shortcuts
 from django.template.loader import render_to_string
+from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
 from openstack_auth import utils
@@ -90,8 +90,6 @@ def download_ec2_bundle(request):
 
     # Gather or create our EC2 credentials
     try:
-        credentials = api.nova.get_x509_credentials(request)
-        cacert = api.nova.get_x509_root_certificate(request)
         context = _get_ec2_credentials(request)
     except Exception:
         exceptions.handle(request,
@@ -103,9 +101,6 @@ def download_ec2_bundle(request):
     try:
         temp_zip = tempfile.NamedTemporaryFile(delete=True)
         with closing(zipfile.ZipFile(temp_zip.name, mode='w')) as archive:
-            archive.writestr('pk.pem', credentials.private_key)
-            archive.writestr('cert.pem', credentials.data)
-            archive.writestr('cacert.pem', cacert.data)
             archive.writestr('ec2rc.sh', render_to_string(template, context))
     except Exception:
         exceptions.handle(request,
@@ -136,6 +131,11 @@ def download_rc_file(request):
 
     # make v3 specific changes
     context['user_domain_name'] = request.user.user_domain_name
+    try:
+        project_domain_id = request.user.token.project['domain_id']
+    except KeyError:
+        project_domain_id = ''
+    context['project_domain_id'] = project_domain_id
     # sanity fix for removing v2.0 from the url if present
     context['auth_url'], _ = utils.fix_auth_url_version_prefix(
         context['auth_url'])

@@ -19,16 +19,15 @@
 """
 Views for managing instances.
 """
-from django.core.urlresolvers import reverse
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse
+from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
+from neutronclient.common import exceptions as neutron_exc
 
 from horizon import exceptions
 from horizon import forms
 from horizon import tables
 from horizon.utils import memoized
-
-from neutronclient.common import exceptions as neutron_exc
 
 from openstack_dashboard import api
 from openstack_dashboard.dashboards.project.security_groups \
@@ -48,7 +47,7 @@ class DetailView(tables.DataTableView):
     def _get_data(self):
         sg_id = filters.get_int_or_uuid(self.kwargs['security_group_id'])
         try:
-            return api.network.security_group_get(self.request, sg_id)
+            return api.neutron.security_group_get(self.request, sg_id)
         except Exception:
             redirect = reverse('horizon:project:security_groups:index')
             exceptions.handle(self.request,
@@ -59,8 +58,20 @@ class DetailView(tables.DataTableView):
         data = self._get_data()
         if data is None:
             return []
-        return sorted(data.rules, key=lambda rule: (rule.ip_protocol or '',
-                                                    rule.from_port or 0))
+
+        def _sort_key(rule):
+            return (
+                rule.direction or '',
+                rule.ethertype or '',
+                # IP protocol can be a string, an integer or None,
+                # so we need to normalize into string
+                # to make sorting work with py3
+                str(rule.ip_protocol) if rule.ip_protocol is not None else '',
+                rule.from_port or 0,
+                rule.to_port or 0,
+            )
+
+        return sorted(data.rules, key=_sort_key)
 
     def get_context_data(self, **kwargs):
         context = super(DetailView, self).get_context_data(**kwargs)
@@ -82,7 +93,7 @@ class UpdateView(forms.ModalFormView):
     def get_object(self):
         sg_id = filters.get_int_or_uuid(self.kwargs['security_group_id'])
         try:
-            return api.network.security_group_get(self.request, sg_id)
+            return api.neutron.security_group_get(self.request, sg_id)
         except Exception:
             msg = _('Unable to retrieve security group.')
             url = reverse('horizon:project:security_groups:index')
@@ -131,7 +142,7 @@ class AddRuleView(forms.ModalFormView):
         kwargs = super(AddRuleView, self).get_form_kwargs()
 
         try:
-            groups = api.network.security_group_list(self.request)
+            groups = api.neutron.security_group_list(self.request)
         except Exception:
             groups = []
             exceptions.handle(self.request,
@@ -167,7 +178,7 @@ class IndexView(tables.DataTableView):
 
     def get_data(self):
         try:
-            security_groups = api.network.security_group_list(self.request)
+            security_groups = api.neutron.security_group_list(self.request)
         except neutron_exc.ConnectionFailed:
             security_groups = []
             exceptions.handle(self.request)

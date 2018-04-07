@@ -43,14 +43,7 @@
       }
     };
 
-    var userSession = {
-      isCurrentProject: function() {
-        deferred.resolve();
-        return deferred.promise;
-      }
-    };
-
-    var deferred, service, $scope, deferredModal;
+    var service, $scope, deferredModal;
 
     ///////////////////////
 
@@ -65,15 +58,12 @@
     beforeEach(module('horizon.app.core.openstack-service-api', function($provide) {
       $provide.value('horizon.app.core.openstack-service-api.glance', glanceAPI);
       $provide.value('horizon.app.core.openstack-service-api.policy', policyAPI);
-      $provide.value('horizon.app.core.openstack-service-api.userSession', userSession);
       spyOn(policyAPI, 'ifAllowed').and.callThrough();
-      spyOn(userSession, 'isCurrentProject').and.callThrough();
     }));
 
     beforeEach(inject(function($injector, _$rootScope_, $q) {
       $scope = _$rootScope_.$new();
       service = $injector.get('horizon.app.core.images.actions.delete-image.service');
-      deferred = $q.defer();
       deferredModal = $q.defer();
     }));
 
@@ -101,18 +91,7 @@
 
       beforeEach(function() {
         spyOn(deleteModalService, 'open').and.callThrough();
-        service.initScope($scope, labelize);
       });
-
-      function labelize(count) {
-        return {
-          title: ngettext('title', 'titles', count),
-          message: ngettext('message', 'messages', count),
-          submit: ngettext('submit', 'submits', count),
-          success: ngettext('success', 'successs', count),
-          error: ngettext('error', 'errors', count)
-        };
-      }
 
       ////////////
 
@@ -121,7 +100,6 @@
       it('should open the delete modal and show correct labels', testpluralLabels);
       it('should open the delete modal with correct entities', testEntities);
       it('should only delete images that are valid', testValids);
-      it('should fail if this project is not owner', testOwner);
       it('should fail if images is protected', testProtected);
       it('should fail if status is deleted', testStatus);
       it('should pass in a function that deletes an image', testGlance);
@@ -188,15 +166,6 @@
         expect(entities[1].name).toEqual('image2');
       }
 
-      function testOwner() {
-        var images = generateImage(1);
-        deferred.reject();
-        service.perform(images);
-        $scope.$apply();
-
-        expect(deleteModalService.open).not.toHaveBeenCalled();
-      }
-
       function testProtected() {
         var images = generateImage(1);
         images[0].protected = true;
@@ -241,7 +210,6 @@
       beforeEach(function() {
         spyOn(resolver, 'success');
         spyOn(resolver, 'error');
-        service.initScope($scope);
       });
 
       ////////////
@@ -249,7 +217,6 @@
       it('should use default policy if batch action', testBatch);
       it('allows delete if image can be deleted', testValid);
       it('disallows delete if image is protected', testProtected);
-      it('disallows delete if image is not owned by user', testOwner);
       it('disallows delete if image status is deleted', testStatus);
 
       ////////////
@@ -272,14 +239,6 @@
       function testProtected() {
         var image = generateImage(1)[0];
         image.protected = true;
-        service.allowed(image).then(resolver.success, resolver.error);
-        $scope.$apply();
-        expect(resolver.error).toHaveBeenCalled();
-      }
-
-      function testOwner() {
-        var image = generateImage(1)[0];
-        deferred.reject();
         service.allowed(image).then(resolver.success, resolver.error);
         $scope.$apply();
         expect(resolver.error).toHaveBeenCalled();

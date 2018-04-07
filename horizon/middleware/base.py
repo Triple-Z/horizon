@@ -30,9 +30,6 @@ from django import http
 from django import shortcuts
 from django.utils.encoding import iri_to_uri
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
-
-from openstack_auth import views as auth_views
 
 from horizon import exceptions
 from horizon.utils import functions as utils
@@ -46,12 +43,13 @@ class HorizonMiddleware(object):
 
     logout_reason = None
 
-    def _logout(self, request, login_url=None, message=None, status='success'):
-        """Logout a user and display a logout message."""
-        response = auth_views.logout(request, login_url)
-        if message is not None:
-            self.logout_reason = message
-            utils.add_logout_reason(request, response, message, status)
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        self.process_request(request)
+        response = self.get_response(request)
+        response = self.process_response(request, response)
         return response
 
     def process_request(self, request):
@@ -60,7 +58,7 @@ class HorizonMiddleware(object):
         request.horizon = {'dashboard': None,
                            'panel': None,
                            'async_messages': []}
-        if not hasattr(request, "user") or not request.user.is_authenticated():
+        if not hasattr(request, "user") or not request.user.is_authenticated:
             # proceed no further if the current request is already known
             # not to be authenticated
             # it is CRITICAL to perform this check as early as possible
@@ -96,8 +94,8 @@ class HorizonMiddleware(object):
                         '%(cookie_size)sB >= %(max_cookie_size)sB. '
                         'You need to configure file-based or database-backed '
                         'sessions instead of cookie-based sessions: '
-                        'http://docs.openstack.org/developer/horizon/topics/'
-                        'deployment.html#session-storage',
+                        'https://docs.openstack.org/horizon/latest/'
+                        'admin/sessions.html',
                         {
                             'user_id': request.session.get(
                                 'user_id', 'Unknown'),
@@ -106,13 +104,15 @@ class HorizonMiddleware(object):
                         }
                     )
 
-        tz = request.session.get('django_timezone')
+        tz = utils.get_timezone(request)
         if tz:
             timezone.activate(tz)
 
     def process_exception(self, request, exception):
-        """Catches internal Horizon exception classes such as NotAuthorized,
-        NotFound and Http302 and handles them gracefully.
+        """Catches internal Horizon exception classes.
+
+        Exception classes such as NotAuthorized, NotFound and Http302
+        are caught and handles them gracefully.
         """
         if isinstance(exception, (exceptions.NotAuthorized,
                                   exceptions.NotAuthenticated)):
@@ -126,12 +126,9 @@ class HorizonMiddleware(object):
             response = redirect_to_login(next_url, login_url=login_url,
                                          redirect_field_name=field_name)
             if isinstance(exception, exceptions.NotAuthorized):
-                logout_reason = _("Unauthorized. Please try logging in again.")
-                utils.add_logout_reason(request, response, logout_reason,
-                                        'error')
-                # delete messages, created in get_data() method
-                # since we are going to redirect user to the login page
                 response.delete_cookie('messages')
+                return shortcuts.render(request, 'not_authorized.html',
+                                        status=403)
 
             if request.is_ajax():
                 response_401 = http.HttpResponse(status=401)
@@ -155,8 +152,9 @@ class HorizonMiddleware(object):
             dst[header] = src[header]
 
     def process_response(self, request, response):
-        """Convert HttpResponseRedirect to HttpResponse if request is via ajax
-        to allow ajax request to redirect url
+        """Convert HttpResponseRedirect to HttpResponse if request is via ajax.
+
+        This is to allow ajax request to redirect url.
         """
         if request.is_ajax() and hasattr(request, 'horizon'):
             queued_msgs = request.horizon['async_messages']

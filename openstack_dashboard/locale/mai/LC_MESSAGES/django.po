@@ -1,9 +1,9 @@
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: horizon 12.0.0.0b2.dev114\n"
+"Project-Id-Version: horizon VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2017-05-17 20:57+0000\n"
+"POT-Creation-Date: 2018-03-29 05:31+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -11,7 +11,7 @@ msgstr ""
 "Last-Translator: Copied by Zanata <copied-by-zanata@zanata.org>\n"
 "Language-Team: Maithili\n"
 "Language: mai\n"
-"X-Generator: Zanata 3.9.6\n"
+"X-Generator: Zanata 4.3.3\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 msgid " - End"
@@ -44,14 +44,6 @@ msgstr "%(name)s - %(size)s GB (%(label)s)"
 #, python-format
 msgid "%(offset)s: %(label)s"
 msgstr "%(offset)s: %(label)s"
-
-#, python-format
-msgid "%(resource_status)s: %(resource_status_reason)s"
-msgstr "%(resource_status)s: %(resource_status_reason)s"
-
-#, python-format
-msgid "%(stack_status_title)s: %(stack_status_reason)s"
-msgstr "%(stack_status_title)s: %(stack_status_reason)s"
 
 #, python-format
 msgid "%(type)s (%(backend)s backend)"
@@ -103,17 +95,8 @@ msgstr ", परियोजना समूह क अद्यतन करू
 msgid "-"
 msgstr "-"
 
-msgid "3des"
-msgstr "3des"
-
-msgid "A local environment to upload."
-msgstr "अपलोड करबाक लेल स्थानीय पर्यावरण."
-
 msgid "A local image to upload."
 msgstr "अपलोड करबाक लेल स्थानीय बिंब।"
-
-msgid "A local template to upload."
-msgstr "अपलोड करबाक लेल स्थानीय नमूना."
 
 msgid ""
 "A script or set of commands to be executed after the instance has been built "
@@ -123,22 +106,12 @@ msgstr "इंस्टेंस क बनबा क बाद निष्प�
 msgid "AKI - Amazon Kernel Image"
 msgstr "AKI - अमेजन कर्नेल बिंब"
 
-msgid "ALLOW"
-msgstr "ALLOW"
-
-msgctxt "Action Name of a Firewall Rule"
-msgid "ALLOW"
-msgstr "ALLOW"
-
 #, python-format
 msgid "ALLOW %(ethertype)s %(proto_port)s %(direction)s %(remote)s"
 msgstr "अनुमति दिअ %(ethertype)s %(proto_port)s %(direction)s %(remote)s"
 
 msgid "AMI - Amazon Machine Image"
 msgstr "AMI - अमेजन सिस्टम बिंब"
-
-msgid "ANY"
-msgstr "कोनो"
 
 msgid "API Access"
 msgstr "API अभिगम"
@@ -157,13 +130,6 @@ msgstr "क्रिया"
 
 msgid "Action Log"
 msgstr "कार्रवाई लाग"
-
-msgid "Action for the firewall rule"
-msgstr "फायरवाल नियम क लेल कार्रवाई"
-
-msgctxt "Current status of a Firewall"
-msgid "Active"
-msgstr "सक्रिय"
 
 msgctxt "Current status of a Floating IP"
 msgid "Active"
@@ -206,47 +172,11 @@ msgstr "जोड़ू"
 msgid "Add DHCP Agent"
 msgstr "DHCP प्रतिनिधि जोड़ू"
 
-msgid "Add Firewall"
-msgstr "फायरवाल जोड़ू"
-
 msgid "Add Group Assignment"
 msgstr "समूह कार्यभार जोड़ू"
 
-msgid "Add IKE Policy"
-msgstr "IKE नीति जोड़ू"
-
-msgid "Add IPSec Policy"
-msgstr "IPSec नीति जोड़ू"
-
-msgid "Add IPSec Site Connection"
-msgstr "IPSec साइट कनेक्शन जोड़ू"
-
 msgid "Add Interface"
 msgstr "अंतरफलक जोड़ू"
-
-msgid "Add New Firewall"
-msgstr " नव फायरवाल जोड़ू"
-
-msgid "Add New IKE Policy"
-msgstr " नवIKE नीति जोड़ू"
-
-msgid "Add New IPSec Policy"
-msgstr " नवIPSec नीति मे जोड़ू"
-
-msgid "Add New IPSec Site Connection"
-msgstr "नव IPsec साइट कनेक्शन जोड़ू"
-
-msgid "Add New Policy"
-msgstr " नवनीति जोड़ू"
-
-msgid "Add New Rule"
-msgstr " नवनियम जोड़ू"
-
-msgid "Add New VPN Service"
-msgstr " नववीपीएन सेवा जोड़ू"
-
-msgid "Add Policy"
-msgstr "नीति जोड़ू"
 
 msgid "Add Rule"
 msgstr "नियम जोड़ू"
@@ -256,9 +186,6 @@ msgstr "समूह मे प्रयोक्ता जोड़ू"
 
 msgid "Add Users"
 msgstr "प्रयोक्ता जोड़ू"
-
-msgid "Add VPN Service"
-msgstr "VPN सेवा जोड़ू"
 
 msgid ""
 "Add hosts to this aggregate or remove hosts from it. Hosts can be in "
@@ -272,34 +199,6 @@ msgstr "ई समुच्चय मे मेजबान केँ जोड�
 
 msgid "Add/Remove Hosts to Aggregate"
 msgstr "सकल सँ मेजबान जोड़ू / हटाउ"
-
-#, python-format
-msgid "Added Firewall \"%s\"."
-msgstr "जोड़ल गेल फायरवाल \"%s\"."
-
-#, python-format
-msgid "Added IKE Policy \"%s\"."
-msgstr "जोड़ल गेल IKE नीति \"%s\"."
-
-#, python-format
-msgid "Added IPSec Policy \"%s\"."
-msgstr "जोड़ल गेल IPSec नीति \"%s\"."
-
-#, python-format
-msgid "Added IPSec Site Connection \"%s\"."
-msgstr "जोड़ल गेल IPSec साइट कनेक्शन \"%s\"."
-
-#, python-format
-msgid "Added Policy \"%s\"."
-msgstr "जोड़ल गेल नीति \"%s\"."
-
-#, python-format
-msgid "Added Rule \"%s\"."
-msgstr "जोड़ल गेल नियम \"%s\"."
-
-#, python-format
-msgid "Added VPN Service \"%s\"."
-msgstr "जोड़ल गेल वीपीएन सेवा \"%s\"."
 
 msgid ""
 "Additional routes announced to the hosts. Each entry is: destination_cidr,"
@@ -318,14 +217,8 @@ msgstr "एडमिन गुड़किल्ली"
 msgid "Admin State"
 msgstr "व्यवस्थापक स्थिति"
 
-msgid "Admin State Up"
-msgstr "व्यवस्थापक स्थिति अप"
-
 msgid "Advanced Options"
 msgstr "उन्नत विकल्प"
-
-msgid "After"
-msgstr "बाद"
 
 msgid ""
 "After launching an instance, you login using the private key (the username "
@@ -386,9 +279,6 @@ msgstr "आवंटित अस्थायी आईपी %(ip)s."
 
 msgid "Allocation Pools"
 msgstr "आवंटन पूल"
-
-msgid "An external (HTTP) URL to load the template from."
-msgstr "बाहरी (एचटीटीपी) यूआरएल सँ नमूना लोड करबाक लेल."
 
 msgid ""
 "An instance can be launched with varying types of attached storage. You may "
@@ -460,17 +350,8 @@ msgstr " %(dev)s पर %(inst)s इंस्टेंस क लेल  %(vol)s
 msgid "Attachments"
 msgstr "संलग्नक"
 
-msgid "Audited"
-msgstr "अंकेक्षित"
-
 msgid "Authentication URL"
 msgstr "प्रमाणन URL"
-
-msgid "Authorization algorithm"
-msgstr "प्राधिकरण एल्गोरिथ्म"
-
-msgid "Authorization mode"
-msgstr "प्राधिकरण मोड"
 
 msgid "Automatic"
 msgstr "स्वचालित"
@@ -502,9 +383,6 @@ msgctxt "Current status of a Volume Backup"
 msgid "Available"
 msgstr "मोजुद"
 
-msgid "Available Rules"
-msgstr "मोजुद नियम"
-
 msgid "Available networks"
 msgstr "मोजुद सँजाल "
 
@@ -513,9 +391,6 @@ msgstr "बैकअप नाम"
 
 msgid "Backups"
 msgstr "बैकअप"
-
-msgid "Before"
-msgstr "पहिने"
 
 msgctxt "Task status of an Instance"
 msgid "Block Device Mapping"
@@ -587,12 +462,6 @@ msgstr "बदलू"
 msgid "Change Password"
 msgstr "गुड़किल्ली बदलू"
 
-msgid "Change Stack Template"
-msgstr " ढेर खाका बदलू"
-
-msgid "Change Template"
-msgstr "खाका बदलू"
-
 msgid "Change Volume Type"
 msgstr "वाल्यूम प्रकार बदलू"
 
@@ -645,9 +514,6 @@ msgstr ""
 
 msgid "Choose the flavor to launch."
 msgstr "लांच करबाक लेल फ्लेवर चुनू."
-
-msgid "Choose the rule you want to remove."
-msgstr "अहाँक द्वारा हटाउ जाए नियम चुनू"
 
 msgid "Cipher"
 msgstr "सिफर"
@@ -767,9 +633,6 @@ msgstr "एनक्रिप्टेड वाल्यूम प्रका�
 msgid "Create Encryption"
 msgstr "गोपन तैआर करू"
 
-msgid "Create Firewall"
-msgstr "फायरवाल बनाउ"
-
 msgid "Create Flavor"
 msgstr "फ्लेवर बनाउ"
 
@@ -821,9 +684,6 @@ msgstr "स्नेपशाट बनाउ"
 msgid "Create Spec"
 msgstr "Spec बनाउ"
 
-msgid "Create Stack"
-msgstr "ढेर बनाउ"
-
 msgid "Create Subnet"
 msgstr "सबनेट बनाउ"
 
@@ -866,18 +726,12 @@ msgstr "वाल्यूम प्रकार क लेल नव \"बा�
 msgid "Create a new role."
 msgstr "नव भूमिका बनाउ"
 
-msgid "Create a new stack with the provided values."
-msgstr "मोजुद कराएल मान क सँग नव ढेर बनाउ."
-
 msgid ""
 "Create a new user and set related properties including the Primary Project "
 "and Role."
 msgstr ""
 "एकटा नव प्रयोक्ता बनाउ आओर प्राथमिक प्रोजेक्ट तथा भूमिका सहित संबंधित विशेषता निर्धारित "
 "करू."
-
-msgid "Create a policy with selected rules."
-msgstr "चयनित नियम क सँग एकटा नीति बनाउ."
 
 msgid "Create a project to organize users."
 msgstr "प्रयोक्ता संगठित करबाक लेल परियोजना बनाउ."
@@ -892,10 +746,6 @@ msgstr ""
 msgid "Create an Encrypted Volume Type"
 msgstr "एकटा एनक्रिप्टेड वाल्यूम प्रकार बनाउ"
 
-msgid "Created"
-msgstr "निर्मित"
-
-msgctxt "Current status of a Firewall"
 msgid "Created"
 msgstr "निर्मित"
 
@@ -960,9 +810,6 @@ msgstr "वाल्यूम बैकअप \"%s\" बनाएल जाए �
 msgid "Creating volume snapshot \"%s\"."
 msgstr " \"%s\" वाल्यूम स्नैपशाट बनाए रहल अछि"
 
-msgid "Creation Timeout (minutes)"
-msgstr "निर्माण समय समाप्त (मिनट)"
-
 msgid "Current Host"
 msgstr "मोजुदा मेजबान"
 
@@ -984,39 +831,14 @@ msgstr "मनपसिन्न यूडीपी नियम"
 msgid "Customization Script Source"
 msgstr "स्क्रिप्ट स्रोत अनुकूलन"
 
-msgid "DENY"
-msgstr "DENY"
-
-msgctxt "Action Name of a Firewall Rule"
-msgid "DENY"
-msgstr "DENY"
-
 msgid "DHCP Agents"
 msgstr "DHCP प्रतिनिधि"
 
 msgid "DNS Name Servers"
 msgstr "DNS नाम सर्वर"
 
-msgid "Date Updated"
-msgstr "तिथि अद्यतित"
-
-msgid "Dead peer detection action"
-msgstr "मृत पीअर पता लगाएब क क्रिया"
-
-msgid "Dead peer detection actions"
-msgstr "मृत पीअर क पता लगाएब क्रिया"
-
-msgid "Dead peer detection interval"
-msgstr "मृत पीअर क पता लगाएब क अंतराल"
-
-msgid "Dead peer detection timeout"
-msgstr "मृत पीअर क पता लगाएब क मध्यांतर"
-
 msgid "Decrypt Password"
 msgstr "गुड़किल्ली डिक्रिप्ट करू"
-
-msgid "Default Quotas"
-msgstr "पूर्वनिर्धारित कोटा"
 
 msgid "Default quotas updated."
 msgstr "पूर्वनिर्धारित कोटा अद्यतन."
@@ -1063,27 +885,6 @@ msgstr "गंतव्य"
 msgid "Destination CIDR"
 msgstr "गंतव्य CIDR"
 
-msgid "Destination IP"
-msgstr " गंतव्य आईपी"
-
-msgid "Destination IP Address"
-msgstr "गंतव्य आईपी पता"
-
-msgid "Destination IP Address/Subnet"
-msgstr "गंतव्य आईपी पता / सबनेट"
-
-msgid "Destination IP address or subnet"
-msgstr "गंतव्य आईपी पता अथवा सबनेट"
-
-msgid "Destination Port"
-msgstr " गंतव्य पोर्ट"
-
-msgid "Destination Port/Port Range"
-msgstr "गंतव्य पोर्ट / पोर्ट सीमा"
-
-msgid "Destination port (integer in [1, 65535] or range in a:b)"
-msgstr "गंतव्य पोर्ट ([1, 65,535] मे पूर्णांक अथवा एकटा मे रेंज: ख)"
-
 msgid "Detached"
 msgstr "विलग"
 
@@ -1108,9 +909,6 @@ msgstr "युक्ति नाम"
 
 msgid "Device Owner"
 msgstr "युक्ति ओनर"
-
-msgid "Device owner attached to the port"
-msgstr " पोर्ट सँ जुड़ल भेलहुँ युक्ति स्वामी"
 
 msgid "Device size (GB)"
 msgstr "डिवाइस क आकार (जीबी)"
@@ -1225,10 +1023,6 @@ msgctxt "Current state of a Hypervisor"
 msgid "Down"
 msgstr "नीच्चाँ"
 
-msgctxt "Current status of a Firewall"
-msgid "Down"
-msgstr "नीच्चाँ"
-
 msgctxt "Current status of a Floating IP"
 msgid "Down"
 msgstr "नीच्चाँ"
@@ -1248,9 +1042,6 @@ msgstr "नीच्चाँ"
 msgid "Download CSV Summary"
 msgstr "सीएसवी सारांश डाउनलोड करू"
 
-msgid "Download Key Pair"
-msgstr "कुँजी युग्म डाउनलोड करू"
-
 msgid "EC2 Access Key"
 msgstr "EC2 पहुँच कुँजी"
 
@@ -1263,17 +1054,11 @@ msgstr "EC2 URL"
 msgid "Edit"
 msgstr "संपादन"
 
-msgid "Edit Connection"
-msgstr "कनेक्शन क संपादन करू"
-
 msgid "Edit Consumer"
 msgstr "उपभोक्ता संपादित करू"
 
 msgid "Edit Domain"
 msgstr "डोमेन संपादित करू"
-
-msgid "Edit Firewall"
-msgstr "फायरवाल संपादित करू "
 
 msgid "Edit Flavor"
 msgstr "फ्लेवर संपादित करू"
@@ -1284,23 +1069,11 @@ msgstr "समूहक संपादन करू"
 msgid "Edit Host Aggregate"
 msgstr "कुल मेजबान क संपादन करू"
 
-msgid "Edit IKE Policy"
-msgstr "IKE नीति संपादित करू"
-
-msgid "Edit IPSec Policy"
-msgstr "IPSec नीति संपादित करू"
-
-msgid "Edit IPSec Site Connection"
-msgstr "संपादित IPSec साइट कनेक्शन"
-
 msgid "Edit Instance"
 msgstr "इंस्टांस संपादित करू "
 
 msgid "Edit Network"
 msgstr "सँजाल संपादित करू"
-
-msgid "Edit Policy"
-msgstr "नीति संपादित करू"
 
 msgid "Edit Port"
 msgstr "पोर्ट संपादित करू"
@@ -1313,9 +1086,6 @@ msgstr "QoS विनिर्देश उपभोक्ता केँ स�
 
 msgid "Edit Router"
 msgstr "राटर संपादन करू"
-
-msgid "Edit Rule"
-msgstr "नियम संपादित करू"
 
 msgid "Edit Security Group"
 msgstr "संपादित सुरक्षा समूह"
@@ -1331,12 +1101,6 @@ msgstr "स्पेक संपादित करू"
 
 msgid "Edit Subnet"
 msgstr " सबनेट संपादित करू"
-
-msgid "Edit Template"
-msgstr "नमूना क संपादन करू"
-
-msgid "Edit VPN Service"
-msgstr "VPN सेवा क संपादन करू."
 
 msgid "Edit Volume"
 msgstr " वाल्यूम संपादित करू"
@@ -1376,18 +1140,12 @@ msgstr " DHCP सक्रिय करू"
 msgid "Enable HA mode"
 msgstr "HA अवस्था सक्रिय करू"
 
-msgid "Enable rollback on create/update failure."
-msgstr "अद्यतन / बिफलता बनाबै पर रोलबैक सक्षम करू."
-
 msgid "Enabled"
 msgstr "सक्रिय"
 
 msgctxt "Current status of a Hypervisor"
 msgid "Enabled"
 msgstr "सक्रिय"
-
-msgid "Encapsulation mode"
-msgstr "सुरक्षात्मक प्रकार"
 
 msgid "Encrypted"
 msgstr "गुप्त"
@@ -1398,9 +1156,6 @@ msgstr "गोपित गुड़किल्ली"
 msgid "Encryption"
 msgstr "गोपन"
 
-msgid "Encryption algorithm"
-msgstr "गोपन अलगोरिथम"
-
 msgid "Enter a value for ICMP code in the range (-1: 255)"
 msgstr " ICMP कोड क लेल एकटा मूल्य दर्ज (: 255 -1) रेंज मे"
 
@@ -1410,34 +1165,11 @@ msgstr " ICMP प्रकार क लेल एकटा मूल्य द�
 msgid "Enter an integer value between 1 and 65535."
 msgstr "1 आओर 65535 क बीच एकटा पूर्णांक मान दर्ज करू."
 
-msgid "Environment Data"
-msgstr "वातावरण डाटा"
-
-msgid "Environment File"
-msgstr "वातावरण फाइल"
-
-msgid "Environment Source"
-msgstr "पर्यावरण स्रोत"
-
 msgid "Ephemeral Disk"
 msgstr "अस्थायी डिस्क "
 
 msgid "Ephemeral Disk (GB)"
 msgstr "अस्थायी डिस्क  (GB)"
-
-msgid "Equal to or greater than 60"
-msgstr "60 सँ पैघ अछि अथवा समान अछि"
-
-msgid ""
-"Equal to or greater than 68 if the local subnet is IPv4. Equal to or greater "
-"than 1280 if the local subnet is IPv6."
-msgstr ""
-"68 क बराबर अथवा एकरासँ बेसी जँ स्थानीय सबनेट IPv4 अछि. 1280 क बराबर अथवा एकरासँ "
-"बेसी जँ स्थानीय सबनेट IPv6 अछि."
-
-msgctxt "Current status of a Firewall"
-msgid "Error"
-msgstr "त्रुटि"
 
 msgctxt "Current status of a Floating IP"
 msgid "Error"
@@ -1497,9 +1229,6 @@ msgid ""
 "Evacuate the servers from the selected down host to an active target host."
 msgstr "सक्रिय लक्ष्य मेजबान करबाक लेल नीच्चाँ चयनित मेजबान सँ सर्वर केँ खाली करू."
 
-msgid "Events"
-msgstr "घटना"
-
 msgid "Extend Volume"
 msgstr "वाल्यूम विस्तार"
 
@@ -1548,10 +1277,6 @@ msgid "Failed to add agent %(agent_name)s for network %(network)s."
 msgstr "संजाल %(network)s क लेल एजेंट %(agent_name)s जोड़ब मे बिफल रहल."
 
 #, python-format
-msgid "Failed to create a port for network %s"
-msgstr "सँजाल %s क लेल एकटा पोर्ट बनाबै मे बिफल "
-
-#, python-format
 msgid "Failed to create network \"%(network)s\": %(reason)s"
 msgstr "सँजाल बनाबै मे बिफल \"%(network)s\": %(reason)s"
 
@@ -1564,28 +1289,12 @@ msgid "Failed to create router \"%s\"."
 msgstr " \"%s\" रूटर बनाबै मे बिफल."
 
 #, python-format
-msgid "Failed to delete agent: %s"
-msgstr "एजेंट मिटाबै मे असमर्थ: %s"
-
-#, python-format
-msgid "Failed to delete interface %s"
-msgstr " %s अंतरफलक हटाएब मे बिफल"
-
-#, python-format
 msgid "Failed to delete network \"%s\""
 msgstr "\"%s\" सँजाल केँ मेटाय पाबै मे बिफल"
 
 #, python-format
-msgid "Failed to delete network %s"
-msgstr "%s सँजाल केँ मेटाय पाबै मे बिफल"
-
-#, python-format
 msgid "Failed to delete port %s"
 msgstr "पोर्ट केँ मेटाय नहि पाएल: %s"
-
-#, python-format
-msgid "Failed to delete subnet %s"
-msgstr "%s सबनेट हटाएब मे बिफल"
 
 #, python-format
 msgid "Failed to disable compute service for host: %s."
@@ -1598,10 +1307,6 @@ msgstr "मेजबान खाली करबामे बिफल: %s."
 #, python-format
 msgid "Failed to evacuate instances: %s"
 msgstr "इंस्टेंस केँ खाली करबामे असफल: %s"
-
-#, python-format
-msgid "Failed to insert rule to policy %(name)s: %(reason)s"
-msgstr " %(name)s नीति क लेल नियम केँ सम्मिलित करबामे बिफल: %(reason)s"
 
 #, python-format
 msgid "Failed to live migrate instance to host \"%s\"."
@@ -1632,60 +1337,16 @@ msgstr ""
 "बिफल."
 
 #, python-format
-msgid "Failed to remove rule from policy %(name)s: %(reason)s"
-msgstr "%(name)s नीति सँ नियम केँ हटाएब मे बिफल: %(reason)s"
-
-#, python-format
-msgid "Failed to retrieve available rules: %s"
-msgstr "मोजुद नियम केँ पाबै मे बिफल: %s"
-
-#, python-format
-msgid "Failed to retrieve current rules in policy %(name)s: %(reason)s"
-msgstr " %(name)s नीति मे मोजुदा नियम केँ पाबै मे बिफल: %(reason)s"
-
-#, python-format
 msgid "Failed to retrieve network %s for a subnet"
 msgstr "सबनेट क लेल सँजाल  %s केँ पाबै मे बिफल"
-
-#, python-format
-msgid "Failed to update IKE Policy %s"
-msgstr "IKE नीति अपडेट करबामे बिफल %s"
-
-#, python-format
-msgid "Failed to update IPSec Policy %s"
-msgstr " IPSec नीति अपडेट करबामे बिफल %s"
-
-#, python-format
-msgid "Failed to update IPSec Site Connection %s"
-msgstr "IPSec साइट कनेक्शन %s अपडेट करबामे बिफल"
-
-#, python-format
-msgid "Failed to update VPN Service %s"
-msgstr " %s वीपीएन सेवा अपडेट करबामे बिफल"
-
-#, python-format
-msgid "Failed to update firewall %(name)s: %(reason)s"
-msgstr "%(name)s फायरवाल अद्यतन करबामे असफल: %(reason)s"
 
 #, python-format
 msgid "Failed to update network %s"
 msgstr "%s सँजाल अद्यतन करबामे बिफल"
 
 #, python-format
-msgid "Failed to update policy %(name)s: %(reason)s"
-msgstr "%(name)s नीति  अद्यतन करबामे असफल: %(reason)s"
-
-#, python-format
-msgid "Failed to update port %s"
-msgstr "पोर्ट %s केँ अद्यतन करबामे बिफल"
-
-#, python-format
 msgid "Failed to update router %s"
 msgstr "राउटर %s केँ अपडेट करबामे बिफल रहल"
-
-#, python-format
-msgid "Failed to update rule %(name)s: %(reason)s"
-msgstr "%(name)s नियम अद्यतन करबामे असफल: %(reason)s"
 
 #, python-format
 msgid "Failed to update subnet \"%(sub)s\":  %(reason)s"
@@ -1693,13 +1354,6 @@ msgstr " \"%(sub)s\" सबनेट अपडेट करबामे बि�
 
 msgid "Fault"
 msgstr "दोष"
-
-msgid ""
-"Fields in this tab are optional. You can configure the detail of IPSec site "
-"connection created."
-msgstr ""
-"ई टैब मे फ़ील्ड वैकल्पिक अछि. अहाँक द्वारा बनाए IPSec साइट कनेक्शन क विस्तार विन्यस्त कए "
-"सकैत अछि."
 
 msgid "File"
 msgstr "फाइल"
@@ -1716,19 +1370,6 @@ msgstr "फिंगरप्रिंट"
 msgctxt "Task status of an Instance"
 msgid "Finishing Resize or Migrate"
 msgstr "आकार बदलब अथवा माइग्रेट होनाइ पूर्ण भ' रहल अछि"
-
-#, python-format
-msgid "Firewall %s was successfully updated."
-msgstr "फायरवाल %s सफलतापूर्वक अद्यतन कएल गेल छल."
-
-msgid "Firewall Policies"
-msgstr "फायरवाल नीतियाँ"
-
-msgid "Firewall Rules"
-msgstr "फायरवाल नियम"
-
-msgid "Firewalls"
-msgstr "फायरवाल"
 
 msgid "Fixed IPs"
 msgstr "स्थिर IP"
@@ -1820,9 +1461,6 @@ msgstr "एतए सँ अहाँ संजाल क लेल एकटा
 
 msgid "From here you can create a snapshot of a volume."
 msgstr "एतए सँ अहाँ एकटा वाल्यूम क स्नैपशाट बनाए सकैत अछि."
-
-msgid "From here you can update the default quotas (max limits)."
-msgstr "एतय सँ अहाँ पूर्वनिर्धारित कोटा (अधिकतम सीमा) अपडेट कए सकैत अछि."
 
 msgid "GB"
 msgstr "GB"
@@ -1947,33 +1585,8 @@ msgstr "हाइपरविजर विवरण"
 msgid "Hypervisors"
 msgstr "हाइपरविजर"
 
-msgid "ICMP"
-msgstr "ICMP"
-
 msgid "ID"
 msgstr "आईडी"
-
-msgid "IKE Phase1 negotiation mode"
-msgstr "IKE Phase1 बातचीत मोड"
-
-msgid "IKE Policies"
-msgstr " IKE नीति"
-
-msgid "IKE Policy"
-msgstr " IKE नीति"
-
-#, python-format
-msgid "IKE Policy %s was successfully updated."
-msgstr "IKE नीति %s सफलतापूर्वक अपडेट कएल गेल छल."
-
-msgid "IKE Policy Details"
-msgstr "IKE नीति विवरण"
-
-msgid "IKE Policy associated with this connection"
-msgstr "ई कनेक्शन क सँग जुड़े IKE नीति"
-
-msgid "IKE version"
-msgstr "IKE संस्करण"
 
 msgid "IP Address"
 msgstr "IP पता"
@@ -2017,37 +1630,17 @@ msgstr ""
 "पूर्वनिर्धारित क उपयोग करू, तँ खाली छोड़ दिअ'. अहाँ कोनो प्रवेश द्वार क उपयोग कएनाइ "
 "चाहैत अछि, तँ 'अक्षम गेटवे' नीच्चाँ क जाँच करू."
 
-msgid "IPSec Policies"
-msgstr "IPSec नीति "
-
-msgid "IPSec Policy"
-msgstr "IPSec नीति "
-
-#, python-format
-msgid "IPSec Policy %s was successfully updated."
-msgstr "IPSec नीति %s सफलतापूर्वक अपडेट कएल गेल छल."
-
-msgid "IPSec Policy Details"
-msgstr "IPSec नीति विवरण"
-
-msgid "IPSec Policy associated with this connection"
-msgstr "ई कनेक्शन क सँग जुड़े IPSec नीति"
-
-#, python-format
-msgid "IPSec Site Connection %s was successfully updated."
-msgstr "IPSec साइट कनेक्शन %s सफलतापूर्वक अद्यतन कएल गेल छल."
-
-msgid "IPSec Site Connection Details"
-msgstr "IPSec साइट कनेक्शन विवरण"
-
-msgid "IPSec Site Connections"
-msgstr "IPSec साइट कनेक्शन"
-
 msgid "IPv4"
 msgstr "IPv4"
 
+msgid "IPv4 Address ="
+msgstr "IPv4 पता ="
+
 msgid "IPv6"
 msgstr "IPv6"
+
+msgid "IPv6 Address ="
+msgstr "IPv6 पता ="
 
 msgid "IPv6 Address Configuration Mode"
 msgstr "IPv6 पता विन्यास अवस्था"
@@ -2127,9 +1720,6 @@ msgstr "बिंब"
 msgid "Import Key Pair"
 msgstr "आयात कुँजी जोड़ल"
 
-msgid "In Policy"
-msgstr "नीति मे"
-
 msgid "Info"
 msgstr "सूचना"
 
@@ -2138,9 +1728,6 @@ msgstr "सूचना"
 
 msgid "Ingress"
 msgstr "प्रवेश"
-
-msgid "Initiator state"
-msgstr "प्रारंभक स्थिति "
 
 msgid "Injected File Content (Bytes)"
 msgstr "इंजेक्ट फाइल सामग्री (बाइट)"
@@ -2153,12 +1740,6 @@ msgstr "इंजेक्ट फाइल पथ बाइट"
 
 msgid "Injected Files"
 msgstr "इंजेक्ट फाइल"
-
-msgid "Insert Rule"
-msgstr "नियम डालू"
-
-msgid "Insert Rule to Policy"
-msgstr "नीति क नियम डालू"
 
 msgid "Instance"
 msgstr "इंस्टेंस"
@@ -2272,9 +1853,6 @@ msgstr "कुँजीमान युग्म"
 msgid "Language"
 msgstr "भाषा"
 
-msgid "Last Updated"
-msgstr "अंतिम बेर अद्यतन"
-
 msgctxt "Time since the last update"
 msgid "Last Updated"
 msgstr "अंतिम बेर अद्यतन"
@@ -2287,12 +1865,6 @@ msgstr "इंस्टांस लान्च करू"
 
 msgid "Launch Instance (Quota exceeded)"
 msgstr "दृष्टांत लान्च करू (कोटा सँ बेसी भ' गेल)"
-
-msgid "Launch Parameters"
-msgstr "पैरामीटर्स लान्च करू "
-
-msgid "Launch Stack"
-msgstr "ढेर लान्च करू"
 
 msgid "Launch as Instance"
 msgstr "इंस्टांस क रूपेँ लान्च करू"
@@ -2310,27 +1882,6 @@ msgstr "एकटा सँ बेसी इंस्टेंस केँ ल�
 
 msgid "Length of Injected File Path"
 msgstr "इंजेक्ट फाइल पथ क नमाइ"
-
-msgid "Lifetime Units"
-msgstr "जीवनकाल एकाइ"
-
-msgid "Lifetime Value"
-msgstr "जीवन मूल्य"
-
-msgid "Lifetime units"
-msgstr "जीवनकाल एकाइ"
-
-msgid "Lifetime units for IKE keys"
-msgstr "IKE कुँजी क लेल जीवनकाल एकाइ"
-
-msgid "Lifetime value"
-msgstr "जीवन मूल्य"
-
-msgid "Lifetime value for IKE keys"
-msgstr "IKE कुँजी क लेल जीवन मूल्य"
-
-msgid "Lifetime value for IKE keys "
-msgstr "IKE कुँजी क लेल जीवन मूल्य "
 
 msgid "Limit"
 msgstr "सीमा"
@@ -2411,9 +1962,6 @@ msgstr "हस्तचालित"
 msgid "Mapped Fixed IP Address"
 msgstr "मैप कएल IP पता"
 
-msgid "Maximum Transmission Unit size for the connection"
-msgstr "कनेक्शन क लेल अधिकतम संचार एकाइ आकार"
-
 msgid "Memory Usage"
 msgstr "मेमोरी उपयोग"
 
@@ -2449,9 +1997,6 @@ msgstr "न्यूनतम डिस्क (जीबी)"
 msgid "Minimum RAM (MB)"
 msgstr "न्यूनतम रैम (एमबी)"
 
-msgid "Minutes"
-msgstr "मिनट"
-
 #, python-format
 msgid "Modified domain \"%s\"."
 msgstr "परिवर्धित डोमेन \"%s\""
@@ -2470,12 +2015,6 @@ msgstr "संशोधित इंस्टेंस \"%s\"."
 #, python-format
 msgid "Modified project \"%s\"."
 msgstr "परिवर्तित परियोजना \"%s\"."
-
-msgid ""
-"Modified project information and members, but unable to modify project "
-"quotas."
-msgstr ""
-"परियोजना क जानकारी आओर सदस्य केँ संशोधित, मुदा परियोजना कोटा संशोधित करबामे असमर्थ."
 
 msgid "Modify Access"
 msgstr "पहुँच रूपांतरित करू"
@@ -2506,20 +2045,6 @@ msgstr "लागू नहि"
 
 msgid "Name"
 msgstr "नाम"
-
-msgid ""
-"Name may only contain letters, numbers, underscores, periods and hyphens."
-msgstr "नाम मे सिर्फ एकटा अक्षर, संख्या, हाइफन, आओर डैश  भ' सकैत अछि."
-
-msgid ""
-"Name must start with a letter and may only contain letters, numbers, "
-"underscores, periods and hyphens."
-msgstr ""
-"नाम एकटा पत्र क सँग शुरू हाएत आओर केवल अक्षर, संख्या, केँ रेखांकित करैत अछि, ओ समय आओर "
-"हाइफ़न भ' सकैत अछि."
-
-msgid "Name of the stack to create."
-msgstr "बनाने क लेल ढेर क नाम."
 
 #, python-format
 msgid "Name: %(name)s ID: %(uuid)s"
@@ -2595,9 +2120,6 @@ msgstr " नवगुड़किल्ली"
 
 msgid "New size must be greater than current size."
 msgstr " नवआकार वर्तमान आकार सँ पैघ होनाइ चाही."
-
-msgid "Next"
-msgstr "अगिला"
 
 msgid "No"
 msgstr "नहि"
@@ -2769,17 +2291,11 @@ msgstr "खुलल भेलहुँ पोर्ट"
 msgid "Open Port/Port Range:"
 msgstr "पोर्ट/पोर्ट श्रेणी खोलू:"
 
-msgid "Optional Parameters"
-msgstr "वैकल्पिक पैरामीटर"
-
 msgid "Optionally, you may choose to create a new volume."
 msgstr "वैकल्पिक रूप सँ, अहाँ एकटा नव वाल्यूम बनाबै क विकल्प चुन सकैत अछि."
 
 msgid "Other Protocol"
 msgstr "आन प्रोटोकाल"
-
-msgid "Outputs"
-msgstr "आउटपुट"
 
 msgid "Overview"
 msgstr "सारांश"
@@ -2787,14 +2303,8 @@ msgstr "सारांश"
 msgid "Owner"
 msgstr "मालिक"
 
-msgid "PFS"
-msgstr "PFS"
-
 msgid "Page Not Found"
 msgstr "पृष्ठ नहि भेटल"
-
-msgid "Parameters"
-msgstr "पैरामीटर्स"
 
 msgid "Password"
 msgstr "गुड़किल्ली"
@@ -2805,10 +2315,6 @@ msgstr "गुड़किल्ली"
 
 msgid "Password changed. Please log in again to continue."
 msgstr "गुड़किल्ली बदैल गेल. जारी राखबा क लेल फिनु सँ लाग ई करू."
-
-#, python-format
-msgid "Password for user \"%s\""
-msgstr "\"%s\" प्रयोक्ता कलेल गुड़किल्ली "
 
 msgid "Passwords do not match."
 msgstr "गुड़किल्ली मेल नहि खाइछ."
@@ -2825,25 +2331,6 @@ msgctxt "Task status of an Instance"
 msgid "Pausing"
 msgstr "ठहरू"
 
-msgid "Peer gateway public IPv4/IPv6 Address or FQDN"
-msgstr "सहकर्मी गेटवे सार्वजनिक IPv4/IPv6 पता अथवा FQDN"
-
-msgid "Peer gateway public IPv4/IPv6 address or FQDN for the VPN Connection"
-msgstr "वीपीएन कनेक्शन क लेल सहकर्मी गेटवे सार्वजनिक IPv4/IPv6 पता अथवा FQDN"
-
-msgid "Peer router identity for authentication (Peer ID)"
-msgstr "प्रमाणीकरण क लेल सहकर्मी रूटर पहचान (सहकर्मी आईडी)"
-
-msgid ""
-"Peer router identity for authentication. Can be IPv4/IPv6 address, e-mail, "
-"key ID, or FQDN"
-msgstr ""
-"प्रमाणीकरण क लेल रूटर पहचान सहकर्मी. IPv4/IPv6 पता, ई - मेल, कुँजी आईडी, अथवा FQDN "
-"भ' सकैत अछि"
-
-msgid "Perfect Forward Secrecy"
-msgstr "बढ़िया अग्रेषित गोपनीयता"
-
 msgid "Physical Network"
 msgstr "भौतिक सँजाल"
 
@@ -2854,25 +2341,8 @@ msgid "Please note: "
 msgstr "कृपया  नोट करू:"
 
 #, python-format
-msgid "Please specify a %s using only one source method."
-msgstr "स्रोत विधि केवल एकटा क उपयोग कए %s क निर्दिष्ट करू."
-
-#, python-format
 msgid "Please try again later [Error: %s]."
 msgstr "कृप्या  बाद मे फिनु सँ कोशिश करू [त्रुटि: %s]."
-
-msgid "Policies"
-msgstr "नीति"
-
-msgid "Policy"
-msgstr "नीति"
-
-#, python-format
-msgid "Policy %s was successfully updated."
-msgstr "नीति %s सफलतापूर्वक अपडेट कएल गेल छल."
-
-msgid "Policy ID"
-msgstr "नीति आईडी"
 
 msgid "Pool"
 msgstr "पूल"
@@ -2900,9 +2370,6 @@ msgstr "जुड़बाक लेल पोर्ट"
 msgid "Ports"
 msgstr "पोर्ट"
 
-msgid "Position in Policy"
-msgstr "नीति मे स्थिति"
-
 msgid "Post-Creation"
 msgstr "पोस्ट निर्माण"
 
@@ -2916,9 +2383,6 @@ msgstr "पावर आफ कएल जाए रहल अछि"
 msgctxt "Task status of an Instance"
 msgid "Powering On"
 msgstr "पावर आन कएल जाए रहल अछि"
-
-msgid "Pre-Shared Key (PSK) string"
-msgstr "पूर्व साझा कुँजी (पीएसके) स्ट्रिंग"
 
 msgctxt "Task status of an Instance"
 msgid "Preparing Resize or Migrate"
@@ -2972,12 +2436,6 @@ msgstr "परियोजना:"
 msgid "Protected"
 msgstr "सुरक्षित"
 
-msgid "Protocol"
-msgstr "प्रोटोकाल"
-
-msgid "Protocol for the firewall rule"
-msgstr "फायरवाल नियम क लेल प्रोटोकाल"
-
 msgid "Provider"
 msgstr "प्रदाता"
 
@@ -3014,9 +2472,6 @@ msgstr "संसाधन राउटर क लेल कोटा पार 
 #, python-format
 msgid "Quota value(s) cannot be less than the current usage value(s): %s."
 msgstr "कोटा मूल्य वर्तमान उपयोग क मूल्य सँ कम नहि भ' सकैत: %s. "
-
-msgid "Quotas"
-msgstr "कोटा"
 
 msgid "RAM"
 msgstr "रैम"
@@ -3099,27 +2554,8 @@ msgstr "क्षेत्र:"
 msgid "Remote"
 msgstr "दूरस्थ"
 
-msgid "Remote peer subnet"
-msgstr "दूरस्थ सहकर्मी सबनेट"
-
-msgid "Remote peer subnet(s)"
-msgstr "दूरस्थ सहकर्मी सबनेट "
-
-msgid ""
-"Remote peer subnet(s) address(es) with mask(s) in CIDR format separated with "
-"commas if needed (e.g. 20.1.0.0/24, 21.1.0.0/24)"
-msgstr ""
-"जँ जरूरत सीआईडीआर प्रारूप मे मुखौटा (एस) क सँग दूरस्थ सहकर्मी सबनेट  पता (ते) कॉमा सँ अलग "
-"भ' (जहिना 20.1.0.0/24, 21.1.0.0/24)"
-
 msgid "Remote:"
 msgstr "दूरस्थ:"
-
-msgid "Remove Rule"
-msgstr "नियम केँ हटाउ"
-
-msgid "Remove Rule from Policy"
-msgstr "नीति सँ नियम केँ हटाउ"
 
 msgid "Request ID"
 msgstr "अनुरोध ID"
@@ -3153,15 +2589,6 @@ msgstr "आकार बदलू अथवा माइग्रेट कर�
 msgctxt "Task status of an Instance"
 msgid "Resizing or Migrating"
 msgstr "आकार बदलब अथवा माइग्रेट भ' रहल अछि"
-
-msgid "Resource"
-msgstr "साधन"
-
-msgid "Resource ID"
-msgstr "संसाधन ID"
-
-msgid "Resource Metadata"
-msgstr "संसाधन मेटाडाटा"
 
 msgid "Resources"
 msgstr "संसाधन"
@@ -3225,20 +2652,11 @@ msgstr "भूमिका सफलतापूर्वक अद्यतन.
 msgid "Roles"
 msgstr "भूमिका"
 
-msgid "Rollback"
-msgstr "वापस करू"
-
-msgid "Rollback On Failure"
-msgstr "बिफलता पर रोलबैक"
-
 msgid "Root Disk"
 msgstr "रूट डिस्क"
 
 msgid "Root Disk (GB)"
 msgstr "मुख्य डिस्क (GB)"
-
-msgid "Route mode"
-msgstr "रूट मोड "
 
 msgid "Router"
 msgstr "रूटर"
@@ -3251,9 +2669,6 @@ msgstr "रूटर %s सफलतापूर्वक बनाएल गे
 msgid "Router %s was successfully updated."
 msgstr "राटर %s सफलतापूर्वक अद्यतन कएल गेल छल."
 
-msgid "Router ID"
-msgstr "रूटर आईडी"
-
 msgid "Router Name"
 msgstr "रूटर नाम"
 
@@ -3265,18 +2680,6 @@ msgstr "रूटर"
 
 msgid "Rule"
 msgstr "नियम"
-
-#, python-format
-msgid "Rule %(rule)s was successfully inserted to policy %(policy)s."
-msgstr "नियम %(rule)s सफलतापूर्वक नीति  %(policy)s केँ सम्मिलित कएल गेल छल."
-
-#, python-format
-msgid "Rule %(rule)s was successfully removed from policy %(policy)s."
-msgstr "नियम  %(rule)s सफलतापूर्वक %(policy)s नीति सँ हटा देल गेल छल."
-
-#, python-format
-msgid "Rule %s was successfully updated."
-msgstr "नियम %s सफलतापूर्वक अद्यतन कएल गेल छल."
 
 msgid "Rule:"
 msgstr "नियम:"
@@ -3340,12 +2743,6 @@ msgstr "विभाजन आईडी"
 msgid "Segmentation ID:"
 msgstr "विभाजन ID:"
 
-msgid "Select IKE Policy"
-msgstr "IKE नीति क चयन करू"
-
-msgid "Select IPSec Policy"
-msgstr "चुनू IPSec नीति"
-
 msgid "Select Image"
 msgstr "बिंब चुनू"
 
@@ -3358,12 +2755,6 @@ msgstr "स्क्रिप्ट स्रोत क चयन करू"
 msgid "Select Subnet"
 msgstr "सबनेट चयन करू"
 
-msgid "Select Template"
-msgstr "नमूना क चयन करू"
-
-msgid "Select VPN Service"
-msgstr "चुनू वीपीएन सेवा"
-
 msgid "Select Volume"
 msgstr "वाल्यूम चुनू"
 
@@ -3372,15 +2763,6 @@ msgstr "वाल्यूम स्नैपशाट चुनू"
 
 msgid "Select a New Flavor"
 msgstr " नवफ्लेवर चुनू"
-
-msgid "Select a Policy"
-msgstr "नीति क चयन करू"
-
-msgid "Select a Router"
-msgstr "रूटर क चयन करू"
-
-msgid "Select a Subnet"
-msgstr "सबनेट चयन करू"
 
 msgid "Select a key pair"
 msgstr "कुँजी युग्म चुनू"
@@ -3391,9 +2773,6 @@ msgstr " नवएजेंट चयन करू"
 msgid "Select a new host"
 msgstr " नव मेजबान चयन करू"
 
-msgid "Select a new template to re-launch a stack."
-msgstr "स्टैक केँ फिनु सँ लान्च करबाक लेल एकटा नव नमूना क चयन करू."
-
 msgid "Select a port"
 msgstr "पोर्ट चुनू."
 
@@ -3402,9 +2781,6 @@ msgstr "परियोजना चुनू"
 
 msgid "Select a target host"
 msgstr "लक्ष्य मेजबान चयन करू"
-
-msgid "Select a template to launch a stack."
-msgstr "एकटा स्टैक लान्च करबाक लेल नमूना क चयन करू."
 
 msgid "Select a volume to restore to."
 msgstr "रीस्टोर करबाक लेल एकटा वाल्यूम क चयन करू."
@@ -3427,9 +2803,6 @@ msgstr "सँजाल चुनू"
 msgid "Select networks for your instance."
 msgstr "अपन इंस्टेंस क लेल संजाल क चयन करू."
 
-msgid "Select rules for your policy."
-msgstr "अपन नीति क लेल नियम क चयन करू."
-
 msgid "Select source"
 msgstr "स्रोत चुनू"
 
@@ -3448,9 +2821,6 @@ msgstr "चयनित मेजबान"
 
 msgid "Selected Projects"
 msgstr "चयनित परियोजना"
-
-msgid "Selected Rules"
-msgstr "चयनित नियम"
 
 msgid "Selected hosts"
 msgstr "चयनित मेजबान"
@@ -3583,27 +2953,6 @@ msgstr "साफ्ट केँ हटाएल जाए रहल अछि"
 msgid "Something went wrong!"
 msgstr "किछु गलत भ' गेल.!"
 
-msgid "Source IP"
-msgstr "स्रोत आईपी"
-
-msgid "Source IP Address"
-msgstr "स्रोत IP पता"
-
-msgid "Source IP Address/Subnet"
-msgstr "स्रोत आईपी पता / सबनेट"
-
-msgid "Source IP address or subnet"
-msgstr "स्रोत IP पता अथवा सबनेट"
-
-msgid "Source Port"
-msgstr "स्रोत पोर्ट "
-
-msgid "Source Port/Port Range"
-msgstr "स्रोत पोर्ट / पोर्ट सीमा"
-
-msgid "Source port (integer in [1, 65535] or range in a:b)"
-msgstr "स्रोत पोर्ट ([1, 65,535] मे पूर्णांक अथवा एकटा मे रेंज: ख)"
-
 msgctxt "Task status of an Instance"
 msgid "Spawning"
 msgstr "परिणाम देब जाए रहल अछि"
@@ -3640,42 +2989,6 @@ msgstr "इंस्टेंस शुरू करबाक लेल वि�
 msgid "Specs"
 msgstr "विशिष्टता"
 
-msgid "Stack Events"
-msgstr "ढेर घटनाक्रम"
-
-msgid "Stack ID"
-msgstr "ढेर आईडी"
-
-msgid "Stack Name"
-msgstr " ढेर नाम"
-
-msgid "Stack Parameters"
-msgstr "ढेर पैरामीटर्स"
-
-msgid "Stack Resource"
-msgstr "ढेर संसाधन"
-
-msgid "Stack Resource ID"
-msgstr "ढेर संसाधन ID"
-
-msgid "Stack Resource Type"
-msgstr "ढेर संसाधन प्रकार"
-
-msgid "Stack Resources"
-msgstr "ढेर संसाधन"
-
-msgid "Stack creation started."
-msgstr "ढेर निर्माण शुरू कए देलक."
-
-msgid "Stack creation timeout in minutes."
-msgstr "मिनटों मे निर्माण मध्यांतर भ' चुकी अछि."
-
-msgid "Stack update started."
-msgstr "ढेर अद्यतन शुरू कए देलक."
-
-msgid "Stacks"
-msgstr "ढेर"
-
 msgid "Start"
 msgstr "प्रारंभ"
 
@@ -3702,9 +3015,6 @@ msgstr "स्थिति"
 
 msgid "Status ="
 msgstr "स्थिति ="
-
-msgid "Status Reason"
-msgstr "स्थिति क कारण"
 
 msgid "Subnet"
 msgstr "सबनेट"
@@ -3818,29 +3128,11 @@ msgstr "तंत्र"
 msgid "System Information"
 msgstr "तंत्र जानकारी"
 
-msgid "TCP"
-msgstr "TCP"
-
 msgid "Target Host"
 msgstr "लक्ष्य मेजबान"
 
 msgid "Task"
 msgstr "काज"
-
-msgid "Template"
-msgstr "नमूना"
-
-msgid "Template Data"
-msgstr "नमूना डाटा"
-
-msgid "Template File"
-msgstr "नमूना फाइल"
-
-msgid "Template Source"
-msgstr "नमूना स्रोत"
-
-msgid "Template URL"
-msgstr "नमूना यूआरएल"
 
 msgid "The \"from\" port number is invalid."
 msgstr "\"सँ\" पोर्ट सँख्या अमान्य अछि."
@@ -3875,13 +3167,6 @@ msgid ""
 msgstr ""
 "<strong>बटन आकार</strong> बिट्स मे गोपन बटन क आकार अछि (जहिना, 128, 256 बिट्स). "
 "जँ एहि फील्ड केँ खाली छोड़ा जाइत अछि तँ प्रदाता पूर्वनिर्धारित क उपयोग कएल जएताह."
-
-msgid ""
-"The <strong>Provider</strong> is the class providing encryption support (e."
-"g. LuksEncryptor)."
-msgstr ""
-"<strong>प्रदाता</strong> गोपन सहयोग प्रदान करब बला वर्ग अछि (जहिना "
-"LuksEncryptor)."
 
 msgid "The Aggregate was updated."
 msgstr "सकल अद्यतन कएल गेल छल."
@@ -3924,16 +3209,6 @@ msgstr ""
 msgid "The container cannot be deleted since it is not empty."
 msgstr "ई कंटेनर केँ हटाएल नहि जाए सकैत अछि किएक ई खाली नहि अछि."
 
-msgid ""
-"The default IP address of the interface created is a gateway of the selected "
-"subnet. You can specify another IP address of the interface here. You must "
-"select a subnet to which the specified IP address belongs to from the above "
-"list."
-msgstr ""
-"बनैलक अंतरफलक क पूर्वनिर्धारित आईपी पता चयनित सबनेट क लेल प्रवेश द्वार अछि. अहाँ एतय "
-"अंतरफलक क एकटा आओर आईपी पता निर्दिष्ट कए सकैत अछि. अहाँ निर्दिष्ट आईपी पता उपरोक्त "
-"सूची सँ संबंध राखैत अछि जे करबाक लेल एकटा सबनेट क चयन कएनाइ हाएत."
-
 #, python-format
 msgid ""
 "The flavor '%(flavor)s' is too small for requested image.\n"
@@ -3970,9 +3245,6 @@ msgid ""
 "implemented."
 msgstr "प्रत्यक्ष संजाल क नाम जकरा पर आभाषी संजाल केँ क्रियान्वित कएल जाइत अछि."
 
-msgid "The page you were looking for doesn't exist"
-msgstr "अहाँक द्वारा खोजागेल पृष्ठ मोजुद नहि अछि"
-
 msgid "The physical mechanism by which the virtual network is implemented."
 msgstr "प्रत्यक्ष प्रणाली जकरा द्वारा आभाषी संजाल केँ क्रियान्वित कएल जाइत अछि."
 
@@ -3983,12 +3255,6 @@ msgstr "निज कुँजी अपन ब्राउजर मे इस�
 
 msgid "The pseudo folder cannot be deleted since it is not empty."
 msgstr "ई छद्म फोल्डर केँ हटाएल नहि जाए सकैत अछि किएक ई खाली नहि अछि."
-
-msgid "The raw contents of the environment file."
-msgstr "वातावरण फाइल क कच्ची सामग्री."
-
-msgid "The raw contents of the template."
-msgstr "नमूना क कच्चा सामग्री."
 
 #, python-format
 msgid ""
@@ -4038,25 +3304,14 @@ msgstr ""
 "pub) कुँजी अछि. एतय सार्वजानिक कुँजी क सामग्री साटू "
 
 msgid ""
-"This is required for operations to be performed throughout the lifecycle of "
-"the stack"
-msgstr "आपरेशन ढेर क जीवन चक्र क दौरान प्रदर्शन कएल जाए करबाक लेल ई आवश्यक अछि"
-
-msgid ""
 "This volume is currently attached to an instance. In some cases, creating a "
 "snapshot from an attached volume can result in a corrupted snapshot."
 msgstr ""
 "ई मात्रा वर्तमान मे एकटा इंस्टेंस सँ जुड़ल भेलहुँ अछि. किछु मामला मे, एकटा संलग्न वाल्यूम सँ "
 "एकटा स्नैपशाट बनाने क एकटा भ्रष्ट स्नैपशाट मे परिणाम कए सकैत अछि."
 
-msgid "Time Since Event"
-msgstr "घटना क बाद सँ समय"
-
 msgid "Time since created"
 msgstr "निर्माण क समय सँ समय"
-
-msgid "Timeout"
-msgstr "समय समाप्ति"
 
 msgid "Timezone"
 msgstr "समयक्षेत्र"
@@ -4098,17 +3353,8 @@ msgstr "वाल्यूम आओर स्नैपशाट क कुल �
 msgid "Total disk usage (GB * Hours Used) for the project"
 msgstr "प्रोजेक्ट क लेल कुल डिस्क उपयोग (GB * प्रयोग क घंटा)"
 
-msgid "Transform Protocol"
-msgstr "प्रोटोकाल रूपांतरण"
-
 msgid "Type"
 msgstr "प्रकार"
-
-msgid "UDP"
-msgstr "UDP"
-
-msgid "URL"
-msgstr "URL"
 
 msgid "UTC"
 msgstr "UTC"
@@ -4116,34 +3362,6 @@ msgstr "UTC"
 #, python-format
 msgid "UTC %(hour)s:%(min)s"
 msgstr "UTC %(hour)s:%(min)s"
-
-#, python-format
-msgid "Unable to add Firewall \"%s\"."
-msgstr "फायरवाल जोड़बा मे असमर्थ \"%s\"."
-
-#, python-format
-msgid "Unable to add IKE Policy \"%s\"."
-msgstr " \"%s\" IKE नीति जोड़बा मे असमर्थ"
-
-#, python-format
-msgid "Unable to add IPSec Policy \"%s\"."
-msgstr "IPSec नीति जोड़बा मे असमर्थ \"%s\"."
-
-#, python-format
-msgid "Unable to add IPSec Site Connection \"%s\"."
-msgstr "IPSec साइट कनेक्शन जोड़बा मे असमर्थ \"%s\"."
-
-#, python-format
-msgid "Unable to add Policy \"%s\"."
-msgstr " \"%s\" नीति जोड़बा मे असमर्थ."
-
-#, python-format
-msgid "Unable to add Rule \"%s\"."
-msgstr "नियम जोड़बा मे असमर्थ \"%s\"."
-
-#, python-format
-msgid "Unable to add VPN Service \"%s\"."
-msgstr "वीपीएन सेवा जोड़बा मे असमर्थ \"%s\"."
 
 msgid "Unable to add rule to security group."
 msgstr "सुरक्षा समूह क लेल शासन केँ जोड़बा मे असमर्थ."
@@ -4167,10 +3385,6 @@ msgstr "गुड़किल्ली केँ बदलब मे असम�
 #, python-format
 msgid "Unable to change the volume type for volume: \"%s\""
 msgstr "वाल्यूम क लेल वाल्यूम प्रकार बदलब मे असमर्थ: \"%s\""
-
-#, python-format
-msgid "Unable to clear gateway for router \"%(name)s\": \"%(msg)s\""
-msgstr " \"%(name)s\" रूटर क लेल प्रवेश द्वार साफ करबामे असमर्थ: \"%(msg)s\""
 
 msgid "Unable to connect to Neutron."
 msgstr "न्यूट्रान सँ जुड़ नहि सकल."
@@ -4201,10 +3415,6 @@ msgstr "नवसकल \"%s\" मेजबान बनाबै मे अस�
 
 msgid "Unable to create host aggregate."
 msgstr "नवसकल मेजबान बनाबै मे असमर्थ"
-
-#, python-format
-msgid "Unable to create key pair: %(exc)s"
-msgstr "कुँजी युग्म बनाबै मे असमर्थ: %(exc)s"
 
 #, python-format
 msgid "Unable to create network \"%s\"."
@@ -4244,22 +3454,6 @@ msgstr "वाल्यूम प्रकार बनाबै मे अस�
 
 msgid "Unable to create volume."
 msgstr "वाल्यूम बनाबै मे असमर्थ."
-
-#, python-format
-msgid "Unable to delete firewall. %s"
-msgstr "फायरवाल हटाएब मे असमर्थl. %s"
-
-#, python-format
-msgid "Unable to delete policy. %s"
-msgstr "नीति हटाएब मे असमर्थ. %s"
-
-#, python-format
-msgid "Unable to delete router \"%s\""
-msgstr "रूटर \"%s\" मिटाबै मे असमर्थ"
-
-#, python-format
-msgid "Unable to delete rule. %s"
-msgstr "नियम हटाएब मे असमर्थ. %s"
 
 msgid "Unable to determine if availability zones extension is supported."
 msgstr "उपलब्धता क्षेत्र क विस्तार क समर्थन कएल अछि, तँ ई निर्धारित करबामे असमर्थ."
@@ -4303,10 +3497,6 @@ msgstr "\"%s\" इंस्टेंस क लेल VNC कँसोल प्
 msgid "Unable to get cinder services list."
 msgstr "सिंडर सेवासभ क सूची प्राप्त करबामे असमर्थ."
 
-#, python-format
-msgid "Unable to get events for stack \"%s\"."
-msgstr "ढेर \"%s\" क लेल घटना प्राप्त करबामे असमर्थ."
-
 msgid "Unable to get flavor list"
 msgstr "फ्लेवर सूची पाबै मे असमर्थ"
 
@@ -4328,13 +3518,6 @@ msgstr "नोवा सेवासभक सूची प्राप्त �
 
 msgid "Unable to get openrc credentials"
 msgstr "openrc क्रेडेंशियल प्राप्त करबामे असमर्थ"
-
-msgid "Unable to get quota info."
-msgstr "कोटा जानकारी प्राप्त करबामे असमर्थ."
-
-#, python-format
-msgid "Unable to get resources for stack \"%s\"."
-msgstr "ढेर \"%s\" क लेल संसाधन केँ प्राप्त करबामे असमर्थ."
 
 #, python-format
 msgid "Unable to get subnet \"%s\""
@@ -4397,16 +3580,6 @@ msgstr "\"%s\" इंस्टेंस आकार परिवर्तन �
 msgid "Unable to restore backup."
 msgstr "बैकअप बहाल करबामे असमर्थ."
 
-msgid "Unable to retrieve IKE Policies list."
-msgstr "IKE नीतियाँ सूची केँ प्राप्त करबामे असमर्थ."
-
-msgid "Unable to retrieve IKE Policy details."
-msgstr "IKE नीति विवरण केँ फिनु प्राप्त करबामे असमर्थ."
-
-#, python-format
-msgid "Unable to retrieve IKE Policy details. %s"
-msgstr "IKE नीति विवरण केँ फिनु प्राप्त करबामे असमर्थ. %s"
-
 #, python-format
 msgid ""
 "Unable to retrieve IP addresses from Neutron for instance \"%(name)s"
@@ -4416,26 +3589,6 @@ msgstr ""
 
 msgid "Unable to retrieve IP addresses from Neutron."
 msgstr "न्यूट्रान सँ IP पता केँ फिनु प्राप्त करबामे असमर्थ."
-
-msgid "Unable to retrieve IPSec Policies list."
-msgstr "IPSec नीति सूची केँ प्राप्त करबामे असमर्थ."
-
-msgid "Unable to retrieve IPSec Policy details."
-msgstr "IPSec नीति विवरण केँ फिनु प्राप्त करबामे असमर्थ."
-
-#, python-format
-msgid "Unable to retrieve IPSec Policy details. %s"
-msgstr "IPSec नीति विवरण केँ फिनु प्राप्त करबामे असमर्थ. %s"
-
-msgid "Unable to retrieve IPSec Site Connection details."
-msgstr "IPSec साइट कनेक्शन विवरण प्राप्त करबामे असमर्थ."
-
-#, python-format
-msgid "Unable to retrieve IPSec Site Connection details. %s"
-msgstr "IPSec साइट कनेक्शन विवरण प्राप्त करबामे असमर्थ. %s"
-
-msgid "Unable to retrieve IPSec Site Connections list."
-msgstr "IPSec साइट कनेक्शन सूची केँ प्राप्त करबामे असमर्थ."
 
 msgid "Unable to retrieve Nova availability zones."
 msgstr "नोवा उपलब्धता क्षेत्र केँ पुनर्प्राप्त करबामे असमर्थ."
@@ -4457,16 +3610,6 @@ msgstr "QoS विनिर्देश सूची पुनर्प्रा
 
 msgid "Unable to retrieve QoS specs"
 msgstr "QoS विनिर्देश पुनर्प्राप्त करबामे असमर्थ"
-
-msgid "Unable to retrieve VPN Service details."
-msgstr "वीपीएन सेवा क विवरण प्राप्त करबामे असमर्थ."
-
-#, python-format
-msgid "Unable to retrieve VPN Service details. %s"
-msgstr "वीपीएन सेवा क विवरण प्राप्त करबामे असमर्थ. %s"
-
-msgid "Unable to retrieve VPN Services list."
-msgstr "वीपीएन सूची केँ प्राप्त करबामे असमर्थ."
 
 #, python-format
 msgid "Unable to retrieve a list of external networks \"%s\"."
@@ -4497,9 +3640,6 @@ msgstr "गणना मेजबान मे सूचना केँ प्�
 msgid "Unable to retrieve compute limit information."
 msgstr "गणना सीमा मे सूचना केँ प्राप्त करबामे असमर्थ."
 
-msgid "Unable to retrieve default Neutron quota values."
-msgstr "पूर्वनिर्धारित मान न्यूट्रान कोटा प्राप्त करबामे असमर्थ."
-
 msgid "Unable to retrieve default quota values."
 msgstr "पूर्वनिर्धारित कोटा मान प्राप्त करबामे असमर्थ."
 
@@ -4529,12 +3669,6 @@ msgstr "एक्सटेंशन क संबंध मे सूचना �
 
 msgid "Unable to retrieve extra spec list."
 msgstr "बाइली विनिर्देश सूची केँ प्राप्त करबामे असमर्थ."
-
-msgid "Unable to retrieve firewall details."
-msgstr "फायरवाल विवरण केँ फिनु प्राप्त करबामे असमर्थ."
-
-msgid "Unable to retrieve firewall list."
-msgstr "फायरवाल सूची केँ प्राप्त करबामे असमर्थ."
 
 msgid "Unable to retrieve flavor access list. Please try again later."
 msgstr "फ्लेवर अभिगम सूची केँ प्राप्त करबामे असमर्थ. बाद मे फिनु प्रयास करू."
@@ -4624,9 +3758,6 @@ msgstr "इंस्टेंस परियोजना सूचना पा
 msgid "Unable to retrieve instance size information."
 msgstr "इंस्टेंस आकार सूचना पाबै मे असमर्थ."
 
-msgid "Unable to retrieve instance."
-msgstr "इंस्टेंस प्राप्त करबामे असमर्थ."
-
 msgid "Unable to retrieve instances."
 msgstr "इंस्टेंस केँ फिनु प्राप्त करबामे असमर्थ."
 
@@ -4648,9 +3779,6 @@ msgstr "वाल्यूम स्नैपशाट क सूची के�
 msgid "Unable to retrieve list of volumes."
 msgstr "संस्करण क सूची केँ प्राप्त करबामे असमर्थ."
 
-msgid "Unable to retrieve metadata."
-msgstr "मेटाडेटा प्राप्त करबामे असमर्थ."
-
 msgid "Unable to retrieve network details."
 msgstr "संजाल जानकारी प्राप्त करबामे असमर्थ."
 
@@ -4659,22 +3787,6 @@ msgstr "संजाल कोटा जानकारी प्राप्त
 
 msgid "Unable to retrieve network."
 msgstr "सँजाल फिनु प्राप्त करबामे असमर्थ."
-
-msgid "Unable to retrieve networks list."
-msgstr "संजाल सूची केँ प्राप्त करबामे असमर्थ."
-
-msgid "Unable to retrieve policies list."
-msgstr "नीति सूची केँ प्राप्त करबामे असमर्थ."
-
-msgid "Unable to retrieve policy details."
-msgstr "नीति विवरण केँ फिनु प्राप्त करबामे असमर्थ."
-
-#, python-format
-msgid "Unable to retrieve policy list (%(error)s)."
-msgstr "नीति सूची केँ प्राप्त करबामे असमर्थ (%(error)s)."
-
-msgid "Unable to retrieve policy list."
-msgstr "नीति सूची केँ प्राप्त करबामे असमर्थ."
 
 msgid "Unable to retrieve port details"
 msgstr "पोर्ट विवरण केँ फिनु प्राप्त करबामे असमर्थ"
@@ -4700,9 +3812,6 @@ msgstr "सार्वजनिक बिंब केँ फिनु प्�
 msgid "Unable to retrieve quota information."
 msgstr "कोटा सूचना पाबै मे असमर्थ."
 
-msgid "Unable to retrieve resource."
-msgstr "संसाधन केँ फिनु प्राप्त करबामे असमर्थ."
-
 msgid "Unable to retrieve role list."
 msgstr "भूमिका सूची केँ प्राप्त करबामे असमर्थ."
 
@@ -4717,19 +3826,6 @@ msgstr "रूटर सूची केँ प्राप्त करबा�
 
 msgid "Unable to retrieve router."
 msgstr "रूटर केँ प्राप्त करबामे असमर्थ."
-
-msgid "Unable to retrieve routers list."
-msgstr "रूटर्स सूची केँ प्राप्त करबामे असमर्थ."
-
-msgid "Unable to retrieve rule details."
-msgstr "नियम विवरण केँ फिनु प्राप्त करबामे असमर्थ."
-
-#, python-format
-msgid "Unable to retrieve rules (%(error)s)."
-msgstr " (%(error)s) नियम केँ फिनु प्राप्त करबामे असमर्थ."
-
-msgid "Unable to retrieve rules list."
-msgstr "नियम सूची केँ प्राप्त करबामे असमर्थ."
 
 msgid "Unable to retrieve security group list. Please try again later."
 msgstr "सुरक्षा समूह सूची केँ प्राप्त करबामे असमर्थ. बाद मे फिनु प्रयास करू."
@@ -4749,15 +3845,6 @@ msgstr "स्नैपशाट जानकारी प्राप्त क
 
 msgid "Unable to retrieve snapshot list."
 msgstr "स्नैपशाट सूची पुनर्प्राप्त करबामे असमर्थ."
-
-msgid "Unable to retrieve stack list."
-msgstr "ढेर सूची केँ प्राप्त करबामे असमर्थ."
-
-msgid "Unable to retrieve stack template."
-msgstr "स्टैक नमूना केँ पुनर्प्राप्त करबामे असमर्थ."
-
-msgid "Unable to retrieve stack."
-msgstr "ढेर केँ फिनु प्राप्त करबामे असमर्थ."
 
 msgid "Unable to retrieve subnet details"
 msgstr "सबनेट विवरण केँ फिनु प्राप्त करबामे असमर्थ"
@@ -4864,9 +3951,6 @@ msgstr "परियोजना क लेल फ्लेवर पहुँ�
 msgid "Unable to set gateway."
 msgstr "गेटवे सेट करबामे असमर्थ."
 
-msgid "Unable to set project quotas."
-msgstr "परियोजना क कोटा निर्धारित करबामे अक्षम."
-
 msgid "Unable to sort instance flavors."
 msgstr "इंस्टेंस फ्लेवर केँ क्रमबद्ध करबामे असमर्थ."
 
@@ -4955,20 +4039,11 @@ msgstr "मेटाडाटा अद्यतन करू"
 msgid "Update Network"
 msgstr " सँजाल अद्यतन करू"
 
-msgid "Update Port"
-msgstr "पोर्ट अद्यतन करू "
-
 msgid "Update Role"
 msgstr "भूमिका अद्यतन करू "
 
 msgid "Update Router"
 msgstr "राटर अद्यतन करू"
-
-msgid "Update Stack"
-msgstr "ढेर अद्यतन "
-
-msgid "Update Stack Parameters"
-msgstr "अद्यतन ढेर पैरामीटर्स"
 
 msgid "Update Status"
 msgstr "स्थिति अपडेट करू"
@@ -4981,15 +4056,6 @@ msgstr "वाल्यूम स्नैपशाट स्थिति अद
 
 msgid "Update Volume Status"
 msgstr "वाल्यूम स्थिति केँ अद्यतन करू"
-
-msgid ""
-"Update a stack with the provided values. Please note that any encrypted "
-"parameters, such as passwords, will be reset to default if you do not change "
-"them here."
-msgstr ""
-"मोजुद कराएल मान क सँग ढेर केँ अद्यतन करू. एहि तरह क गुड़किल्ली क रूपेँ ककरो सेहो एन्क्रिप्टेड "
-"पैरामीटर, अहाँ ओकरा एतय परिवर्तन नहि करैत अछि, तँ पूर्वनिर्धारित पर रीसेट भ' जएताह "
-"कृप्या  ध्यान दिअ'."
 
 msgid ""
 "Update a subnet associated with the network. Advanced configuration are "
@@ -5055,22 +4121,12 @@ msgstr "स्रोत क रूपेँ वाल्यूम क प्र�
 msgid "Use image as a source"
 msgstr "स्रोत क रूपेँ छवि क उपयोग करू"
 
-msgid ""
-"Use one of the available template source options to specify the template to "
-"be used in creating this stack."
-msgstr ""
-"ई ढेर केँ बनाबै मे प्रयोग क जाएबला नमूना निर्दिष्ट करबाक लेल मोजुद नमूना स्रोत विकल्प मे सँ "
-"एकटा क प्रयोग करू."
-
 msgid "Use snapshot as a source"
 msgstr "स्रोत क रूपेँ स्नैपशाट क उपयोग"
 
 #, python-format
 msgid "Used <span> %(used)s </span> of <span> %(available)s </span>"
 msgstr "<span> %(available)s </span> क <span> %(used)s </span> मोजुद."
-
-msgid "Used in Policy"
-msgstr "नीति मे प्रयुक्त"
 
 msgid "User"
 msgstr "प्रयोक्ता"
@@ -5126,33 +4182,8 @@ msgstr "VCPUs ( उपयोग मे)"
 msgid "VLAN"
 msgstr "VLAN"
 
-msgid "VPN"
-msgstr "VPN"
-
-msgid "VPN Connections"
-msgstr "वीपीएन कनेक्शन्स"
-
-msgid "VPN Service"
-msgstr "VPN V"
-
-#, python-format
-msgid "VPN Service %s was successfully updated."
-msgstr "वीपीएन सेवा %s सफलतापूर्वक अद्यतन कएल गेल छल."
-
-msgid "VPN Service Details"
-msgstr "वीपीएन सेवा क विवरण"
-
-msgid "VPN Service associated with this connection"
-msgstr "वीपीएन सेवा एहि कनेक्शन क सँग जुड़े"
-
-msgid "VPN Services"
-msgstr "VPN सेवा"
-
 msgid "VXLAN"
 msgstr "VXLAN"
-
-msgid "Valid integer greater than the DPD interval"
-msgstr "DPD क अंतराल सँ बेसी मान्य पूर्णांक"
 
 msgid "Value"
 msgstr "मान"
@@ -5171,9 +4202,6 @@ msgstr "लाग देखू"
 
 msgid "View Usage"
 msgstr "उपयोग देखू "
-
-msgid "Virtual Private Network"
-msgstr "आभासी निज सँजाल"
 
 msgid "Volume"
 msgstr "आयतन"
@@ -5325,36 +4353,8 @@ msgstr "अहाँ साइत पता केँ गलत टाइप क
 msgid "You may optionally set a password on the rebuilt instance."
 msgstr "अहाँ वैकल्पिक पुनर्निर्माण इंस्टेंस पर एकटा गुड़किल्ली सेट कए सकैत अछि."
 
-msgid "You may update IKE Policy details here."
-msgstr "अहाँ एतय IKE नीति विवरण अपडेट कए सकैत अछि."
-
-msgid "You may update IPSec Policy details here."
-msgstr "अहाँ एतय IPSec नीति विवरण अपडेट कए सकैत अछि."
-
-msgid "You may update IPSec Site Connection details here."
-msgstr "अहाँ एतय IPSec साइट कनेक्शन विवरण केँ अपडेट कए सकैत अछि."
-
-msgid "You may update VPN Service details here."
-msgstr "अहाँ एतय वीपीएन सेवा क विवरण अद्यतन कए सकैत अछि."
-
-msgid "You may update firewall details here."
-msgstr "अहाँ एतय फायरवाल विवरण अपडेट कए सकैत अछि."
-
-msgid ""
-"You may update policy details here. Use 'Insert Rule' or 'Remove Rule' links "
-"instead to insert or remove a rule"
-msgstr ""
-"अहाँ एतय नीति विवरण अपडेट कए सकैत अछि. 'सम्मिलित करू' नियम अथवा एकटा नियम डालब "
-"अथवा निकालब केर लेल बजाय लिंक 'नियम केँ हटाउ' क प्रयोग करू"
-
-msgid "You may update rule details here."
-msgstr "अहाँ एतय नियम विवरण अपडेट कए सकैत अछि."
-
 msgid "You may update the editable properties of your network here."
 msgstr "अहाँ एतय अपन संजाल क संपादन योग्य गुण अद्यतन कए सकैत अछि."
-
-msgid "You may update the editable properties of your port here."
-msgstr "अहाँ एतय अपन पोर्ट क संपादन योग्य गुण अद्यतन कए सकैत अछि."
 
 msgid "You may update the editable properties of your router here."
 msgstr "अहाँ एतय अपन राटर क संपादन योग्य गुण अद्यतन कए सकैत अछि."
@@ -5370,9 +4370,6 @@ msgstr "अहाँ एकटा बिंब क चयन कएनाइ ह
 
 msgid "You must set volume size"
 msgstr "अहाँ हरदम वाल्यूम आकर सेट कए सकैत अछि"
-
-msgid "You must specify a template via one of the available sources."
-msgstr "अहाँक मोजुद स्रोतक एकसँ नमूना निर्दिष्ट कएनाइ चाही."
 
 msgid ""
 "You must specify the source of the traffic to be allowed via this rule. You "
@@ -5393,96 +4390,24 @@ msgstr "अहाँक बिंब %s क निर्माण क लेल 
 msgid "Zone"
 msgstr "क्षेत्र"
 
-msgid "aes-128"
-msgstr "aes-128"
-
-msgid "aes-192"
-msgstr "aes-192"
-
-msgid "aes-256"
-msgstr "aes-256"
-
-msgid "ah"
-msgstr "ah"
-
-msgid "ah-esp"
-msgstr "ah-esp"
-
 msgid "back-end"
 msgstr "बेक-एंड"
-
-msgid "bi-directional"
-msgstr "द्विदैशिक"
 
 msgctxt "Both of front-end and back-end"
 msgid "both"
 msgstr "दुनू"
 
-msgid "clear"
-msgstr "साफ करू"
-
-msgid "disabled"
-msgstr "निष्क्रिय"
-
 msgid "dm-crypt"
 msgstr "dm-crypt"
-
-msgid "environment"
-msgstr "वातावरण"
-
-msgid "esp"
-msgstr "esp"
 
 msgid "front-end"
 msgstr "फ्रंट - एंड"
 
-msgid "group14"
-msgstr "group14"
-
-msgid "group2"
-msgstr "group2"
-
-msgid "group5"
-msgstr "group5"
-
-msgid "hold"
-msgstr "पकड़ू"
-
 msgid "instance"
 msgstr "इंस्टेंस"
-
-msgid "response-only"
-msgstr "प्रतिक्रिया केवल"
-
-msgid "restart"
-msgstr "पुनःप्रारंभ करू"
-
-msgid "restart-by-peer"
-msgstr "फिनु आरंभ दर पीअर"
-
-msgid "seconds"
-msgstr "सेकण्ड"
-
-msgid "sha1"
-msgstr "sha1"
-
-msgid "template"
-msgstr "नमूना"
-
-msgid "transport"
-msgstr "परिवहन"
-
-msgid "tunnel"
-msgstr "टनल"
 
 msgid "undefined"
 msgstr "अपारिभाषित"
 
 msgid "unknown IP address"
 msgstr "अज्ञात  IP पता"
-
-msgid "v1"
-msgstr "v1"
-
-msgid "v2"
-msgstr "v2"

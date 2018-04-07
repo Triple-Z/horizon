@@ -44,7 +44,7 @@ def openstack(request):
 
     # Auth/Keystone context
     context.setdefault('authorized_tenants', [])
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         context['authorized_tenants'] = [
             tenant for tenant in
             request.user.authorized_tenants if tenant.enabled]
@@ -86,6 +86,15 @@ def openstack(request):
     # Adding webroot access
     context['WEBROOT'] = getattr(settings, "WEBROOT", "/")
 
+    user_menu_links = getattr(settings, "USER_MENU_LINKS", [])
+
+    if not getattr(settings, "SHOW_KEYSTONE_V2_RC", True):
+        user_menu_links = [
+            link for link in user_menu_links
+            if 'horizon:project:api_access:openrcv2' != link['url']]
+
+    context['USER_MENU_LINKS'] = user_menu_links
+
     # Adding profiler support flag
     profiler_settings = getattr(settings, 'OPENSTACK_PROFILER', {})
     profiler_enabled = profiler_settings.get('enabled', False)
@@ -96,13 +105,17 @@ def openstack(request):
         context['x_trace_info'] = profiler.update_trace_headers(
             hmac_keys, parent_id=index_view_id)
 
+    context['JS_CATALOG'] = get_js_catalog(conf)
+
+    return context
+
+
+def get_js_catalog(conf):
     # Search for external plugins and append to javascript message catalog
     # internal plugins are under the openstack_dashboard domain
     # so we exclude them from the js_catalog
     js_catalog = ['horizon', 'openstack_dashboard']
     regex = re.compile(r'^openstack_dashboard')
-    all_plugins = conf.HORIZON_CONFIG['plugins']
+    all_plugins = conf.HORIZON_CONFIG.get('plugins', [])
     js_catalog.extend(p for p in all_plugins if not regex.search(p))
-    context['JS_CATALOG'] = '+'.join(js_catalog)
-
-    return context
+    return '+'.join(js_catalog)

@@ -14,16 +14,16 @@
 
 import logging
 
-from django.core.urlresolvers import reverse
 from django.template import defaultfilters as filters
+from django.urls import reverse
 from django.utils.translation import pgettext_lazy
 from django.utils.translation import ugettext_lazy as _
 from django.utils.translation import ungettext_lazy
-from neutronclient.common import exceptions as q_ext
+from neutronclient.common import exceptions as neutron_exceptions
 
 from horizon import exceptions
-from horizon import messages
 from horizon import tables
+from horizon.tables import actions
 
 from openstack_dashboard import api
 from openstack_dashboard import policy
@@ -53,38 +53,26 @@ class DeleteRouter(policy.PolicyTargetMixin, tables.DeleteAction):
     redirect_url = "horizon:project:routers:index"
     policy_rules = (("network", "delete_router"),)
 
+    @actions.handle_exception_with_detail_message(
+        # normal_log_message
+        'Failed to delete router %(id)s: %(exc)s',
+        # target_exception
+        neutron_exceptions.NeutronClientException,
+        # target_log_message
+        'Unable to delete router %(id)s: %(exc)s',
+        # target_user_message
+        _('Unable to delete router %(name)s: %(exc)s'),
+        # logger_name
+        __name__)
     def delete(self, request, obj_id):
-        try:
-            # detach all interfaces before attempting to delete the router
-            search_opts = {'device_owner': 'network:router_interface',
-                           'device_id': obj_id}
-            ports = api.neutron.port_list(request, **search_opts)
-            for port in ports:
-                api.neutron.router_remove_interface(request, obj_id,
-                                                    port_id=port.id)
-            api.neutron.router_delete(request, obj_id)
-        except q_ext.NeutronClientException as e:
-            # TODO(amotoki): Revisit why Http302 needs to be raised.
-            # We have this pattern ONLY HERE.
-            # Can't we merge two except clauses?
-            LOG.info('Unable to delete router %(id)s: %(exc)s',
-                     {'id': obj_id, 'exc': e})
-            obj = self.table.get_object_by_id(obj_id)
-            name = self.table.get_object_display(obj)
-            msg = _('Unable to delete router "%s"') % name
-            messages.error(request, msg)
-            redirect = reverse(self.redirect_url)
-            raise exceptions.Http302(redirect, message=msg)
-        except Exception as e:
-            LOG.info('Unable to delete router %(id)s: %(exc)s',
-                     {'id': obj_id, 'exc': e})
-            obj = self.table.get_object_by_id(obj_id)
-            name = self.table.get_object_display(obj)
-            msg = _('Unable to delete router "%s"') % name
-            exceptions.handle(request, msg)
-
-    def allowed(self, request, router=None):
-        return True
+        # detach all interfaces before attempting to delete the router
+        search_opts = {'device_owner': 'network:router_interface',
+                       'device_id': obj_id}
+        ports = api.neutron.port_list(request, **search_opts)
+        for port in ports:
+            api.neutron.router_remove_interface(request, obj_id,
+                                                port_id=port.id)
+        api.neutron.router_delete(request, obj_id)
 
 
 class CreateRouter(tables.LinkAction):
@@ -96,10 +84,10 @@ class CreateRouter(tables.LinkAction):
     policy_rules = (("network", "create_router"),)
 
     def allowed(self, request, datum=None):
-        usages = quotas.tenant_quota_usages(request)
+        usages = quotas.tenant_quota_usages(request, targets=('router', ))
         # when Settings.OPENSTACK_NEUTRON_NETWORK['enable_quotas'] = False
-        # usages['routers'] is empty
-        if usages.get('routers', {}).get('available', 1) <= 0:
+        # usages['router'] is empty
+        if usages.get('router', {}).get('available', 1) <= 0:
             if "disabled" not in self.classes:
                 self.classes = [c for c in self.classes] + ["disabled"]
                 self.verbose_name = _("Create Router (Quota exceeded)")
@@ -159,19 +147,21 @@ class ClearGateway(policy.PolicyTargetMixin, tables.BatchAction):
     policy_rules = (("network", "update_router"),)
     action_type = "danger"
 
+    @actions.handle_exception_with_detail_message(
+        # normal_log_message
+        'Unable to clear gateway for router %(id)s: %(exc)s',
+        # target_exception
+        neutron_exceptions.Conflict,
+        # target_log_message
+        'Unable to clear gateway for router %(id)s: %(exc)s',
+        # target_user_message
+        _('Unable to clear gateway for router %(name)s. '
+          'Most possible reason is because the gateway is required '
+          'by one or more floating IPs'),
+        # logger_name
+        __name__)
     def action(self, request, obj_id):
-        obj = self.table.get_object_by_id(obj_id)
-        name = self.table.get_object_display(obj)
-        try:
-            api.neutron.router_remove_gateway(request, obj_id)
-        except Exception as e:
-            LOG.info('Unable to clear gateway for router %(id)s: %(exc)s',
-                     {'id': obj_id, 'exc': e})
-            msg = (_('Unable to clear gateway for router '
-                     '"%(name)s": "%(msg)s"')
-                   % {"name": name, "msg": e})
-            redirect = reverse(self.redirect_url)
-            exceptions.handle(request, msg, redirect=redirect)
+        api.neutron.router_remove_gateway(request, obj_id)
 
     def get_success_url(self, request):
         return reverse(self.redirect_url)
@@ -193,6 +183,13 @@ class UpdateRow(tables.Row):
 def get_external_network(router):
     if router.external_gateway_info:
         return router.external_gateway_info['network']
+    else:
+        return _("-")
+
+
+def get_availability_zones(router):
+    if 'availability_zones' in router and router.availability_zones:
+        return ', '.join(router.availability_zones)
     else:
         return _("-")
 
@@ -236,6 +233,8 @@ class RoutersTable(tables.DataTable):
     admin_state = tables.Column("admin_state",
                                 verbose_name=_("Admin State"),
                                 display_choices=ADMIN_STATE_DISPLAY_CHOICES)
+    availability_zones = tables.Column(get_availability_zones,
+                                       verbose_name=_("Availability Zones"))
 
     def __init__(self, request, data=None, needs_form_wrapper=None, **kwargs):
         super(RoutersTable, self).__init__(
@@ -247,6 +246,15 @@ class RoutersTable(tables.DataTable):
             del self.columns["distributed"]
         if not api.neutron.get_feature_permission(request, "l3-ha", "get"):
             del self.columns["ha"]
+        try:
+            if not api.neutron.is_extension_supported(
+                    request, "router_availability_zone"):
+                del self.columns["availability_zones"]
+        except Exception:
+            msg = _("Unable to check if router availability zone extension "
+                    "is supported")
+            exceptions.handle(self.request, msg)
+            del self.columns['availability_zones']
 
     def get_object_display(self, obj):
         return obj.name

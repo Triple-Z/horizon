@@ -24,11 +24,18 @@
 
 from __future__ import print_function
 
-import django
+import logging
 import os
-import subprocess
 import sys
-import warnings
+
+import django
+
+# NOTE(amotoki): Sphinx 1.6.x catches warnings from imported modules.
+# Ignore warnings from openstack_dashboard.settings in the doc build.
+# This can be dropped once Sphinx correctly ignore such warnings.
+logging.getLogger('openstack_dashboard.settings').setLevel(logging.ERROR)
+logging.getLogger('horizon.test.helpers').setLevel(logging.ERROR)
+
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(BASE_DIR, "..", ".."))
@@ -60,8 +67,14 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.todo',
               'sphinx.ext.coverage',
               'sphinx.ext.viewcode',
-              'oslosphinx',
+              'openstackdocstheme',
               ]
+
+# openstackdocstheme options
+repository_name = 'openstack/horizon'
+bug_project = 'horizon'
+bug_tag = 'documentation'
+html_last_updated_fmt = '%Y-%m-%d %H:%M'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -132,7 +145,7 @@ nitpicky = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 # html_theme_path = ['.']
-# html_theme = '_theme'
+html_theme = 'openstackdocs'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -168,14 +181,6 @@ html_static_path = []
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
 # html_last_updated_fmt = '%b %d, %Y'
-git_cmd = ["git", "log", "--pretty=format:'%ad, commit %h'", "--date=local",
-           "-n1"]
-try:
-    html_last_updated_fmt = subprocess.Popen(
-        git_cmd, stdout=subprocess.PIPE).communicate()[0]
-except Exception:
-    warnings.warn('Cannot get last updated time from git repository. '
-                  'Not setting "html_last_updated_fmt".')
 
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.
@@ -216,7 +221,6 @@ except Exception:
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'Horizondoc'
-
 
 # -- Options for LaTeX output -------------------------------------------------
 

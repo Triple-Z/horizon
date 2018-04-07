@@ -181,6 +181,7 @@
         availability_zone: null,
         admin_pass: null,
         config_drive: false,
+        description: null,
         // REQUIRED Server Key.  Null allowed.
         user_data: '',
         disk_config: 'AUTO',
@@ -200,6 +201,7 @@
         // REQUIRED for JS logic (image | snapshot | volume | volume_snapshot)
         source_type: null,
         source: [],
+        create_volume_default: true,
         // REQUIRED for JS logic
         vol_create: false,
         // May be null
@@ -250,7 +252,10 @@
         promise = $q.all([
           novaAPI.getAvailabilityZones().then(onGetAvailabilityZones)
             .finally(onGetAvailabilityZonesComplete),
-          novaAPI.getFlavors(true, true).then(onGetFlavors, noop),
+          novaAPI.getFlavors({
+            is_public: true,
+            get_extras: true
+          }).then(onGetFlavors, noop),
           novaAPI.getKeypairs().then(onGetKeypairs, noop),
           novaAPI.getLimits(true).then(onGetNovaLimits, noop),
           securityGroup.query().then(onGetSecurityGroups, noop),
@@ -287,6 +292,10 @@
       }
       if ('config_drive' in defaults) {
         model.newInstanceSpec.config_drive = defaults.config_drive;
+      }
+      if ('create_volume' in defaults) {
+        // Append "_default" to distinguish from the 'vol_create' item
+        model.newInstanceSpec.create_volume_default = defaults.create_volume;
       }
     }
 
@@ -440,9 +449,9 @@
     // Server Groups
 
     function getServerGroups() {
-      if (policy.check(stepPolicy.serverGroups)) {
-        return novaAPI.getServerGroups().then(onGetServerGroups, noop);
-      }
+      policy.ifAllowed(stepPolicy.serverGroups).then(function() {
+        novaAPI.getServerGroups().then(onGetServerGroups, noop);
+      }, noop);
     }
 
     function onGetServerGroups(data) {
@@ -466,13 +475,13 @@
     function onGetNetworks(data) {
       model.neutronEnabled = true;
       model.networks.length = 0;
-      if (data.data.items.length === 1) {
-        model.newInstanceSpec.networks.push(data.data.items[0]);
-      }
       push.apply(model.networks,
         data.data.items.filter(function(net) {
           return net.subnets.length > 0;
         }));
+      if (model.networks.length === 1) {
+        model.newInstanceSpec.networks.push(model.networks[0]);
+      }
       return data;
     }
 
@@ -506,7 +515,9 @@
         if (port.device_owner === "" && port.admin_state === "UP") {
           port.subnet_names = getPortSubnets(port, network.subnets);
           port.network_name = network.name;
-          ports.push(port);
+          if (!port.hasOwnProperty("trunk_id")) {
+            ports.push(port);
+          }
         }
       });
       push.apply(model.ports, ports);
@@ -561,6 +572,7 @@
     function addVolumeSourcesIfEnabled(config) {
       var volumeDeferred = $q.defer();
       var volumeSnapshotDeferred = $q.defer();
+      var absoluteLimitsDeferred = $q.defer();
       serviceCatalog
         .ifTypeEnabled('volumev2')
         .then(onVolumeServiceEnabled, onCheckVolumeV3);
@@ -576,8 +588,10 @@
           .then(onBootToVolumeSupported);
         if (!config || !config.disable_volume) {
           getVolumes().then(resolveVolumes, failVolumes);
+          getAbsoluteLimits().then(resolveAbsoluteLimitsDeferred, resolveAbsoluteLimitsDeferred);
         } else {
           resolveVolumes();
+          resolveAbsoluteLimitsDeferred();
         }
         if (!config || !config.disable_volume_snapshot) {
           getVolumeSnapshots().then(resolveVolumeSnapshots, failVolumeSnapshots);
@@ -592,6 +606,9 @@
         return cinderAPI.getVolumes({status: 'available', bootable: 1})
           .then(onGetVolumes);
       }
+      function getAbsoluteLimits() {
+        return cinderAPI.getAbsoluteLimits().then(onGetCinderLimits);
+      }
       function getVolumeSnapshots() {
         return cinderAPI.getVolumeSnapshots({status: 'available'})
           .then(onGetVolumeSnapshots);
@@ -599,6 +616,7 @@
       function resolvePromises() {
         volumeDeferred.resolve();
         volumeSnapshotDeferred.resolve();
+        absoluteLimitsDeferred.resolve();
       }
       function resolveVolumes() {
         volumeDeferred.resolve();
@@ -612,10 +630,14 @@
       function failVolumeSnapshots() {
         volumeSnapshotDeferred.resolve();
       }
+      function resolveAbsoluteLimitsDeferred() {
+        absoluteLimitsDeferred.resolve();
+      }
       return $q.all(
         [
           volumeDeferred.promise,
-          volumeSnapshotDeferred.promise
+          volumeSnapshotDeferred.promise,
+          absoluteLimitsDeferred.promise
         ]);
     }
 
@@ -670,6 +692,9 @@
         model.allowedBootSources.push({
           type: type,
           label: label
+        });
+        model.allowedBootSources.sort(function(a, b) {
+          return a.type > b.type;
         });
       }
     }
@@ -738,6 +763,12 @@
 
       // Source ID must be empty for API
       finalSpec.source_id = '';
+    }
+
+    // Cinder Limits
+
+    function onGetCinderLimits(response) {
+      model.cinderLimits = response.data;
     }
 
     // Nova Limits

@@ -16,8 +16,8 @@
 Views for managing Neutron Networks.
 """
 from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse
+from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
 from horizon import exceptions
@@ -138,6 +138,10 @@ class DetailView(tabs.TabbedTableView):
             exceptions.handle(self.request, msg,
                               redirect=self.get_redirect_url())
         return network
+
+    def get_subnets_data(self):
+        # MultiTableMixin requires this method to be defined
+        pass
 
     def get_context_data(self, **kwargs):
         context = super(DetailView, self).get_context_data(**kwargs)

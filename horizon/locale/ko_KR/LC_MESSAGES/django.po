@@ -1,35 +1,22 @@
 # Sungjin Kang <gang.sungjin@gmail.com>, 2015. #zanata
-# Andrea Young Oak Li <youli@redhat.com>, 2016. #zanata
-# Eunseop Shin <kairos9603@khu.ac.kr>, 2016. #zanata
-# Ian Y. Choi <ianyrchoi@gmail.com>, 2016. #zanata
 # Sungjin Kang <gang.sungjin@gmail.com>, 2016. #zanata
-# skywalker54 <shpark@rockplace.co.kr>, 2016. #zanata
+# ByungYeol Woo <wby1089@gmail.com>, 2017. #zanata
 # Sungjin Kang <gang.sungjin@gmail.com>, 2017. #zanata
+# Ian Y. Choi <ianyrchoi@gmail.com>, 2018. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: horizon 12.0.0.0b2.dev85\n"
+"Project-Id-Version: horizon VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2017-05-05 01:36+0000\n"
+"POT-Creation-Date: 2018-03-01 14:57+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2017-02-02 08:15+0000\n"
-"Last-Translator: Sungjin Kang <gang.sungjin@gmail.com>\n"
+"PO-Revision-Date: 2018-02-07 02:13+0000\n"
+"Last-Translator: Ian Y. Choi <ianyrchoi@gmail.com>\n"
 "Language-Team: Korean (South Korea)\n"
-"Language: ko-KR\n"
-"X-Generator: Zanata 3.9.6\n"
+"Language: ko_KR\n"
+"X-Generator: Zanata 4.3.3\n"
 "Plural-Forms: nplurals=1; plural=0\n"
-
-#, python-format
-msgid ""
-"\n"
-"            Displaying %(counter)s item"
-msgid_plural ""
-"\n"
-"            Displaying %(counter)s items"
-msgstr[0] ""
-"\n"
-"%(counter)s 항목 표시"
 
 #, python-format
 msgid "%(action)s: %(objs)s"
@@ -47,6 +34,18 @@ msgstr "%(name)s: %(error)s"
 msgid "%(size)d Byte"
 msgid_plural "%(size)d Bytes"
 msgstr[0] "%(size)d 바이트"
+
+#, python-format
+msgid "%(usedphrase)s <span> %(used)s </span>(No Limit)"
+msgstr "%(usedphrase)s <span> %(used)s </span>(제한 없음)"
+
+#, python-format
+msgid "%(usedphrase)s <span> %(used)s </span>of<span> %(available)s </span>"
+msgstr "%(usedphrase)s <span> %(used)s </span>of<span> %(available)s </span>"
+
+#, python-format
+msgid "%s EB"
+msgstr "%s EB"
 
 #, python-format
 msgid "%s GB"
@@ -69,6 +68,14 @@ msgid "%s TB"
 msgstr "%s TB"
 
 #, python-format
+msgid "%s YB"
+msgstr "%s YB"
+
+#, python-format
+msgid "%s ZB"
+msgstr "%s ZB"
+
+#, python-format
 msgid "%s completed successfully."
 msgstr "%s가 성공적으로 완료되었습니다."
 
@@ -87,14 +94,6 @@ msgstr "-"
 
 msgid "0 Bytes"
 msgstr "0 Bytes"
-
-#, python-format
-msgid "<label>From:</label> %(start)s"
-msgstr "<label>보낸 사람:</label> %(start)s"
-
-#, python-format
-msgid "<label>To:</label>%(end)s"
-msgstr "<label>받는 사람:</label>%(end)s"
 
 #, python-format
 msgid "A %(resource)s with the name \"%(name)s\" already exists."
@@ -143,6 +142,11 @@ msgid_plural "Displaying %(content_items)s items"
 msgstr[0] "%(content_items)s 항목 표시"
 
 #, python-format
+msgid "Displaying %(counter)s item"
+msgid_plural "Displaying %(counter)s items"
+msgstr[0] "%(counter)s 항목 표시"
+
+#, python-format
 msgid "Displaying %(nav_items)s item"
 msgid_plural "Displaying %(nav_items)s items"
 msgstr[0] "%(nav_items)s 항목 표시"
@@ -181,12 +185,22 @@ msgstr "사용하는  인증 방법을 모르는경우, 관리자에게 문의�
 msgid "Incorrect format for IP address"
 msgstr "IP 주소 형식이 잘못되었습니다."
 
+msgid "Infinity"
+msgstr "무한"
+
 msgid "Info: "
 msgstr "정보:"
+
+msgid "Invalid MAC Address format"
+msgstr "잘못된 MAC Address 형식"
 
 msgid "Invalid metadata entry. Use comma-separated key=value pairs"
 msgstr ""
 "올바르지 않은 메타데이터 항목. 콤마로 구분된 key=value 페어를 사용하세요."
+
+#, python-format
+msgid "Invalid service catalog: %s"
+msgstr "올바르지 않은 서비스 카탈로그: %s"
 
 msgid "Invalid subnet mask"
 msgstr "서브넷 마스크가 잘못되었습니다."
@@ -380,14 +394,6 @@ msgstr[0] "항목 위로 옮김"
 msgid "Usage Summary"
 msgstr "사용량 요약"
 
-#, python-format
-msgid "Used <span> %(used)s </span>(No Limit)"
-msgstr "<span> %(used)s </span> 사용함 (제한 없음)"
-
-#, python-format
-msgid "Used <span> %(used)s </span>of<span> %(available)s </span>"
-msgstr "<span> %(available)s </span> 중 <span> %(used)s </span> 사용함"
-
 msgid "Warning: "
 msgstr "경고:"
 
@@ -399,8 +405,14 @@ msgstr "%(action)s 이(가) 허용되지 않았습니다: %(objs)s "
 msgid "You are not authorized to access %s"
 msgstr "%s 에 접근 권한이 없습니다. "
 
+msgid "You are not authorized to access this page"
+msgstr "이 페이지로의 접근이 인가되지 않았습니다."
+
 msgid "You do not have permission to access the resource:"
 msgstr "당신은 리소스에 접근할 권한이 없습니다.:"
 
 msgid "You have selected: [[selection]]. "
 msgstr "다음을 선택하였습니다: [[selection]]."
+
+msgid "to"
+msgstr "에서"

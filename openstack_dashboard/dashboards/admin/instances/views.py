@@ -17,11 +17,9 @@
 #    License for the specific language governing permissions and limitations
 #    under the License.
 
-import futurist
-
 from django.conf import settings
-from django.core.urlresolvers import reverse
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse
+from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 
 from horizon import exceptions
@@ -39,6 +37,7 @@ from openstack_dashboard.dashboards.admin.instances import tabs
 from openstack_dashboard.dashboards.project.instances import views
 from openstack_dashboard.dashboards.project.instances.workflows \
     import update_instance
+from openstack_dashboard.utils import futurist_utils
 
 
 # re-use console from project.instances.views to make reflection work
@@ -61,9 +60,9 @@ def rdp(args, **kvargs):
     return views.rdp(args, **kvargs)
 
 
-# re-use get_resource_id_by_name from project.instances.views
-def swap_filter(resources, filters, fake_field, real_field):
-    return views.swap_filter(resources, filters, fake_field, real_field)
+# re-use mks from project.instances.views to make reflection work
+def mks(args, **kvargs):
+    return views.mks(args, **kvargs)
 
 
 class AdminUpdateView(views.UpdateView):
@@ -81,17 +80,56 @@ class AdminIndexView(tables.DataTableView):
     def needs_filter_first(self, table):
         return self._needs_filter_first
 
+    def _get_tenants(self):
+        # Gather our tenants to correlate against IDs
+        try:
+            tenants, __ = api.keystone.tenant_list(self.request)
+            return dict([(t.id, t) for t in tenants])
+        except Exception:
+            msg = _('Unable to retrieve instance project information.')
+            exceptions.handle(self.request, msg)
+            return {}
+
+    def _get_images(self):
+        # Gather our images to correlate againts IDs
+        try:
+            images, __, __ = api.glance.image_list_detailed(self.request)
+            return dict([(image.id, image) for image in images])
+        except Exception:
+            msg = _("Unable to retrieve image list.")
+            exceptions.handle(self.request, msg)
+            return {}
+
+    def _get_flavors(self):
+        # Gather our flavors to correlate against IDs
+        try:
+            flavors = api.nova.flavor_list(self.request)
+            return dict([(str(flavor.id), flavor) for flavor in flavors])
+        except Exception:
+            msg = _("Unable to retrieve flavor list.")
+            exceptions.handle(self.request, msg)
+            return {}
+
+    def _get_instances(self, search_opts):
+        try:
+            instances, self._more = api.nova.server_list(
+                self.request,
+                search_opts=search_opts)
+        except Exception:
+            self._more = False
+            instances = []
+            exceptions.handle(self.request,
+                              _('Unable to retrieve instance list.'))
+        return instances
+
     def get_data(self):
         instances = []
-        tenants = []
-        tenant_dict = {}
-        images = []
-        flavors = []
-        full_flavors = {}
 
         marker = self.request.GET.get(
             project_tables.AdminInstancesTable._meta.pagination_param, None)
-        default_search_opts = {'marker': marker, 'paginate': True}
+        default_search_opts = {'marker': marker,
+                               'paginate': True,
+                               'all_tenants': True}
 
         search_opts = self.get_filters(default_search_opts.copy())
 
@@ -99,101 +137,47 @@ class AdminIndexView(tables.DataTableView):
         # selected, then search criteria must be provided and return an empty
         # list
         filter_first = getattr(settings, 'FILTER_DATA_FIRST', {})
-        if filter_first.get('admin.instances', False) and \
-                len(search_opts) == len(default_search_opts):
+        if (filter_first.get('admin.instances', False) and
+                len(search_opts) == len(default_search_opts)):
             self._needs_filter_first = True
             self._more = False
-            return instances
+            return []
 
         self._needs_filter_first = False
 
-        def _task_get_tenants():
-            # Gather our tenants to correlate against IDs
-            try:
-                tmp_tenants, __ = api.keystone.tenant_list(self.request)
-                tenants.extend(tmp_tenants)
-                tenant_dict.update([(t.id, t) for t in tenants])
-            except Exception:
-                msg = _('Unable to retrieve instance project information.')
-                exceptions.handle(self.request, msg)
+        results = futurist_utils.call_functions_parallel(
+            self._get_images, self._get_flavors, self._get_tenants)
+        image_dict, flavor_dict, tenant_dict = results
 
-        def _task_get_images():
-            # Gather our images to correlate againts IDs
-            try:
-                tmp_images = api.glance.image_list_detailed(self.request)[0]
-                images.extend(tmp_images)
-            except Exception:
-                msg = _("Unable to retrieve image list.")
-                exceptions.handle(self.request, msg)
+        non_api_filter_info = (
+            ('project', 'tenant_id', tenant_dict.values()),
+            ('image_name', 'image', image_dict.values()),
+            ('flavor_name', 'flavor', flavor_dict.values()),
+        )
+        if not views.process_non_api_filters(search_opts, non_api_filter_info):
+            self._more = False
+            return []
 
-        def _task_get_flavors():
-            # Gather our flavors to correlate against IDs
-            try:
-                tmp_flavors = api.nova.flavor_list(self.request)
-                flavors.extend(tmp_flavors)
-                full_flavors.update([(str(flavor.id), flavor)
-                                     for flavor in flavors])
-            except Exception:
-                msg = _("Unable to retrieve flavor list.")
-                exceptions.handle(self.request, msg)
+        instances = self._get_instances(search_opts)
 
-        def _task_get_instances():
-            try:
-                tmp_instances, self._more = api.nova.server_list(
-                    self.request,
-                    search_opts=search_opts,
-                    all_tenants=True)
-                instances.extend(tmp_instances)
-            except Exception:
-                self._more = False
-                exceptions.handle(self.request,
-                                  _('Unable to retrieve instance list.'))
-                # In case of exception when calling nova.server_list
-                # don't call api.network
-                return
-
-            try:
-                api.network.servers_update_addresses(self.request, instances,
-                                                     all_tenants=True)
-            except Exception:
-                exceptions.handle(
-                    self.request,
-                    message=_('Unable to retrieve IP addresses from Neutron.'),
-                    ignore=True)
-
-        with futurist.ThreadPoolExecutor(max_workers=4) as e:
-            e.submit(fn=_task_get_tenants)
-            e.submit(fn=_task_get_images)
-            e.submit(fn=_task_get_flavors)
-            e.submit(fn=_task_get_instances)
-
-        # This code gets activated only in case of filtering by nonexistent
-        # project, image or flavor. Executing it before _task_get_instances
-        # would make Horizon make less API calls, but as a drawback would make
-        # it impossible to parallelize the request. Executing it after is
-        # a tradeoff, as it happens less often to filter by nonexistent values.
-
-        if 'project' in search_opts and \
-                not swap_filter(tenants, search_opts, 'project', 'tenant_id'):
-                self._more = False
-                return instances
-        elif 'image_name' in search_opts and \
-                not swap_filter(images, search_opts, 'image_name', 'image'):
-                self._more = False
-                return instances
-        elif "flavor_name" in search_opts and \
-                not swap_filter(flavors, search_opts, 'flavor_name', 'flavor'):
-                self._more = False
-                return instances
-
-        # Loop through instances to get flavor and tenant info.
+        # Loop through instances to get image, flavor and tenant info.
         for inst in instances:
+            if hasattr(inst, 'image') and isinstance(inst.image, dict):
+                image_id = inst.image.get('id')
+                if image_id in image_dict:
+                    inst.image = image_dict[image_id]
+                # In case image not found in image_map, set name to empty
+                # to avoid fallback API call to Glance in api/nova.py
+                # until the call is deprecated in api itself
+                else:
+                    inst.image['name'] = _("-")
+
             flavor_id = inst.flavor["id"]
             try:
-                if flavor_id in full_flavors:
-                    inst.full_flavor = full_flavors[flavor_id]
+                if flavor_id in flavor_dict:
+                    inst.full_flavor = flavor_dict[flavor_id]
                 else:
-                    # If the flavor_id is not in full_flavors list,
+                    # If the flavor_id is not in flavor_dict list,
                     # gets it via nova api.
                     inst.full_flavor = api.nova.flavor_get(
                         self.request, flavor_id)
@@ -221,7 +205,9 @@ class LiveMigrateView(forms.ModalFormView):
     @memoized.memoized_method
     def get_hosts(self, *args, **kwargs):
         try:
-            return api.nova.host_list(self.request)
+            services = api.nova.service_list(self.request,
+                                             binary='nova-compute')
+            return [s.host for s in services]
         except Exception:
             redirect = reverse("horizon:admin:instances:index")
             msg = _('Unable to retrieve host information.')

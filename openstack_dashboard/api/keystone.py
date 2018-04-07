@@ -158,7 +158,7 @@ def keystoneclient(request, admin=False):
     user = request.user
     token_id = user.token.id
 
-    if is_multi_domain_enabled:
+    if is_multi_domain_enabled():
         # Cloud Admin, Domain Admin or Mixed Domain Admin
         if is_domain_admin(request):
             domain_token = request.session.get('domain_token')
@@ -172,7 +172,7 @@ def keystoneclient(request, admin=False):
     else:
         endpoint_type = getattr(settings,
                                 'OPENSTACK_ENDPOINT_TYPE',
-                                'internalURL')
+                                'publicURL')
 
     # Take care of client connection caching/fetching a new client.
     # Admin vs. non-admin clients are cached separately for token matching.
@@ -216,7 +216,7 @@ def domain_get(request, domain_id):
 @profiler.trace
 def domain_delete(request, domain_id):
     manager = keystoneclient(request, admin=True).domains
-    return manager.delete(domain_id)
+    manager.delete(domain_id)
 
 
 @profiler.trace
@@ -311,8 +311,9 @@ def get_default_domain(request, get_name=True):
 
 
 def get_effective_domain_id(request):
-    """Gets the id of the default domain to use when creating Identity
-    objects. If the requests default domain is the same as DEFAULT_DOMAIN,
+    """Gets the id of the default domain.
+
+    If the requests default domain is the same as DEFAULT_DOMAIN,
     return None.
     """
     default_domain = get_default_domain(request)
@@ -337,13 +338,17 @@ def is_domain_admin(request):
 @profiler.trace
 def tenant_get(request, project, admin=True):
     manager = VERSIONS.get_project_manager(request, admin=admin)
-    return manager.get(project)
+    try:
+        return manager.get(project)
+    except keystone_exceptions.NotFound:
+        LOG.info("Tenant '%s' not found.", project)
+        raise
 
 
 @profiler.trace
 def tenant_delete(request, project):
     manager = VERSIONS.get_project_manager(request, admin=True)
-    return manager.delete(project)
+    manager.delete(project)
 
 
 @profiler.trace
@@ -446,7 +451,7 @@ def user_create(request, name=None, email=None, password=None, project=None,
 
 @profiler.trace
 def user_delete(request, user_id):
-    return keystoneclient(request, admin=True).users.delete(user_id)
+    keystoneclient(request, admin=True).users.delete(user_id)
 
 
 @profiler.trace
@@ -508,9 +513,9 @@ def user_update(request, user, **data):
 def user_update_enabled(request, user, enabled):
     manager = keystoneclient(request, admin=True).users
     if VERSIONS.active < 3:
-        return manager.update_enabled(user, enabled)
+        manager.update_enabled(user, enabled)
     else:
-        return manager.update(user, enabled=enabled)
+        manager.update(user, enabled=enabled)
 
 
 @profiler.trace
@@ -522,9 +527,9 @@ def user_update_password(request, user, password, admin=True):
 
     manager = keystoneclient(request, admin=admin).users
     if VERSIONS.active < 3:
-        return manager.update_password(user, password)
+        manager.update_password(user, password)
     else:
-        return manager.update(user, password=password)
+        manager.update(user, password=password)
 
 
 def user_verify_admin_password(request, admin_password):
@@ -532,7 +537,7 @@ def user_verify_admin_password(request, admin_password):
     # verify if it's correct.
     client = keystone_client_v2 if VERSIONS.active < 3 else keystone_client_v3
     try:
-        endpoint = _get_endpoint_url(request, 'internalURL')
+        endpoint = _get_endpoint_url(request, 'publicURL')
         insecure = getattr(settings, 'OPENSTACK_SSL_NO_VERIFY', False)
         cacert = getattr(settings, 'OPENSTACK_SSL_CACERT', None)
         client.Client(
@@ -667,7 +672,7 @@ def get_project_groups_roles(request, project):
 @profiler.trace
 def role_assignments_list(request, project=None, user=None, role=None,
                           group=None, domain=None, effective=False,
-                          include_subtree=True):
+                          include_subtree=True, include_names=False):
     if VERSIONS.active < 3:
         raise exceptions.NotAvailable
 
@@ -678,7 +683,8 @@ def role_assignments_list(request, project=None, user=None, role=None,
 
     return manager.list(project=project, user=user, role=role, group=group,
                         domain=domain, effective=effective,
-                        include_subtree=include_subtree)
+                        include_subtree=include_subtree,
+                        include_names=include_names)
 
 
 @profiler.trace
@@ -702,7 +708,7 @@ def role_update(request, role_id, name=None):
 @profiler.trace
 def role_delete(request, role_id):
     manager = keystoneclient(request, admin=True).roles
-    return manager.delete(role_id)
+    manager.delete(role_id)
 
 
 @profiler.trace
@@ -800,10 +806,10 @@ def add_tenant_user_role(request, project=None, user=None, role=None,
     """Adds a role for a user on a tenant."""
     manager = keystoneclient(request, admin=True).roles
     if VERSIONS.active < 3:
-        return manager.add_user_role(user, role, project)
+        manager.add_user_role(user, role, project)
     else:
-        return manager.grant(role, user=user, project=project,
-                             group=group, domain=domain)
+        manager.grant(role, user=user, project=project,
+                      group=group, domain=domain)
 
 
 @profiler.trace

@@ -13,15 +13,21 @@
 #    under the License.
 
 from collections import OrderedDict
+import logging
+import operator
 import sys
 
 import six
 
+from django.conf import settings
 from django.template.loader import render_to_string
 from django.template import TemplateSyntaxError
+from django.utils import module_loading
 
 from horizon import exceptions
 from horizon.utils import html
+
+LOG = logging.getLogger(__name__)
 
 SEPARATOR = "__"
 CSS_TAB_GROUP_CLASSES = ["nav", "nav-tabs", "ajax-tabs"]
@@ -30,12 +36,16 @@ CSS_DISABLED_TAB_CLASSES = ["disabled"]
 
 
 class TabGroup(html.HTMLElement):
-    """A container class which knows how to manage and render
-    :class:`~horizon.tabs.Tab` objects.
+    """A container class which knows how to manage and render Tab objects.
 
     .. attribute:: slug
 
         The URL slug and pseudo-unique identifier for this tab group.
+
+    .. attribute:: tabs
+
+       A list of :class:`.Tab` classes. Tabs specified here are displayed
+       in the order of the list.
 
     .. attribute:: template_name
 
@@ -105,14 +115,54 @@ class TabGroup(html.HTMLElement):
         self.request = request
         self.kwargs = kwargs
         self._data = None
-        tab_instances = []
-        for tab in self.tabs:
-            tab_instances.append((tab.slug, tab(self, request)))
-        self._tabs = OrderedDict(tab_instances)
+        self._tabs = self._load_tabs(request)
         if self.sticky:
             self.attrs['data-sticky-tabs'] = 'sticky'
         if not self._set_active_tab():
             self.tabs_not_available()
+
+    def _load_tabs(self, request):
+        tabs = tuple(self.tabs)
+        tabs += self._load_tabs_from_config()
+        return OrderedDict([(tab.slug, tab(self, request))
+                            for tab in tabs])
+
+    def _load_tabs_from_config(self):
+        my_name = '.'.join([self.__class__.__module__,
+                            self.__class__.__name__])
+        horizon_config = settings.HORIZON_CONFIG.get('extra_tabs', {})
+        tabs_config = [self._load_tab_config(tab_config, my_name)
+                       for tab_config in horizon_config.get(my_name, [])]
+        tabs_config = [t for t in tabs_config if t]
+        tabs_config.sort(key=operator.itemgetter(0))
+        LOG.debug('Loaded extra tabs for %s: %s',
+                  my_name, tabs_config)
+        return tuple(x[1] for x in tabs_config)
+
+    @staticmethod
+    def _load_tab_config(tab_config, my_name):
+        if isinstance(tab_config, str):
+            tab_config = (0, tab_config)
+        if not isinstance(tab_config, (tuple, list)):
+            LOG.error('Extra tab definition must be a string or '
+                      'a tuple/list (tab group "%s")', my_name)
+            return
+        if len(tab_config) != 2:
+            LOG.error('Entry must be a format of (priority, tab class) '
+                      '(tab group "%s")', my_name)
+            return
+        priority, tab_class = tab_config
+        if not isinstance(priority, int):
+            LOG.error('Priority of tab entry must be an integer '
+                      '(tab group "%s")', my_name)
+            return
+        try:
+            class_ = module_loading.import_string(tab_class)
+        except ImportError:
+            LOG.error('Tab class "%s" is not found (tab group "%s")',
+                      tab_class, my_name)
+            return
+        return priority, class_
 
     def __repr__(self):
         return "<%s: %s>" % (self.__class__.__name__, self.slug)
@@ -128,21 +178,26 @@ class TabGroup(html.HTMLElement):
                     exceptions.handle(self.request)
 
     def get_id(self):
-        """Returns the id for this tab group. Defaults to the value of the tab
+        """Returns the id for this tab group.
+
+        Defaults to the value of the tab
         group's :attr:`horizon.tabs.Tab.slug`.
         """
         return self.slug
 
     def get_default_classes(self):
-        """Returns a list of the default classes for the tab group. Defaults to
-        ``["nav", "nav-tabs", "ajax-tabs"]``.
+        """Returns a list of the default classes for the tab group.
+
+        Defaults to ``["nav", "nav-tabs", "ajax-tabs"]``.
         """
         default_classes = super(TabGroup, self).get_default_classes()
         default_classes.extend(CSS_TAB_GROUP_CLASSES)
         return default_classes
 
     def tabs_not_available(self):
-        """In the event that no tabs are either allowed or enabled, this method
+        """The fallback handler if no tabs are either allowed or enabled.
+
+        In the event that no tabs are either allowed or enabled, this method
         is the fallback handler. By default it's a no-op, but it exists
         to make redirecting or raising exceptions possible for subclasses.
         """
@@ -214,8 +269,7 @@ class TabGroup(html.HTMLElement):
 
 
 class Tab(html.HTMLElement):
-    """A reusable interface for constructing a tab within a
-    :class:`~horizon.tabs.TabGroup`.
+    """A reusable interface for constructing a tab within a TabGroup.
 
     .. attribute:: name
 
@@ -301,9 +355,10 @@ class Tab(html.HTMLElement):
         return getattr(self, "_data", None) is not None
 
     def render(self):
-        """Renders the tab to HTML using the
+        """Renders the tab to HTML.
+
         :meth:`~horizon.tabs.Tab.get_context_data` method and
-        the :meth:`~horizon.tabs.Tab.get_template_name` method.
+        the :meth:`~horizon.tabs.Tab.get_template_name` method are called.
 
         If :attr:`~horizon.tabs.Tab.preload` is ``False`` and ``force_load``
         is not ``True``, or
@@ -323,8 +378,9 @@ class Tab(html.HTMLElement):
         return render_to_string(self.get_template_name(self.request), context)
 
     def get_id(self):
-        """Returns the id for this tab. Defaults to
-        ``"{{ tab_group.slug }}__{{ tab.slug }}"``.
+        """Returns the id for this tab.
+
+        Defaults to ``"{{ tab_group.slug }}__{{ tab.slug }}"``.
         """
         return SEPARATOR.join([self.tab_group.slug, self.slug])
 
@@ -332,9 +388,10 @@ class Tab(html.HTMLElement):
         return "=".join((self.tab_group.param_name, self.get_id()))
 
     def get_default_classes(self):
-        """Returns a list of the default classes for the tab. Defaults to
-        and empty list (``[]``), however additional classes may be added
-        depending on the state of the tab as follows:
+        """Returns a list of the default classes for the tab.
+
+        Defaults to and empty list (``[]``), however additional classes may
+        be added depending on the state of the tab as follows:
 
         If the tab is the active tab for the tab group, in which
         the class ``"active"`` will be added.
@@ -362,14 +419,17 @@ class Tab(html.HTMLElement):
         return self.template_name
 
     def get_context_data(self, request, **kwargs):
-        """This method should return a dictionary of context data used to
-        render the tab. Required.
+        """Return a dictionary of context data used to render the tab.
+
+        Required.
         """
         return kwargs
 
     def enabled(self, request):
-        """Determines whether or not the tab should be accessible
-        (e.g. be rendered into the HTML on load and respond to a click event).
+        """Determines whether or not the tab should be accessible.
+
+        For example, the tab should be rendered into the HTML
+        on load and respond to a click event.
 
         If a tab returns ``False`` from ``enabled`` it will ignore the value
         of ``preload`` and only render the HTML of the tab after being clicked.
@@ -400,8 +460,7 @@ class Tab(html.HTMLElement):
 
 
 class TableTab(Tab):
-    """A :class:`~horizon.tabs.Tab` class which knows how to deal with
-    :class:`~horizon.tables.DataTable` classes rendered inside of it.
+    """A Tab class which knows how to deal with DataTable classes inside of it.
 
     This distinct class is required due to the complexity involved in handling
     both dynamic tab loading, dynamic table updating and table actions all
@@ -432,8 +491,9 @@ class TableTab(Tab):
         self._table_data_loaded = False
 
     def load_table_data(self):
-        """Calls the ``get_{{ table_name }}_data`` methods for each table class
-        and sets the data on the tables.
+        """Calls the ``get_{{ table_name }}_data`` methods for each table class.
+
+        When returning, the loaded data is set on the tables.
         """
         # We only want the data to be loaded once, so we track if we have...
         if not self._table_data_loaded:
@@ -456,8 +516,10 @@ class TableTab(Tab):
             self._table_data_loaded = True
 
     def get_context_data(self, request, **kwargs):
-        """Adds a ``{{ table_name }}_table`` item to the context for each table
-        in the :attr:`~horizon.tabs.TableTab.table_classes` attribute.
+        """Adds a ``{{ table_name }}_table`` item to the context for each table.
+
+        The target tables are specified by
+        the :attr:`~horizon.tabs.TableTab.table_classes` attribute.
 
         If only one table class is provided, a shortcut ``table`` context
         variable is also added containing the single table.

@@ -13,8 +13,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""API for the network abstraction APIs.
-"""
+"""API for the network abstraction APIs."""
 
 from django.views import generic
 
@@ -42,15 +41,14 @@ class SecurityGroups(generic.View):
         http://localhost/api/network/securitygroups
         """
 
-        security_groups = api.network.security_group_list(request)
+        security_groups = api.neutron.security_group_list(request)
 
         return {'items': [sg.to_dict() for sg in security_groups]}
 
 
 @urls.register
 class FloatingIP(generic.View):
-    """API for a single floating IP address.
-    """
+    """API for a single floating IP address."""
     url_regex = r'network/floatingip/$'
 
     @rest_utils.ajax(data_required=True)
@@ -63,7 +61,7 @@ class FloatingIP(generic.View):
         :return: JSON representation of the new floating IP address
         """
         pool = request.DATA['pool_id']
-        result = api.network.tenant_floating_ip_allocate(request, pool)
+        result = api.neutron.tenant_floating_ip_allocate(request, pool)
         return result.to_dict()
 
     @rest_utils.ajax(data_required=True)
@@ -77,15 +75,14 @@ class FloatingIP(generic.View):
         address = request.DATA['address_id']
         port = request.DATA.get('port_id')
         if port is None:
-            api.network.floating_ip_disassociate(request, address)
+            api.neutron.floating_ip_disassociate(request, address)
         else:
-            api.network.floating_ip_associate(request, address, port)
+            api.neutron.floating_ip_associate(request, address, port)
 
 
 @urls.register
 class FloatingIPs(generic.View):
-    """API for floating IP addresses.
-    """
+    """API for floating IP addresses."""
     url_regex = r'network/floatingips/$'
 
     @rest_utils.ajax()
@@ -98,14 +95,13 @@ class FloatingIPs(generic.View):
         Example:
         http://localhost/api/network/floatingips
         """
-        result = api.network.tenant_floating_ip_list(request)
+        result = api.neutron.tenant_floating_ip_list(request)
         return {'items': [ip.to_dict() for ip in result]}
 
 
 @urls.register
 class FloatingIPPools(generic.View):
-    """API for floating IP pools.
-    """
+    """API for floating IP pools."""
     url_regex = r'network/floatingippools/$'
 
     @rest_utils.ajax()
@@ -118,5 +114,5 @@ class FloatingIPPools(generic.View):
         Example:
         http://localhost/api/network/floatingippools
         """
-        result = api.network.floating_ip_pools_list(request)
+        result = api.neutron.floating_ip_pools_list(request)
         return {'items': [p.to_dict() for p in result]}

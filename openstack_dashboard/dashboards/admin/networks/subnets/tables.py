@@ -14,10 +14,9 @@
 
 import logging
 
-from django.core.urlresolvers import reverse
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse
+from django.urls import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
-from django.utils.translation import ungettext_lazy
 
 from horizon import exceptions
 from horizon import tables
@@ -28,40 +27,9 @@ from openstack_dashboard.dashboards.project.networks.subnets \
     import tables as proj_tables
 from openstack_dashboard.dashboards.project.networks.subnets.tabs \
     import SubnetsTab as project_tabs_subnets_tab
+from openstack_dashboard.usage import quotas
 
 LOG = logging.getLogger(__name__)
-
-
-class DeleteSubnet(proj_tables.SubnetPolicyTargetMixin, tables.DeleteAction):
-    @staticmethod
-    def action_present(count):
-        return ungettext_lazy(
-            u"Delete Subnet",
-            u"Delete Subnets",
-            count
-        )
-
-    @staticmethod
-    def action_past(count):
-        return ungettext_lazy(
-            u"Deleted Subnet",
-            u"Deleted Subnets",
-            count
-        )
-
-    policy_rules = (("network", "delete_subnet"),)
-
-    def delete(self, request, obj_id):
-        try:
-            api.neutron.subnet_delete(request, obj_id)
-        except Exception as e:
-            LOG.info('Failed to delete subnet %(id)s: %(exc)s',
-                     {'id': obj_id, 'exc': e})
-            msg = _('Failed to delete subnet %s') % obj_id
-            network_id = self.table.kwargs['network_id']
-            redirect = reverse('horizon:admin:networks:detail',
-                               args=[network_id])
-            exceptions.handle(request, msg, redirect=redirect)
 
 
 class CreateSubnet(proj_tables.SubnetPolicyTargetMixin, tables.LinkAction):
@@ -75,6 +43,23 @@ class CreateSubnet(proj_tables.SubnetPolicyTargetMixin, tables.LinkAction):
     def get_link_url(self, datum=None):
         network_id = self.table.kwargs['network_id']
         return reverse(self.url, args=(network_id,))
+
+    def allowed(self, request, datum=None):
+        network = self.table._get_network()
+        usages = quotas.tenant_quota_usages(
+            request, tenant_id=network.tenant_id, targets=('subnet', ))
+
+        # when Settings.OPENSTACK_NEUTRON_NETWORK['enable_quotas'] = False
+        # usages["subnet'] is empty
+        if usages.get('subnet', {}).get('available', 1) <= 0:
+            if 'disabled' not in self.classes:
+                self.classes = [c for c in self.classes] + ['disabled']
+                self.verbose_name = _('Create Subnet (Quota exceeded)')
+        else:
+            self.verbose_name = _('Create Subnet')
+            self.classes = [c for c in self.classes if c != 'disabled']
+
+        return True
 
 
 class UpdateSubnet(proj_tables.SubnetPolicyTargetMixin, tables.LinkAction):
@@ -131,8 +116,9 @@ class SubnetsTable(tables.DataTable):
     class Meta(object):
         name = "subnets"
         verbose_name = _("Subnets")
-        table_actions = (CreateSubnet, DeleteSubnet, tables.FilterAction,)
-        row_actions = (UpdateSubnet, DeleteSubnet,)
+        table_actions = (CreateSubnet, proj_tables.DeleteSubnet,
+                         tables.FilterAction,)
+        row_actions = (UpdateSubnet, proj_tables.DeleteSubnet,)
         hidden_title = False
 
     def __init__(self, request, data=None, needs_form_wrapper=None, **kwargs):

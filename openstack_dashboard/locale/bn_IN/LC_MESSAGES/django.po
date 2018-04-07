@@ -1,17 +1,17 @@
 # OpenStack Infra <zanata@openstack.org>, 2015. #zanata
 msgid ""
 msgstr ""
-"Project-Id-Version: horizon 12.0.0.0b2.dev114\n"
+"Project-Id-Version: horizon VERSION\n"
 "Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
-"POT-Creation-Date: 2017-05-17 20:57+0000\n"
+"POT-Creation-Date: 2018-03-29 05:31+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "PO-Revision-Date: 2015-09-09 04:28+0000\n"
 "Last-Translator: Copied by Zanata <copied-by-zanata@zanata.org>\n"
 "Language-Team: Bengali (India)\n"
-"Language: bn-IN\n"
-"X-Generator: Zanata 3.9.6\n"
+"Language: bn_IN\n"
+"X-Generator: Zanata 4.3.3\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 msgid " - End"
@@ -44,14 +44,6 @@ msgstr "%(name)s - %(size)s GB (%(label)s)"
 #, python-format
 msgid "%(offset)s: %(label)s"
 msgstr "%(offset)s: %(label)s"
-
-#, python-format
-msgid "%(resource_status)s: %(resource_status_reason)s"
-msgstr "%(resource_status)s: %(resource_status_reason)s"
-
-#, python-format
-msgid "%(stack_status_title)s: %(stack_status_reason)s"
-msgstr "%(stack_status_title)s: %(stack_status_reason)s"
 
 #, python-format
 msgid "%(type)s (%(backend)s backend)"
@@ -97,17 +89,8 @@ msgstr ", প্রোজেক্ট শ্রেণি আপডেট কর�
 msgid "-"
 msgstr "-"
 
-msgid "3des"
-msgstr "3des"
-
-msgid "A local environment to upload."
-msgstr "আপলোড করতে একটি স্থানীয় পরিবেশ."
-
 msgid "A local image to upload."
 msgstr "আপলোড করতে এক স্থানীয় ইমেজ."
-
-msgid "A local template to upload."
-msgstr "আপলোড করতে এক স্থানীয় টেমপ্লেট."
 
 msgid ""
 "A script or set of commands to be executed after the instance has been built "
@@ -119,22 +102,12 @@ msgstr ""
 msgid "AKI - Amazon Kernel Image"
 msgstr "AKI - আমাজন কার্নেল ইমেজ"
 
-msgid "ALLOW"
-msgstr "ALLOW"
-
-msgctxt "Action Name of a Firewall Rule"
-msgid "ALLOW"
-msgstr "ALLOW"
-
 #, python-format
 msgid "ALLOW %(ethertype)s %(proto_port)s %(direction)s %(remote)s"
 msgstr "অনুমতি দিন %(ethertype)s %(proto_port)s %(direction)s %(remote)s"
 
 msgid "AMI - Amazon Machine Image"
 msgstr "AMI - আমাজন মেশিন ইমেজ"
-
-msgid "ANY"
-msgstr "ANY"
 
 msgid "API Access"
 msgstr "API অ্যাক্সেস"
@@ -153,13 +126,6 @@ msgstr "ক্রিয়া"
 
 msgid "Action Log"
 msgstr "ক্রিয়া লগ"
-
-msgid "Action for the firewall rule"
-msgstr "ফায়ারওয়াল নিয়মের জন্য ক্রিয়া"
-
-msgctxt "Current status of a Firewall"
-msgid "Active"
-msgstr "সক্রিয়"
 
 msgctxt "Current status of a Floating IP"
 msgid "Active"
@@ -202,47 +168,11 @@ msgstr "যোগ করুন"
 msgid "Add DHCP Agent"
 msgstr "DHCP এজেন্ট যোগ করুন"
 
-msgid "Add Firewall"
-msgstr "ফায়ারওয়াল যোগ করুন"
-
 msgid "Add Group Assignment"
 msgstr "শ্রেণি নিয়োগ যোগ করুন"
 
-msgid "Add IKE Policy"
-msgstr "IKE নীতি যোগ করুন"
-
-msgid "Add IPSec Policy"
-msgstr "IPSec নীতি যোগ করুন"
-
-msgid "Add IPSec Site Connection"
-msgstr "IPSec সাইট সংযোগ যোগ করুন"
-
 msgid "Add Interface"
 msgstr "ইন্টারফেস যোগ করুন"
-
-msgid "Add New Firewall"
-msgstr "নতুন ফায়ারওয়াল যোগ করুন"
-
-msgid "Add New IKE Policy"
-msgstr "নতুন  IKE নীতি যোগ করুন"
-
-msgid "Add New IPSec Policy"
-msgstr "নতুন IPSec নীতি যোগ করুন"
-
-msgid "Add New IPSec Site Connection"
-msgstr "নতুন IPSec সাইট সংযোগ যোগ করুন"
-
-msgid "Add New Policy"
-msgstr "নতুন নীতি যোগ করুন"
-
-msgid "Add New Rule"
-msgstr "নতুন নিয়ম যোগ করুন"
-
-msgid "Add New VPN Service"
-msgstr "নতুন VPN সেবা যোগ করুন"
-
-msgid "Add Policy"
-msgstr "নীতি যোগ করুন"
 
 msgid "Add Rule"
 msgstr "নিয়ম যোগ করুন"
@@ -252,9 +182,6 @@ msgstr "শ্রেণিতে ব্যবহর্তা যোগ করু
 
 msgid "Add Users"
 msgstr "ব্যবহর্তা যোগ করুন"
-
-msgid "Add VPN Service"
-msgstr "VPN সেবা যোগ করুন"
 
 msgid ""
 "Add hosts to this aggregate or remove hosts from it. Hosts can be in "
@@ -268,34 +195,6 @@ msgstr "এই সমুহে হোস্ট যোগ করুন. হোস
 
 msgid "Add/Remove Hosts to Aggregate"
 msgstr "সমুহতে হোস্ট যোগ করুন/সরিয়ে ফেলুন"
-
-#, python-format
-msgid "Added Firewall \"%s\"."
-msgstr "যোগ করা ফায়ারওয়াল \"%s\"."
-
-#, python-format
-msgid "Added IKE Policy \"%s\"."
-msgstr "যুক্ত IKE নীতি \"%s\"."
-
-#, python-format
-msgid "Added IPSec Policy \"%s\"."
-msgstr "যোগ করা IPSec নীতি \"%s\"."
-
-#, python-format
-msgid "Added IPSec Site Connection \"%s\"."
-msgstr "যুক্ত IPSec সাইট সংযোগ \"%s\"."
-
-#, python-format
-msgid "Added Policy \"%s\"."
-msgstr "যোগ করা নীতি \"%s\"."
-
-#, python-format
-msgid "Added Rule \"%s\"."
-msgstr "যোগ করা নিয়ম \"%s\"."
-
-#, python-format
-msgid "Added VPN Service \"%s\"."
-msgstr "যোগ করা VPN সেবা \"%s\"."
 
 msgid ""
 "Additional routes announced to the hosts. Each entry is: destination_cidr,"
@@ -313,14 +212,8 @@ msgstr "অ্যাডমিন পাসওয়ার্ড"
 msgid "Admin State"
 msgstr "অ্যাডমিন স্থিতি"
 
-msgid "Admin State Up"
-msgstr "অ্যাডমিন অবস্থা উপরে"
-
 msgid "Advanced Options"
 msgstr "উন্নত বিকল্প"
-
-msgid "After"
-msgstr "পরে"
 
 msgid ""
 "After launching an instance, you login using the private key (the username "
@@ -381,9 +274,6 @@ msgstr "বণ্টিত ফ্লোটিং IP %(ip)s."
 
 msgid "Allocation Pools"
 msgstr "বণ্টন পুল"
-
-msgid "An external (HTTP) URL to load the template from."
-msgstr "থেকে টেমপ্লেট লোড করতে একটি বাহ্যিক (HTTP) URL."
 
 msgid ""
 "An instance can be launched with varying types of attached storage. You may "
@@ -455,17 +345,8 @@ msgstr "%(dev)s তে  %(inst)s উদাহরণ করতে ভলিয়্
 msgid "Attachments"
 msgstr "সংযোজন"
 
-msgid "Audited"
-msgstr "নিরীক্ষিত"
-
 msgid "Authentication URL"
 msgstr "প্রত্যয়ন URL"
-
-msgid "Authorization algorithm"
-msgstr "অনুমোদন অ্যালগারিদম"
-
-msgid "Authorization mode"
-msgstr "অনুমোদন প্রণালী"
 
 msgid "Automatic"
 msgstr "স্বতোশ্চল"
@@ -497,9 +378,6 @@ msgctxt "Current status of a Volume Backup"
 msgid "Available"
 msgstr "লভ্য"
 
-msgid "Available Rules"
-msgstr "লভ্য নিয়মগুলি"
-
 msgid "Available networks"
 msgstr "লভ্য নেটওয়ার্ক"
 
@@ -508,9 +386,6 @@ msgstr "ব্যাকআপ নাম"
 
 msgid "Backups"
 msgstr "ব্যাকআপ"
-
-msgid "Before"
-msgstr "আগে"
 
 msgid "Block Migration"
 msgstr "ব্লক স্থানান্তরণ"
@@ -553,12 +428,6 @@ msgstr "বদল করুন"
 
 msgid "Change Password"
 msgstr "পাসওয়ার্ড বদলান"
-
-msgid "Change Stack Template"
-msgstr "স্ট্যাক টেমপ্লেট বদলান"
-
-msgid "Change Template"
-msgstr "টেমপ্লেট বদল করুন"
 
 msgid "Change Volume Type"
 msgstr "ভলিয়্যুম প্রকার বদলান"
@@ -612,9 +481,6 @@ msgstr ""
 
 msgid "Choose the flavor to launch."
 msgstr "শুরু করতে ফ্লেভার বাছুন."
-
-msgid "Choose the rule you want to remove."
-msgstr "আপনি যে নিয়মটি সরিয়ে ফেলতে চান তা বাছুন."
 
 msgid "Cipher"
 msgstr "সিফার"
@@ -728,9 +594,6 @@ msgstr "এনক্রিপ্টেড ভলিয়্যুম প্রক�
 msgid "Create Encryption"
 msgstr "এনক্রিপশন তৈরি করুন"
 
-msgid "Create Firewall"
-msgstr "ফায়ারওয়াল তৈরি করুন"
-
 msgid "Create Flavor"
 msgstr "ফ্লেভার তৈরি করুন"
 
@@ -782,9 +645,6 @@ msgstr "স্ন্যাপশট তৈরি করুন"
 msgid "Create Spec"
 msgstr "স্পেক তৈরি করুন"
 
-msgid "Create Stack"
-msgstr "স্ট্যাক তৈরি করুন"
-
 msgid "Create Subnet"
 msgstr "সাবনেট তৈরি করুন"
 
@@ -827,18 +687,12 @@ msgstr "ভলিয়্যুম প্রকারের জন্য একট
 msgid "Create a new role."
 msgstr "একটি নতুন ভূমিকা তৈরি করুন."
 
-msgid "Create a new stack with the provided values."
-msgstr "সরবরাহ করা মান সহ একটি নতুন স্টেক তৈরি করুন."
-
 msgid ""
 "Create a new user and set related properties including the Primary Project "
 "and Role."
 msgstr ""
 "একটি নতুন ব্যবহর্তা তৈরি করুন এবং প্রাথমিক প্রোজেক্ট ও ভূমিকা সহ সম্পর্কিত বৈশিষ্ট্য সেট "
 "করুন."
-
-msgid "Create a policy with selected rules."
-msgstr "নির্বাচিত নিয়মগুলি সহ একটি নীতি তৈরি করুন."
 
 msgid "Create a project to organize users."
 msgstr "ব্যবহর্তাদের সংগঠিত করতে একটি প্রোজেক্ট তৈরি করুন."
@@ -853,10 +707,6 @@ msgstr ""
 msgid "Create an Encrypted Volume Type"
 msgstr "একটি এনক্রিপ্ট করা ভলিয়্যুম প্রকার তৈরি করুন"
 
-msgid "Created"
-msgstr "তৈরি"
-
-msgctxt "Current status of a Firewall"
 msgid "Created"
 msgstr "তৈরি"
 
@@ -921,9 +771,6 @@ msgstr "\"%s\" ভলিয়্যুম ব্যাকআপ তৈরি ক�
 msgid "Creating volume snapshot \"%s\"."
 msgstr "ভলিয়্যুম স্ন্যাপশট \"%s\" তৈরি করছে."
 
-msgid "Creation Timeout (minutes)"
-msgstr "নির্মাণ বিরতি (মিনিট)"
-
 msgid "Current Host"
 msgstr "বর্তমান হোস্ট"
 
@@ -945,39 +792,14 @@ msgstr "ব্যবহর্তা-বিহিত UDP নিয়ম"
 msgid "Customization Script Source"
 msgstr "কাস্টমাইজেশন স্ক্রিপ্ট উত্স"
 
-msgid "DENY"
-msgstr "DENY"
-
-msgctxt "Action Name of a Firewall Rule"
-msgid "DENY"
-msgstr "DENY"
-
 msgid "DHCP Agents"
 msgstr "DHCP এজেন্ট"
 
 msgid "DNS Name Servers"
 msgstr "DNS নাম সার্ভার"
 
-msgid "Date Updated"
-msgstr "আপডেটের তারিখ"
-
-msgid "Dead peer detection action"
-msgstr "মৃত পীর সনাক্তকরণ ক্রিয়া"
-
-msgid "Dead peer detection actions"
-msgstr "মৃত পীর সনাক্তকরণ ক্রিয়া"
-
-msgid "Dead peer detection interval"
-msgstr "মৃত পীর সনাক্তকরণ বিরাম"
-
-msgid "Dead peer detection timeout"
-msgstr "মৃত পীর সনাক্তকরণ বিরতি"
-
 msgid "Decrypt Password"
 msgstr "ডিক্রিপ্ট পাসওয়ার্ড"
-
-msgid "Default Quotas"
-msgstr "স্থিতক কোটা"
 
 msgid "Default quotas updated."
 msgstr "স্থিতক কোটা আপডেট করা."
@@ -1024,27 +846,6 @@ msgstr "গন্তব্য"
 msgid "Destination CIDR"
 msgstr "গন্তব্য CIDR"
 
-msgid "Destination IP"
-msgstr "গন্তব্য IP"
-
-msgid "Destination IP Address"
-msgstr "গন্তব্য IP ঠিকানা"
-
-msgid "Destination IP Address/Subnet"
-msgstr "গন্তব্য  IP ঠিকানা/সাবনেট"
-
-msgid "Destination IP address or subnet"
-msgstr "গন্তব্য  IP ঠিকানা বা সাবনেট"
-
-msgid "Destination Port"
-msgstr "গন্তব্য পোর্ট"
-
-msgid "Destination Port/Port Range"
-msgstr "গন্তব্য পোর্ট/পোর্ট ব্যপ্তি"
-
-msgid "Destination port (integer in [1, 65535] or range in a:b)"
-msgstr "গন্তব্য পোর্ট  ([1, 65535]তে পূর্ণসংখ্যা বা a:b তে ব্যপ্তি)"
-
 msgid "Detached"
 msgstr "বিচ্ছিন্ন"
 
@@ -1069,9 +870,6 @@ msgstr "ডিভাইস নাম"
 
 msgid "Device Owner"
 msgstr "ডিভাইস মালিক"
-
-msgid "Device owner attached to the port"
-msgstr "পোর্টে যুক্ত ডিভাইস মালিক"
 
 msgid "Device size (GB)"
 msgstr "ডিভাইস আয়তন (GB)"
@@ -1185,10 +983,6 @@ msgctxt "Current state of a Hypervisor"
 msgid "Down"
 msgstr "নিচে"
 
-msgctxt "Current status of a Firewall"
-msgid "Down"
-msgstr "নিচে"
-
 msgctxt "Current status of a Floating IP"
 msgid "Down"
 msgstr "নিচে"
@@ -1208,9 +1002,6 @@ msgstr "নিচে"
 msgid "Download CSV Summary"
 msgstr "CSV সারাংশ ডাউনলোড করুন"
 
-msgid "Download Key Pair"
-msgstr "কী যুগ্ম ডাউনলোড করুন"
-
 msgid "EC2 Access Key"
 msgstr "EC2 অ্যাক্সেস কী"
 
@@ -1223,17 +1014,11 @@ msgstr "EC2 URL"
 msgid "Edit"
 msgstr "সম্পাদনা করুন"
 
-msgid "Edit Connection"
-msgstr "সংযোগ সম্পাদনা করুন"
-
 msgid "Edit Consumer"
 msgstr "ক্রেতা সম্পাদনা করুন "
 
 msgid "Edit Domain"
 msgstr "ডোমেন সম্পাদনা করুন"
-
-msgid "Edit Firewall"
-msgstr "ফায়ারওয়াল সম্পাদনা করুন"
 
 msgid "Edit Flavor"
 msgstr "ফ্লেভার সম্পাদনা করুন"
@@ -1244,23 +1029,11 @@ msgstr "শ্রেণি সম্পাদনা করুন"
 msgid "Edit Host Aggregate"
 msgstr "হোস্ট সমূহ সম্পাদনা করুন"
 
-msgid "Edit IKE Policy"
-msgstr "IKE নীতি সম্পাদনা করুন"
-
-msgid "Edit IPSec Policy"
-msgstr "IPSec নীতি সম্পাদনা করুন"
-
-msgid "Edit IPSec Site Connection"
-msgstr "IPSec সাইট সংযোগ সম্পাদনা করুন"
-
 msgid "Edit Instance"
 msgstr "উদাহরণ সম্পাদনা করুন"
 
 msgid "Edit Network"
 msgstr "নেটওয়ার্ক সম্পাদনা করুন"
-
-msgid "Edit Policy"
-msgstr "নীতি সম্পাদনা করুন"
 
 msgid "Edit Port"
 msgstr "পোর্ট সম্পাদনা করুন"
@@ -1273,9 +1046,6 @@ msgstr "QoS স্পেক ক্রেতা সম্পাদনা কর�
 
 msgid "Edit Router"
 msgstr "রাউটার সম্পাদনা করুন"
-
-msgid "Edit Rule"
-msgstr "নিয়ম সম্পাদনা করুন"
 
 msgid "Edit Security Group"
 msgstr "সুরক্ষা শ্রেণি সম্পাদনা করুন"
@@ -1291,12 +1061,6 @@ msgstr "স্পেক সম্পাদনা করুন"
 
 msgid "Edit Subnet"
 msgstr "সাবনেট সম্পাদনা করুন"
-
-msgid "Edit Template"
-msgstr "টেমপ্লেট সম্পাদনা করুন"
-
-msgid "Edit VPN Service"
-msgstr "VPN সেবা সম্পাদনা করুন"
 
 msgid "Edit Volume"
 msgstr "ভলিয়্যুম সম্পাদনা করুন"
@@ -1336,18 +1100,12 @@ msgstr "DHCP সমর্থ"
 msgid "Enable HA mode"
 msgstr "HA প্রণালী সমর্থ করুন"
 
-msgid "Enable rollback on create/update failure."
-msgstr "নির্মাণ/আপডেট ব্যর্থতায় রোলব্যাক সক্ষম."
-
 msgid "Enabled"
 msgstr "সমর্থ"
 
 msgctxt "Current status of a Hypervisor"
 msgid "Enabled"
 msgstr "সমর্থ"
-
-msgid "Encapsulation mode"
-msgstr "এনক্যাপসুলেশন প্রণালী"
 
 msgid "Encrypted"
 msgstr "এনক্রিপ্ট করা"
@@ -1358,9 +1116,6 @@ msgstr "এনক্রিপ্ট করা পাসওয়ার্ড"
 msgid "Encryption"
 msgstr "এনক্রিপশন"
 
-msgid "Encryption algorithm"
-msgstr "এনক্রিপশন অ্যালগারিদম"
-
 msgid "Enter a value for ICMP code in the range (-1: 255)"
 msgstr "ICMP কোডের জন্য মান ভরুন ব্যপ্তি (-1: 255)"
 
@@ -1370,34 +1125,11 @@ msgstr "ICMP প্রকারের জন্য মান ভরুন ব্
 msgid "Enter an integer value between 1 and 65535."
 msgstr "1 এবং 65535 এর মধ্যে একটি পূর্ণ মান ভরুন."
 
-msgid "Environment Data"
-msgstr "পরিবেশ ডেটা"
-
-msgid "Environment File"
-msgstr "পরিবেশ ফাইল"
-
-msgid "Environment Source"
-msgstr "পরিবেশ উত্স"
-
 msgid "Ephemeral Disk"
 msgstr "অস্থায়ী ডিস্ক"
 
 msgid "Ephemeral Disk (GB)"
 msgstr "অস্থায়ী ডিস্ক (GB)"
-
-msgid "Equal to or greater than 60"
-msgstr "সমান বা 60 এর চেয়ে বড়"
-
-msgid ""
-"Equal to or greater than 68 if the local subnet is IPv4. Equal to or greater "
-"than 1280 if the local subnet is IPv6."
-msgstr ""
-"স্থানীয় সাবনেট IPv4 হলে 68 এর সমান বা বেশি. স্থানীয় সাবনেট IPv6 হলে 1280 এর "
-"সমান বা বেশি."
-
-msgctxt "Current status of a Firewall"
-msgid "Error"
-msgstr "ভুল"
 
 msgctxt "Current status of a Floating IP"
 msgid "Error"
@@ -1457,9 +1189,6 @@ msgid ""
 "Evacuate the servers from the selected down host to an active target host."
 msgstr "একটি সক্রিয় লক্ষ্য হোস্টে নির্বাচিত ডাউন হোস্ট থেকে সার্ভার অপসারণ করুন."
 
-msgid "Events"
-msgstr "ঘটনা"
-
 msgid "Extend Volume"
 msgstr "প্রসারিত ভলিয়্যুম"
 
@@ -1504,10 +1233,6 @@ msgid "Failed to add agent %(agent_name)s for network %(network)s."
 msgstr "%(network)s নেটওয়ার্কের জন্য %(agent_name)s এজেন্ট যোগ করতে ব্যর্থ."
 
 #, python-format
-msgid "Failed to create a port for network %s"
-msgstr "%s নেটওয়ার্কের জন্য পোর্ট তৈরি করতে ব্যর্থ"
-
-#, python-format
 msgid "Failed to create network \"%(network)s\": %(reason)s"
 msgstr "নেটওয়ার্ক \"%(network)s\" তৈরি করতে ব্যর্থ: %(reason)s"
 
@@ -1520,28 +1245,12 @@ msgid "Failed to create router \"%s\"."
 msgstr "রাউটার \"%s\" তৈরি করতে ব্যর্থ."
 
 #, python-format
-msgid "Failed to delete agent: %s"
-msgstr "এজেন্ট মুছে ফেলতে ব্যর্থ: %s"
-
-#, python-format
-msgid "Failed to delete interface %s"
-msgstr "%s ইন্টারফেস মুছে ফেলতে ব্যর্থ"
-
-#, python-format
 msgid "Failed to delete network \"%s\""
 msgstr "নেটওয়ার্ক \"%s\" মুছে ফেলতে ব্যর্থ"
 
 #, python-format
-msgid "Failed to delete network %s"
-msgstr "নেটওয়ার্ক %s মুছে ফেলতে ব্যর্থ"
-
-#, python-format
 msgid "Failed to delete port %s"
 msgstr "পোর্ট %s মুছে ফেলতে ব্যর্থ"
-
-#, python-format
-msgid "Failed to delete subnet %s"
-msgstr "সাবনেট %s মুছে ফেলতে ব্যর্থ"
 
 #, python-format
 msgid "Failed to disable compute service for host: %s."
@@ -1554,10 +1263,6 @@ msgstr "হোস্ট অপসরণ করতে ব্যর্থ: %s."
 #, python-format
 msgid "Failed to evacuate instances: %s"
 msgstr "উদাহরণ অপসরণ করতে ব্যর্থ: %s"
-
-#, python-format
-msgid "Failed to insert rule to policy %(name)s: %(reason)s"
-msgstr "%(name)s নীতিতে নিয়ম সন্নিহিত করতে ব্যর্থ: %(reason)s"
 
 #, python-format
 msgid "Failed to live migrate instance to host \"%s\"."
@@ -1587,60 +1292,16 @@ msgstr ""
 "%s প্রোজেক্ট সদস্য সংশোধন করতে ব্যর্থ, প্রোজেক্ট শ্রেণি এবং প্রোজেক্ট কোটা আপডেট করুন."
 
 #, python-format
-msgid "Failed to remove rule from policy %(name)s: %(reason)s"
-msgstr "%(name)s নীতি থেকে নিয়ম সরিয়ে ফেলতে ব্যর্থ: %(reason)s"
-
-#, python-format
-msgid "Failed to retrieve available rules: %s"
-msgstr "লভ্য নিয়মগুলি পুনরুদ্ধার করতে ব্যর্থ: %s"
-
-#, python-format
-msgid "Failed to retrieve current rules in policy %(name)s: %(reason)s"
-msgstr "%(name)s নীতিতে বর্তমান নিয়মগুলি পুনরুদ্ধার করতে ব্যর্থ: %(reason)s"
-
-#, python-format
 msgid "Failed to retrieve network %s for a subnet"
 msgstr "একটি সাবনেটের জন্য  %s নেটওয়ার্ক পুনরুদ্ধার করতে ব্যর্থ"
-
-#, python-format
-msgid "Failed to update IKE Policy %s"
-msgstr "IKE নীতি %s আপডেট করতে ব্যর্থ"
-
-#, python-format
-msgid "Failed to update IPSec Policy %s"
-msgstr "IPSec নীতি %s আপডেট করতে ব্যর্থ"
-
-#, python-format
-msgid "Failed to update IPSec Site Connection %s"
-msgstr "IPSec সাইট সংযোগ %s আপডেট করতে ব্যর্থ"
-
-#, python-format
-msgid "Failed to update VPN Service %s"
-msgstr "VPN সেবা %s আপডেট করতে ব্যর্থ"
-
-#, python-format
-msgid "Failed to update firewall %(name)s: %(reason)s"
-msgstr "ফায়ারওয়াল আপডেট করতে ব্যর্থ %(name)s: %(reason)s"
 
 #, python-format
 msgid "Failed to update network %s"
 msgstr "নেটওয়ার্ক %s আপডেট করতে ব্যর্থ"
 
 #, python-format
-msgid "Failed to update policy %(name)s: %(reason)s"
-msgstr "নীতি %(name)s: %(reason)s আপডেট করতে ব্যর্থ"
-
-#, python-format
-msgid "Failed to update port %s"
-msgstr "%s পোর্ট আপডেট করতে ব্যর্থ"
-
-#, python-format
 msgid "Failed to update router %s"
 msgstr "রাউটার %s আপডেট করতে ব্যর্থ"
-
-#, python-format
-msgid "Failed to update rule %(name)s: %(reason)s"
-msgstr "%(name)s নিয়ম আপডেট করতে ব্যর্থ: %(reason)s"
 
 #, python-format
 msgid "Failed to update subnet \"%(sub)s\":  %(reason)s"
@@ -1648,13 +1309,6 @@ msgstr "সাবনেট \"%(sub)s\" আপডেট করতে ব্যর
 
 msgid "Fault"
 msgstr "ত্রুটি"
-
-msgid ""
-"Fields in this tab are optional. You can configure the detail of IPSec site "
-"connection created."
-msgstr ""
-"এই ট্যাবে ক্ষেত্রগুলি বৈকল্পিক. আপনি IPSec-এর বিশদ রূপাকৃত করতে পারেন সাইট সংযোগ "
-"তৈরি."
 
 msgid "File"
 msgstr "ফাইল"
@@ -1667,19 +1321,6 @@ msgstr "ফিল্টার"
 
 msgid "Fingerprint"
 msgstr "ফিঙ্গারপ্রিন্ট"
-
-#, python-format
-msgid "Firewall %s was successfully updated."
-msgstr "ফায়ারওয়াল %s সফলভাবে আপডেট হয়েছিল."
-
-msgid "Firewall Policies"
-msgstr "ফায়ারওয়াল নীতিগুলি"
-
-msgid "Firewall Rules"
-msgstr "ফায়ারওয়াল নিয়মগুলি"
-
-msgid "Firewalls"
-msgstr "ফায়ারওয়াল"
 
 msgid "Fixed IPs"
 msgstr "স্থির IPs"
@@ -1767,9 +1408,6 @@ msgstr "এখান থেকে আপনি নেটওয়ার্কের
 
 msgid "From here you can create a snapshot of a volume."
 msgstr "এখান থেকে আপনি একটি ভলিয়্যুমের স্ন্যাপশট তৈরি করতে পারেন."
-
-msgid "From here you can update the default quotas (max limits)."
-msgstr "এখান থেকে আপনি স্থিতক কোটা আপডেট করতে পারেন (সর্বাধিক সীমা)."
 
 msgid "GB"
 msgstr "GB"
@@ -1888,33 +1526,8 @@ msgstr "হাইপারভাইসর সারাংশ"
 msgid "Hypervisors"
 msgstr "হাইপারভাইসর"
 
-msgid "ICMP"
-msgstr "ICMP"
-
 msgid "ID"
 msgstr "ID"
-
-msgid "IKE Phase1 negotiation mode"
-msgstr "IKE দশা1 আলোচনা প্রণালী"
-
-msgid "IKE Policies"
-msgstr "IKE নীতি"
-
-msgid "IKE Policy"
-msgstr "IKE নীতি"
-
-#, python-format
-msgid "IKE Policy %s was successfully updated."
-msgstr "IKE নীতি %s সফলভাবে আপডেট হয়েছিল."
-
-msgid "IKE Policy Details"
-msgstr "IKE নীতি বিশদ"
-
-msgid "IKE Policy associated with this connection"
-msgstr "এই সংযোগ সহ IKE নীতি মিলিত"
-
-msgid "IKE version"
-msgstr "IKE সংস্করণ"
 
 msgid "IP Address"
 msgstr "IP ঠিকানা"
@@ -1958,37 +1571,17 @@ msgstr ""
 "স্থিতক ব্যবহার করলে, খালি ছাড়ুন. আপনি গেটওয়ে না ব্যবহার করতে চাইলে, নিচের  "
 "'Disable Gateway' মান যাচাই করুন."
 
-msgid "IPSec Policies"
-msgstr "IPSec নীতি"
-
-msgid "IPSec Policy"
-msgstr "IPSec নীতি"
-
-#, python-format
-msgid "IPSec Policy %s was successfully updated."
-msgstr "IPSec নীতি %s সফলভাবে আপডেট হয়েছিল."
-
-msgid "IPSec Policy Details"
-msgstr "IPSec নীতি বিশদ"
-
-msgid "IPSec Policy associated with this connection"
-msgstr "এই সংযোগ সহ IPSec নীতি মিলিত"
-
-#, python-format
-msgid "IPSec Site Connection %s was successfully updated."
-msgstr "IPSec সাইট সংযোগ %s সফলভাবে আপডেট হয়েছিল."
-
-msgid "IPSec Site Connection Details"
-msgstr "IPSec সাইট সংযোগ বিশদ"
-
-msgid "IPSec Site Connections"
-msgstr "IPSec সাইট সংযোগ"
-
 msgid "IPv4"
 msgstr "IPv4"
 
+msgid "IPv4 Address ="
+msgstr "IPv4 ঠিকানা ="
+
 msgid "IPv6"
 msgstr "IPv6"
+
+msgid "IPv6 Address ="
+msgstr "IPv6 ঠিকানা ="
 
 msgid "IPv6 Address Configuration Mode"
 msgstr "IPv6 ঠিকানা রূপাকৃতি প্রণালী"
@@ -2052,9 +1645,6 @@ msgstr "ইমেজ"
 msgid "Import Key Pair"
 msgstr "কী যুগ্ম আমদানি করুন"
 
-msgid "In Policy"
-msgstr "নীতিতে"
-
 msgid "Info"
 msgstr "তথ্য"
 
@@ -2063,9 +1653,6 @@ msgstr "তথ্য"
 
 msgid "Ingress"
 msgstr "প্রবেশ"
-
-msgid "Initiator state"
-msgstr "প্রারম্ভকারীর স্থিতি"
 
 msgid "Injected File Content (Bytes)"
 msgstr "ইঞ্জেক্ট করা ফাইল বিষয় (বাইট্‌স্)"
@@ -2078,12 +1665,6 @@ msgstr "ইঞ্জেক্ট করা ফাইল পথ বাইট"
 
 msgid "Injected Files"
 msgstr "ইঞ্জেক্ট করা ফাইলগুলি"
-
-msgid "Insert Rule"
-msgstr "নিয়ম সন্নিহিত করুন"
-
-msgid "Insert Rule to Policy"
-msgstr "নীতিতে নিয়ম সন্নিহিত করুন"
 
 msgid "Instance"
 msgstr "উদাহরণ"
@@ -2197,9 +1778,6 @@ msgstr "কী-মান জোড়া"
 msgid "Language"
 msgstr "ভাষা"
 
-msgid "Last Updated"
-msgstr "শেষ সদ্যতন"
-
 msgctxt "Time since the last update"
 msgid "Last Updated"
 msgstr "শেষ সদ্যতন"
@@ -2212,12 +1790,6 @@ msgstr "উদাহরণ শুরু করুন"
 
 msgid "Launch Instance (Quota exceeded)"
 msgstr "উদাহরণ শুরু করুন (কোটা পেরিয়ে গেছে)"
-
-msgid "Launch Parameters"
-msgstr "পরিশর্ত শুরু করুন"
-
-msgid "Launch Stack"
-msgstr "স্টেক শুরু করুন"
 
 msgid "Launch as Instance"
 msgstr "উদাহরণ হিসেবে শুরু করুন"
@@ -2235,27 +1807,6 @@ msgstr "বহু উদাহরণ শুরু করা কেবলমা�
 
 msgid "Length of Injected File Path"
 msgstr "ইঞ্জেক্ট করা ফাইল পথের দৈর্ঘ্য"
-
-msgid "Lifetime Units"
-msgstr "আজীবন ইউনিট"
-
-msgid "Lifetime Value"
-msgstr "আজীবন মান"
-
-msgid "Lifetime units"
-msgstr "আজীবন ইউনিট"
-
-msgid "Lifetime units for IKE keys"
-msgstr "IKE কী -এর জন্য আজীবন ইউনিট"
-
-msgid "Lifetime value"
-msgstr "আজীবন মান"
-
-msgid "Lifetime value for IKE keys"
-msgstr "IKE কী-এর জন্য আজীবন মান"
-
-msgid "Lifetime value for IKE keys "
-msgstr "IKE কী-এর জন্য আজীবন মান"
 
 msgid "Limit"
 msgstr "সীমা"
@@ -2336,9 +1887,6 @@ msgstr "ম্যানুয়েল"
 msgid "Mapped Fixed IP Address"
 msgstr "ম্যাপ করা স্থির IP ঠিকানা"
 
-msgid "Maximum Transmission Unit size for the connection"
-msgstr "সংযোগটির জন্য সর্বাধিক সঞ্চার ইউনিট আয়তন"
-
 msgid "Memory Usage"
 msgstr "মেমোরি প্রয়োগ"
 
@@ -2374,9 +1922,6 @@ msgstr "ন্যূনতম ডিস্ক (GB)"
 msgid "Minimum RAM (MB)"
 msgstr "ন্যূনতম RAM (MB)"
 
-msgid "Minutes"
-msgstr "মিনিট"
-
 #, python-format
 msgid "Modified domain \"%s\"."
 msgstr "সংশোধিত ডোমেন \"%s\"."
@@ -2395,11 +1940,6 @@ msgstr "সংশোধিত উদাহরণ \"%s\"."
 #, python-format
 msgid "Modified project \"%s\"."
 msgstr "সংশোধিত প্রোজেক্ট \"%s\"."
-
-msgid ""
-"Modified project information and members, but unable to modify project "
-"quotas."
-msgstr "প্রোজেক্ট তথ্য এবং সদস্য সংশোধিত, কিন্তু প্রোজেক্ট কোটা সংশোধন করতে অসমর্থ."
 
 msgid "Modify Access"
 msgstr "অ্যাক্সেস সংশোধন করুন"
@@ -2430,20 +1970,6 @@ msgstr "N/A"
 
 msgid "Name"
 msgstr "নাম"
-
-msgid ""
-"Name may only contain letters, numbers, underscores, periods and hyphens."
-msgstr "নামে কেবলমাত্র বর্ণ,সংখ্যা, আন্ডারস্কোর, পিরিয়ড এবং হাইফেন থাকতে পারে."
-
-msgid ""
-"Name must start with a letter and may only contain letters, numbers, "
-"underscores, periods and hyphens."
-msgstr ""
-"নাম একটি অক্ষর দিয়ে শুরু হওয়া চাই এবং এতে কেবলমাত্র অক্ষর, নম্বর, আন্ডারস্কোর, "
-"বিরামচিহ্ন ও হাইফেন থাকতে পারে."
-
-msgid "Name of the stack to create."
-msgstr "তৈরি করতে স্ট্যাকের নাম."
 
 #, python-format
 msgid "Name: %(name)s ID: %(uuid)s"
@@ -2519,9 +2045,6 @@ msgstr "নতুন পাসওয়ার্ড"
 
 msgid "New size must be greater than current size."
 msgstr "নতুন আয়তন বর্তমান আয়তনের চেয়ে বড় হওয়া চাই."
-
-msgid "Next"
-msgstr "পরে"
 
 msgid "No"
 msgstr "না"
@@ -2689,17 +2212,11 @@ msgstr "পোর্ট খুলুন"
 msgid "Open Port/Port Range:"
 msgstr "পোর্ট/পোর্ট ব্যপ্তি খুলুন:"
 
-msgid "Optional Parameters"
-msgstr "বৈকল্পিক পরিশর্ত"
-
 msgid "Optionally, you may choose to create a new volume."
 msgstr "বৈকল্পিকভাবে, একটি নতুন ভলিয়্যুম তৈরি করতে বাছতেও পারেন."
 
 msgid "Other Protocol"
 msgstr "অন্যান্য প্রোটোকল"
-
-msgid "Outputs"
-msgstr "আউটপুট"
 
 msgid "Overview"
 msgstr "একনজর"
@@ -2707,14 +2224,8 @@ msgstr "একনজর"
 msgid "Owner"
 msgstr "মালিক"
 
-msgid "PFS"
-msgstr "PFS"
-
 msgid "Page Not Found"
 msgstr "পাতা পাওয়া গেল না"
-
-msgid "Parameters"
-msgstr "পরিশর্ত"
 
 msgid "Password"
 msgstr "পাসওয়ার্ড"
@@ -2725,10 +2236,6 @@ msgstr "পাসওয়ার্ড"
 
 msgid "Password changed. Please log in again to continue."
 msgstr "পাসওয়ার্ড বদলেছে. চালিয়ে যেতে আবার লগইন করুন."
-
-#, python-format
-msgid "Password for user \"%s\""
-msgstr "ব্যবহর্তার \"%s\" জন্য পাসওয়ার্ড"
 
 msgid "Passwords do not match."
 msgstr "পাসওয়ার্ডগুলি মিলে না."
@@ -2741,25 +2248,6 @@ msgctxt "Power state of an Instance"
 msgid "Paused"
 msgstr "থামা"
 
-msgid "Peer gateway public IPv4/IPv6 Address or FQDN"
-msgstr "পীর গেটওয়ে পাবলিক IPv4/IPv6 ঠিকানা বা FQDN"
-
-msgid "Peer gateway public IPv4/IPv6 address or FQDN for the VPN Connection"
-msgstr "VPN সংযোগের জন্য পীর গেটওয়ে পাবলিক IPv4/IPv6 ঠিকানা বা FQDN"
-
-msgid "Peer router identity for authentication (Peer ID)"
-msgstr "প্রত্যয়নের জন্য পীর রাউটার পরিচয় (পীর ID)"
-
-msgid ""
-"Peer router identity for authentication. Can be IPv4/IPv6 address, e-mail, "
-"key ID, or FQDN"
-msgstr ""
-"প্রত্যয়নের জন্য পীর রাউটার পরিচয়. IPv4/IPv6 ঠিকানা, ই-মেল, কী ID, বা FQDN হতে "
-"পারে"
-
-msgid "Perfect Forward Secrecy"
-msgstr "সঠিক সামনে গোপনীয়তা"
-
 msgid "Physical Network"
 msgstr "ভৌতিক নেটওয়ার্ক"
 
@@ -2770,25 +2258,8 @@ msgid "Please note: "
 msgstr "দয়া করে মনে রাখবেন: "
 
 #, python-format
-msgid "Please specify a %s using only one source method."
-msgstr "কেবলমাত্র একটি উত্স পদ্ধতি ব্যবহার করে %s নির্দিষ্ট করুন."
-
-#, python-format
 msgid "Please try again later [Error: %s]."
 msgstr "পরে আবার চেষ্টা করুন [ভুল: %s]."
-
-msgid "Policies"
-msgstr "নীতিগুলি"
-
-msgid "Policy"
-msgstr "নীতি"
-
-#, python-format
-msgid "Policy %s was successfully updated."
-msgstr "নীতি %s সফলভাবে আপডেট হয়েছিল."
-
-msgid "Policy ID"
-msgstr "নীতি ID"
 
 msgid "Pool"
 msgstr "পুল"
@@ -2816,17 +2287,11 @@ msgstr "মিলিত হতে পোর্ট"
 msgid "Ports"
 msgstr "পোর্ট"
 
-msgid "Position in Policy"
-msgstr "নীতিতে অবস্থান"
-
 msgid "Post-Creation"
 msgstr "উত্তর-সৃষ্টি"
 
 msgid "Power State"
 msgstr "শক্তির স্থিতি"
-
-msgid "Pre-Shared Key (PSK) string"
-msgstr "পূর্ব-অংশীদার কী (PSK) স্ট্রিং"
 
 msgid "Primary Project"
 msgstr "প্রাথমিক প্রোজেক্ট"
@@ -2876,12 +2341,6 @@ msgstr "প্রোজেক্ট:"
 msgid "Protected"
 msgstr "সুরক্ষিত"
 
-msgid "Protocol"
-msgstr "প্রোটোকল"
-
-msgid "Protocol for the firewall rule"
-msgstr "ফায়ারওয়াল নিয়মের জন্য প্রোটোকল"
-
 msgid "Provider"
 msgstr "সরবরাহকারী"
 
@@ -2918,9 +2377,6 @@ msgstr "উত্স রাউটারের জন্য কোটা পে�
 #, python-format
 msgid "Quota value(s) cannot be less than the current usage value(s): %s."
 msgstr "কোটা মান বর্তমানে উপযোগী মানের চেয়ে কম হতে পারে না: %s."
-
-msgid "Quotas"
-msgstr "কোটা"
 
 msgid "RAM"
 msgstr "RAM"
@@ -2971,27 +2427,8 @@ msgstr "অঞ্চল:"
 msgid "Remote"
 msgstr "রিমোট"
 
-msgid "Remote peer subnet"
-msgstr "রিমোট পীর সাবনেট"
-
-msgid "Remote peer subnet(s)"
-msgstr "রিমোট পীর সাবনেট"
-
-msgid ""
-"Remote peer subnet(s) address(es) with mask(s) in CIDR format separated with "
-"commas if needed (e.g. 20.1.0.0/24, 21.1.0.0/24)"
-msgstr ""
-"প্রয়োজন হলে কমা দ্বারা পৃথকীকৃত CIDR রূপণে মাস্ক সহ রিমোট পীর সাবনেট ঠিকানা (যেমন "
-"20.1.0.0/24, 21.1.0.0/24)"
-
 msgid "Remote:"
 msgstr "রিমোট:"
-
-msgid "Remove Rule"
-msgstr "নিয়ম সরিয়ে ফেলুন"
-
-msgid "Remove Rule from Policy"
-msgstr "নীতি থেকে নিয়ম সরিয়ে ফেলুন"
 
 msgid "Request ID"
 msgstr "অনুরোধ ID"
@@ -3005,15 +2442,6 @@ msgstr "পুনঃআয়তন"
 
 msgid "Resize Instance"
 msgstr "উদাহরণ পুনঃআয়তন করুন"
-
-msgid "Resource"
-msgstr "উত্স"
-
-msgid "Resource ID"
-msgstr "উত্স ID"
-
-msgid "Resource Metadata"
-msgstr "উত্স মেটাডেটা"
 
 msgid "Resources"
 msgstr "উত্স"
@@ -3061,20 +2489,11 @@ msgstr "ভূমিকা সফলভাবে আপডেট করা."
 msgid "Roles"
 msgstr "ভূমিকা"
 
-msgid "Rollback"
-msgstr "রোলব্যাক"
-
-msgid "Rollback On Failure"
-msgstr "ব্যর্থতায় রোলব্যাক"
-
 msgid "Root Disk"
 msgstr "রুট ডিস্ক"
 
 msgid "Root Disk (GB)"
 msgstr "রুট ডিস্ক (GB)"
-
-msgid "Route mode"
-msgstr "রুট প্রণালী"
 
 msgid "Router"
 msgstr "রাউটার"
@@ -3087,9 +2506,6 @@ msgstr "রাউটার %s সফলভাবে তৈরি হয়েছি
 msgid "Router %s was successfully updated."
 msgstr "রাউটার %s সফলভাবে আপডেট হয়েছিল."
 
-msgid "Router ID"
-msgstr "রাউটার ID"
-
 msgid "Router Name"
 msgstr "রাউটার নাম"
 
@@ -3101,18 +2517,6 @@ msgstr "রাউটার"
 
 msgid "Rule"
 msgstr "নিয়ম"
-
-#, python-format
-msgid "Rule %(rule)s was successfully inserted to policy %(policy)s."
-msgstr "%(policy)s নীতিতে %(rule)s নিয়ম সফলভাবে নিবেশ হয়েছিল."
-
-#, python-format
-msgid "Rule %(rule)s was successfully removed from policy %(policy)s."
-msgstr "%(policy)s নীতিতে %(rule)s নিয়ম সফলভাবে সরেছিল."
-
-#, python-format
-msgid "Rule %s was successfully updated."
-msgstr "নিয়ম %s সফলভাবে আপডেট হয়েছিল."
 
 msgid "Rule:"
 msgstr "নিয়ম:"
@@ -3168,12 +2572,6 @@ msgstr "বৃত্তাংশ বিভাজন ID"
 msgid "Segmentation ID:"
 msgstr "বৃত্তাংশ বিভাজন ID:"
 
-msgid "Select IKE Policy"
-msgstr "IKE নীতি নির্বাচন করুন"
-
-msgid "Select IPSec Policy"
-msgstr "IPSec নীতি নির্বাচন করুন"
-
 msgid "Select Image"
 msgstr "ইমেজ নির্বাচন করুন"
 
@@ -3186,12 +2584,6 @@ msgstr "স্ক্রিপ্ট উত্স নির্বাচন কর
 msgid "Select Subnet"
 msgstr "সাবনেট নির্বাচন করুন"
 
-msgid "Select Template"
-msgstr "টেমপ্লেট নির্বাচন করুন"
-
-msgid "Select VPN Service"
-msgstr "VPN সেবা নির্বাচন করুন"
-
 msgid "Select Volume"
 msgstr "ভলিয়্যুম নির্বাচন করুন"
 
@@ -3200,15 +2592,6 @@ msgstr "ভলিয়্যুম স্ন্যাপশট নির্বা�
 
 msgid "Select a New Flavor"
 msgstr "একটি নতুন ফ্লেভার নির্বাচন করুন"
-
-msgid "Select a Policy"
-msgstr "একটি নীতি যোগ করুন"
-
-msgid "Select a Router"
-msgstr "একটি রাউটার নির্বাচন করুন"
-
-msgid "Select a Subnet"
-msgstr "একটি সাবনেট নির্বাচন করুন"
 
 msgid "Select a key pair"
 msgstr "একটি কী জোড়া নির্বাচন করুন"
@@ -3219,9 +2602,6 @@ msgstr "একটি নতুন এজেন্ট নির্বাচন �
 msgid "Select a new host"
 msgstr "নতুন হোস্ট নির্বাচন করুন"
 
-msgid "Select a new template to re-launch a stack."
-msgstr "একটি স্টেক পুনরায় শুরু করতে একটি নতুন টেমপ্লেট নির্বাচন করুন."
-
 msgid "Select a port"
 msgstr "একটি পোর্ট নির্বাচন করুন"
 
@@ -3230,9 +2610,6 @@ msgstr "একটি প্রোজেক্ট নির্বাচন কর
 
 msgid "Select a target host"
 msgstr "একটি লক্ষ্য হোস্ট নির্বাচন করুন"
-
-msgid "Select a template to launch a stack."
-msgstr "একটি স্টেক শুরু করতে একটি টেমপ্লেট নির্বাচন করুন."
 
 msgid "Select a volume to restore to."
 msgstr "তে ফিরিয়ে আনতে একটি ভলিয়্যুম নির্বাচন করুন."
@@ -3255,9 +2632,6 @@ msgstr "নেটওয়ার্ক নির্বাচন করুন"
 msgid "Select networks for your instance."
 msgstr "আপনার উদাহরণের জন্য নেটওয়ার্ক নির্বাচন করুন."
 
-msgid "Select rules for your policy."
-msgstr "আপনার নীতির জন্য নিয়ম নির্বাচন করুন."
-
 msgid "Select source"
 msgstr "উত্স নির্বাচন করুন"
 
@@ -3276,9 +2650,6 @@ msgstr "নির্বাচিত হোস্ট"
 
 msgid "Selected Projects"
 msgstr "নির্বাচিত প্রোজেক্ট"
-
-msgid "Selected Rules"
-msgstr "নির্বাচিত নিয়মগুলি"
 
 msgid "Selected hosts"
 msgstr "নির্বাচিত হোস্ট"
@@ -3363,27 +2734,6 @@ msgstr "স্ন্যাপশট উত্স নির্দিষ্ট হ
 msgid "Something went wrong!"
 msgstr "কিছু ভুল হয়েছে!"
 
-msgid "Source IP"
-msgstr "উত্স IP"
-
-msgid "Source IP Address"
-msgstr "উত্স IP ঠিকানা"
-
-msgid "Source IP Address/Subnet"
-msgstr "উত্স IP ঠিকানা/সাবনেট"
-
-msgid "Source IP address or subnet"
-msgstr "উত্স IP ঠিকানা বা সাবনেট"
-
-msgid "Source Port"
-msgstr "উত্স পোর্ট"
-
-msgid "Source Port/Port Range"
-msgstr "উত্স পোর্ট/পোর্ট ব্যপ্তি"
-
-msgid "Source port (integer in [1, 65535] or range in a:b)"
-msgstr "উত্স পোর্ট ([1, 65535] তে পূর্ণসংখ্যা বা a:b তে ব্যপ্তি)"
-
 msgid ""
 "Specifies how IPv6 addresses and additional information are configured. We "
 "can specify SLAAC/DHCPv6 stateful/DHCPv6 stateless provided by OpenStack, or "
@@ -3414,42 +2764,6 @@ msgstr "একটি উদাহরণ চালু করার জন্য �
 msgid "Specs"
 msgstr "স্পেক"
 
-msgid "Stack Events"
-msgstr "স্ট্যাক ঘটনা"
-
-msgid "Stack ID"
-msgstr "স্ট্যাক ID"
-
-msgid "Stack Name"
-msgstr "স্ট্যাক নাম"
-
-msgid "Stack Parameters"
-msgstr "স্ট্যাক পরিশর্ত"
-
-msgid "Stack Resource"
-msgstr "স্টেক উত্স"
-
-msgid "Stack Resource ID"
-msgstr "স্ট্যাক উত্স ID"
-
-msgid "Stack Resource Type"
-msgstr "স্ট্যাক উত্স প্রকার"
-
-msgid "Stack Resources"
-msgstr "স্ট্যাক উত্স"
-
-msgid "Stack creation started."
-msgstr "স্টেক সৃষ্টি তৈরি হয়েছে."
-
-msgid "Stack creation timeout in minutes."
-msgstr "স্ট্যাক নির্মাণ বিরতি মিনিটে."
-
-msgid "Stack update started."
-msgstr "স্টেক আপডেট শুরু হয়েছে."
-
-msgid "Stacks"
-msgstr "স্ট্যাক"
-
 msgid "Start"
 msgstr "শুরু"
 
@@ -3476,9 +2790,6 @@ msgstr "স্থিতি"
 
 msgid "Status ="
 msgstr "স্থিতি ="
-
-msgid "Status Reason"
-msgstr "স্থিতির কারণ"
 
 msgid "Subnet"
 msgstr "সাবনেট"
@@ -3589,29 +2900,11 @@ msgstr "সিস্টেম"
 msgid "System Information"
 msgstr "সিস্টেম তথ্য"
 
-msgid "TCP"
-msgstr "TCP"
-
 msgid "Target Host"
 msgstr "লক্ষ্য হোস্ট"
 
 msgid "Task"
 msgstr "কার্য"
-
-msgid "Template"
-msgstr "টেমপ্লেট"
-
-msgid "Template Data"
-msgstr "টেমপ্লেট ডেটা"
-
-msgid "Template File"
-msgstr "টেনপ্লেট ফাইল"
-
-msgid "Template Source"
-msgstr "টেমপ্লেট উত্স"
-
-msgid "Template URL"
-msgstr "টেমপ্লেট URL"
 
 msgid "The \"from\" port number is invalid."
 msgstr "\"from\" পোর্ট নম্বর অবৈধ."
@@ -3646,13 +2939,6 @@ msgid ""
 msgstr ""
 "<strong>Key Size</strong> হল এনক্রিপশন কী-এর আয়তন, বিট-এ (যেমন, 128, 256). "
 "ক্ষেত্রটি খালি ছাড়লে, সরবরাহকারী স্থিতক ব্যবহার হবে."
-
-msgid ""
-"The <strong>Provider</strong> is the class providing encryption support (e."
-"g. LuksEncryptor)."
-msgstr ""
-"<strong>সরবরাহকারী</strong> এনক্রিপশন সহায়তা প্রদান করার এক শ্রেণি (যেমন "
-"LuksEncryptor)."
 
 msgid "The Aggregate was updated."
 msgstr "সমূহ সদ্যতন ছিল."
@@ -3693,16 +2979,6 @@ msgstr "নিচের চার্ট প্রোজেক্ট কোটা
 msgid "The container cannot be deleted since it is not empty."
 msgstr "কন্টেনারটি খালি না থাকায় এটি মুছে ফেলা যেতে পারে না."
 
-msgid ""
-"The default IP address of the interface created is a gateway of the selected "
-"subnet. You can specify another IP address of the interface here. You must "
-"select a subnet to which the specified IP address belongs to from the above "
-"list."
-msgstr ""
-"তৈরি করা ইন্টারফেসের স্থিতক IP ঠিকানা নির্বাচিত সাবনেটের এক গেটওয়ে. আপনি এখানে "
-"ইন্টারফেসের অন্য একটি IP ঠিকানা নির্দিষ্ট করতে পারেন. আপনাকে একটি সাবনেট নির্বাচন "
-"করতে হবে যাতে উপরের তালিকা থেকে নির্দিষ্ট IP ঠিকানা থাকে."
-
 #, python-format
 msgid ""
 "The flavor '%(flavor)s' is too small for requested image.\n"
@@ -3741,9 +3017,6 @@ msgid ""
 "implemented."
 msgstr "ভৌতিক নেটওয়ার্কের নাম যাতে কার্যকর নেটওয়ার্ক বাস্তবায়িত."
 
-msgid "The page you were looking for doesn't exist"
-msgstr "আপনি যে পাতাটি চাইছেন সেটি নেই"
-
 msgid "The physical mechanism by which the virtual network is implemented."
 msgstr "ভৌতিক পদ্ধতি যার দ্বারা বাস্তব নেটওয়ার্ক বাস্তবায়িত."
 
@@ -3755,12 +3028,6 @@ msgstr ""
 
 msgid "The pseudo folder cannot be deleted since it is not empty."
 msgstr "সুডো ফোল্ডার খালি না থাকায় এটি মুছে ফেলা যেতে পারে না."
-
-msgid "The raw contents of the environment file."
-msgstr "পরিবেশ ফাইলের কাঁচা বিষয়বস্তু."
-
-msgid "The raw contents of the template."
-msgstr "টেমপ্লেটের কাঁচা বিষয়."
 
 #, python-format
 msgid ""
@@ -3810,25 +3077,14 @@ msgstr ""
 "(cloud.key.pub) রাখতে পারেন. এখানে পাবলিক কী ফাইলের বিষয়বস্তু তুলে বসান."
 
 msgid ""
-"This is required for operations to be performed throughout the lifecycle of "
-"the stack"
-msgstr "স্ট্যাক-এর জীবনচক্রের মাধ্যমে সম্পাদনা করতে সংসাধনের জন্য এটি প্রয়োজনীয়"
-
-msgid ""
 "This volume is currently attached to an instance. In some cases, creating a "
 "snapshot from an attached volume can result in a corrupted snapshot."
 msgstr ""
 "এই ভলিয়্যুম বর্তমানে একটি উদাহরণের সঙ্গে যুক্ত. কিছু ক্ষেত্রে, সংযুক্ত ভলিয়্যুম থেকে "
 "স্ন্যাপশট তৈরির ফল দূষিত স্ন্যাপশট হতে পারে."
 
-msgid "Time Since Event"
-msgstr "ঘটনার পর থেকে সময়"
-
 msgid "Time since created"
 msgstr "তৈরি হওয়া থেকে সময়"
-
-msgid "Timeout"
-msgstr "বিরতি"
 
 msgid "Timezone"
 msgstr "টাইমজোন"
@@ -3871,17 +3127,8 @@ msgstr "ভলিয়্যুম ও স্ন্যাপশটের মোট
 msgid "Total disk usage (GB * Hours Used) for the project"
 msgstr "প্রোজেক্টের জন্য মোট ডিস্ক প্রয়োগ (GB * ঘণ্টা ব্যবহৃত)"
 
-msgid "Transform Protocol"
-msgstr "প্রোটোকল রূপান্তর"
-
 msgid "Type"
 msgstr "প্রকার"
-
-msgid "UDP"
-msgstr "UDP"
-
-msgid "URL"
-msgstr "URL"
 
 msgid "UTC"
 msgstr "UTC"
@@ -3889,34 +3136,6 @@ msgstr "UTC"
 #, python-format
 msgid "UTC %(hour)s:%(min)s"
 msgstr "UTC %(hour)s:%(min)s"
-
-#, python-format
-msgid "Unable to add Firewall \"%s\"."
-msgstr "ফায়ারওয়াল \"%s\" যোগ করতে অসমর্থ."
-
-#, python-format
-msgid "Unable to add IKE Policy \"%s\"."
-msgstr "IKE নীতি \"%s\" যোগ করতে অসমর্থ."
-
-#, python-format
-msgid "Unable to add IPSec Policy \"%s\"."
-msgstr "IPSec নীতি \"%s\" যোগ করতে অসমর্থ."
-
-#, python-format
-msgid "Unable to add IPSec Site Connection \"%s\"."
-msgstr "IPSec সাইট সংযোগ \"%s\" যোগ করতে অসমর্থ."
-
-#, python-format
-msgid "Unable to add Policy \"%s\"."
-msgstr "নীতি যোগ করতে অসমর্থ \"%s\"."
-
-#, python-format
-msgid "Unable to add Rule \"%s\"."
-msgstr "নিয়ম \"%s\" যোগ করতে অসমর্থ."
-
-#, python-format
-msgid "Unable to add VPN Service \"%s\"."
-msgstr "VPN সেবা যোগ করতে অসমর্থ \"%s\"."
 
 msgid "Unable to add rule to security group."
 msgstr "সুরক্ষা শ্রেণিতে নিয়ম যোগ করতে অসমর্থ."
@@ -3940,10 +3159,6 @@ msgstr "পাসওয়ার্ড বদলাতে অসমর্থ."
 #, python-format
 msgid "Unable to change the volume type for volume: \"%s\""
 msgstr "ভলিয়্যুমের জন্য ভলিয়্যুম প্রকার বদল করতে অসমর্থ: \"%s\""
-
-#, python-format
-msgid "Unable to clear gateway for router \"%(name)s\": \"%(msg)s\""
-msgstr "\"%(name)s\" রাউটারের জন্য গেটওয়ে পরিষ্কার করতে অসমর্থ: \"%(msg)s\""
 
 msgid "Unable to connect to Neutron."
 msgstr "নিউট্রনে সংযোগ করতে অসমর্থ."
@@ -3974,10 +3189,6 @@ msgstr "হোস্ট সমুহ \"%s\" তৈরি করতে অসম�
 
 msgid "Unable to create host aggregate."
 msgstr "হোস্ট সমূহ তৈরি করতে অসমর্থ."
-
-#, python-format
-msgid "Unable to create key pair: %(exc)s"
-msgstr "কী যুগ্ম তৈরি করতে অসমর্থ: %(exc)s"
 
 #, python-format
 msgid "Unable to create network \"%s\"."
@@ -4017,22 +3228,6 @@ msgstr "ভলিয়্যুম প্রকার তৈরি করতে �
 
 msgid "Unable to create volume."
 msgstr "ভলিয়্যুম তৈরি করতে অসমর্থ."
-
-#, python-format
-msgid "Unable to delete firewall. %s"
-msgstr "ফায়ারওয়াল মুছে ফেলতে অসমর্থ. %s"
-
-#, python-format
-msgid "Unable to delete policy. %s"
-msgstr "নীতি মুছে ফেলতে অসমর্থ. %s"
-
-#, python-format
-msgid "Unable to delete router \"%s\""
-msgstr "রাউটার \"%s\" মুছে ফেলতে অসমর্থ"
-
-#, python-format
-msgid "Unable to delete rule. %s"
-msgstr "নিয়ম মুছে ফেলতে অসমর্থ. %s"
 
 msgid "Unable to determine if availability zones extension is supported."
 msgstr "লভ্যতা অঞ্চল বিস্তারণ সমর্থন থাকলে নির্ধারণ করতে অসমর্থ."
@@ -4076,10 +3271,6 @@ msgstr "উদাহরণ \"%s\" এর জন্য VNC কনসোল পে
 msgid "Unable to get cinder services list."
 msgstr "সিন্ডার সেবা তালিকা পেতে অসমর্থ."
 
-#, python-format
-msgid "Unable to get events for stack \"%s\"."
-msgstr "\"%s\" স্ট্যাকের জন্য ঘটনা পেতে অসমর্থ."
-
 msgid "Unable to get flavor list"
 msgstr "ফ্লেভার তালিকা পেতে অসমর্থ"
 
@@ -4101,13 +3292,6 @@ msgstr "নোভা সেবা তালিকা পেতে অসমর�
 
 msgid "Unable to get openrc credentials"
 msgstr "openrc ক্রেডেনশিয়াল পেতে অসমর্থ"
-
-msgid "Unable to get quota info."
-msgstr "কোটা তথ্য পেতে অসমর্থ."
-
-#, python-format
-msgid "Unable to get resources for stack \"%s\"."
-msgstr "স্ট্যাক \"%s\" এর জন্য উত্স পেতে অসমর্থ."
 
 #, python-format
 msgid "Unable to get subnet \"%s\""
@@ -4170,16 +3354,6 @@ msgstr "উদাহরণ \"%s\" পুনঃআয়তন করতে অস�
 msgid "Unable to restore backup."
 msgstr "ব্যাকআপ পুনরায় ফিরিয়ে আনতে অসমর্থ."
 
-msgid "Unable to retrieve IKE Policies list."
-msgstr "IKE নীতি তালিকা পুনরুদ্ধার করতে অসমর্থ."
-
-msgid "Unable to retrieve IKE Policy details."
-msgstr "IKE নীতি বিশদ পুনরুদ্ধার করতে অসমর্থ."
-
-#, python-format
-msgid "Unable to retrieve IKE Policy details. %s"
-msgstr "IKE নীতি বিশদ পুনরুদ্ধার করতে অসমর্থ. %s"
-
 #, python-format
 msgid ""
 "Unable to retrieve IP addresses from Neutron for instance \"%(name)s"
@@ -4189,26 +3363,6 @@ msgstr ""
 
 msgid "Unable to retrieve IP addresses from Neutron."
 msgstr "নিউট্রন থেকে IP ঠিকানা পুনরুদ্ধার করতে অসমর্থ."
-
-msgid "Unable to retrieve IPSec Policies list."
-msgstr "IPSec নীতি তালিকা পুনরুদ্ধার করতে অসমর্থ."
-
-msgid "Unable to retrieve IPSec Policy details."
-msgstr "IPSec নীতি বিশদ পুনরুদ্ধার করতে অসমর্থ."
-
-#, python-format
-msgid "Unable to retrieve IPSec Policy details. %s"
-msgstr "IPSec নীতি বিশদ পুনরুদ্ধার করতে অসমর্থ. %s"
-
-msgid "Unable to retrieve IPSec Site Connection details."
-msgstr "IPSec সাইট সংযোগ বিশধ পুনরুদ্ধার করতে অসমর্থ."
-
-#, python-format
-msgid "Unable to retrieve IPSec Site Connection details. %s"
-msgstr "IPSec সাইট সংযোগ বিশদ পুনরুদ্ধার করতে অসমর্থ. %s"
-
-msgid "Unable to retrieve IPSec Site Connections list."
-msgstr "IPSec সাইট সংযোগ তালিকা পুনরুদ্ধার করতে অসমর্থ."
 
 msgid "Unable to retrieve Nova availability zones."
 msgstr "নোভা লভ্যতা অঞ্চল পুনরুদ্ধার করতে অসমর্থ."
@@ -4230,16 +3384,6 @@ msgstr "QoS স্পেক তালিকা পুনরুদ্ধার �
 
 msgid "Unable to retrieve QoS specs"
 msgstr "QoS স্পেক পুনরুদ্ধার করতে অসমর্থ"
-
-msgid "Unable to retrieve VPN Service details."
-msgstr "VPN সেবা বিশদ পুনরুদ্ধার করতে অসমর্থ."
-
-#, python-format
-msgid "Unable to retrieve VPN Service details. %s"
-msgstr "VPN সেবা বিশদ পুনরুদ্ধার করতে অসমর্থ. %s"
-
-msgid "Unable to retrieve VPN Services list."
-msgstr "VPN সেবা তালিকা পুনরুদ্ধার করতে অসমর্থ."
 
 #, python-format
 msgid "Unable to retrieve a list of external networks \"%s\"."
@@ -4270,9 +3414,6 @@ msgstr "গণনা হোস্ট তথ্য পুনরুদ্ধার
 msgid "Unable to retrieve compute limit information."
 msgstr "গণনা সীমা তথ্য পুনরুদ্ধার করতে অসমর্থ."
 
-msgid "Unable to retrieve default Neutron quota values."
-msgstr "স্থিতক নিউট্রন কোটা মান পুনরুদ্ধার করতে অসমর্থ."
-
 msgid "Unable to retrieve default quota values."
 msgstr "স্থিতক কোটা মান পুনরুদ্ধার করতে অসমর্থ."
 
@@ -4302,12 +3443,6 @@ msgstr "এক্সটেনশন তথ্য পুনরুদ্ধার 
 
 msgid "Unable to retrieve extra spec list."
 msgstr "অতিরিক্ত স্পেক তালিকা পুনরুদ্ধার করতে অসমর্থ."
-
-msgid "Unable to retrieve firewall details."
-msgstr "ফায়ারওয়াল বিশদ পুনরুদ্ধার করতে অসমর্থ."
-
-msgid "Unable to retrieve firewall list."
-msgstr "ফায়ারওয়াল তালিকা পুনরুদ্ধার করতে অসমর্থ."
 
 msgid "Unable to retrieve flavor access list. Please try again later."
 msgstr "ফ্লেভার অ্যাক্সেস তালিকা পুনরুদ্ধার করতে অসমর্থ. পরে আবার চেষ্টা করুন."
@@ -4396,9 +3531,6 @@ msgstr "উদাহরণ প্রোজেক্ট তথ্য পুনর
 msgid "Unable to retrieve instance size information."
 msgstr "উদাহরণ আয়তন তথ্য পুনরুদ্ধার করতে অসমর্থ."
 
-msgid "Unable to retrieve instance."
-msgstr "উদাহরণ পুনরুদ্ধার করতে অসমর্থ."
-
 msgid "Unable to retrieve instances."
 msgstr "উদাহরণ পুনরুদ্ধার করতে অসমর্থ."
 
@@ -4420,9 +3552,6 @@ msgstr "ভলিয়্যুম স্ন্যাপশটের তালি�
 msgid "Unable to retrieve list of volumes."
 msgstr "ভলিয়্যুমের তালিকা পুনরুদ্ধার করতে অসমর্থ."
 
-msgid "Unable to retrieve metadata."
-msgstr "মেটাডেটা পুনরুদ্ধার করতে অসমর্থ."
-
 msgid "Unable to retrieve network details."
 msgstr "নেটওয়ার্ক বিশদ পুনরুদ্ধার করতে অসমর্থ."
 
@@ -4431,22 +3560,6 @@ msgstr "নেটওয়ার্ক কোটা তথ্য পুনরুদ
 
 msgid "Unable to retrieve network."
 msgstr "নেটওয়ার্ক পুনরুদ্ধার করতে অসমর্থ."
-
-msgid "Unable to retrieve networks list."
-msgstr "নেটওয়ার্ক তালিকা পুনরুদ্ধার করতে অসমর্থ."
-
-msgid "Unable to retrieve policies list."
-msgstr "পলিসি তালিকা পুনরুদ্ধার করতে অসমর্থ."
-
-msgid "Unable to retrieve policy details."
-msgstr "নীতি বিশদ পুনরুদ্ধার করতে অসমর্থ."
-
-#, python-format
-msgid "Unable to retrieve policy list (%(error)s)."
-msgstr "নীতি তালিকা (%(error)s) পুনরুদ্ধার করতে অসমর্থ."
-
-msgid "Unable to retrieve policy list."
-msgstr "নীতি তালিকা পুনরুদ্ধার করতে অসমর্থ."
 
 msgid "Unable to retrieve port details"
 msgstr "পোর্ট বিশদ পুনরুদ্ধার করতে অসমর্থ"
@@ -4472,9 +3585,6 @@ msgstr "পাবলিক ইমেজ পুনরুদ্ধার করত
 msgid "Unable to retrieve quota information."
 msgstr "কোটা তথ্য পুনরুদ্ধার করতে অসমর্থ."
 
-msgid "Unable to retrieve resource."
-msgstr "উত্স পুনরুদ্ধার করতে অসমর্থ."
-
 msgid "Unable to retrieve role list."
 msgstr "ভূমিকা তালিকা পুনরুদ্ধার করতে অসমর্থ."
 
@@ -4489,19 +3599,6 @@ msgstr "রাউটার তালিকা পুনরুদ্ধার ক
 
 msgid "Unable to retrieve router."
 msgstr "রাউটার পুনরুদ্ধার করতে অসমর্থ."
-
-msgid "Unable to retrieve routers list."
-msgstr "রাউটার তালিকা পুনরুদ্ধার করতে অসমর্থ."
-
-msgid "Unable to retrieve rule details."
-msgstr "নিয়ম বিশদ পুনরুদ্ধার করতে অসমর্থ."
-
-#, python-format
-msgid "Unable to retrieve rules (%(error)s)."
-msgstr "নিয়মগুলি (%(error)s) পুনরুদ্ধার করতে অসমর্থ."
-
-msgid "Unable to retrieve rules list."
-msgstr "নিয়ম তালিকা পুনরুদ্ধার করতে অসমর্থ."
 
 msgid "Unable to retrieve security group list. Please try again later."
 msgstr "সুরক্ষা শ্রেণি তালিকা পুনরুদ্ধার করতে অসমর্থ. পরে আবার চেষ্টা করুন."
@@ -4521,15 +3618,6 @@ msgstr "স্ন্যাপশট বিশদ পুনরুদ্ধার 
 
 msgid "Unable to retrieve snapshot list."
 msgstr "স্ন্যাপশট তালিকা পুনরুদ্ধার করতে অসমর্থ."
-
-msgid "Unable to retrieve stack list."
-msgstr "স্ট্যাক তালিকা পুনরুদ্ধার করতে অসমর্থ."
-
-msgid "Unable to retrieve stack template."
-msgstr "স্ট্যাক টেমপ্লেট পুনরুদ্ধার করতে অসমর্থ."
-
-msgid "Unable to retrieve stack."
-msgstr "স্ট্যাক পুনরুদ্ধার করতে অসমর্থ."
 
 msgid "Unable to retrieve subnet details"
 msgstr "সাবনেট বিশদ পুনরুদ্ধার করতে অসমর্থ"
@@ -4636,9 +3724,6 @@ msgstr "%s প্রোজেক্টের জন্য ফ্লেভার 
 msgid "Unable to set gateway."
 msgstr "গেটওয়ে সেট করতে অসমর্থ."
 
-msgid "Unable to set project quotas."
-msgstr "প্রোজেক্ট কোটা সেট করতে অসমর্থ."
-
 msgid "Unable to sort instance flavors."
 msgstr "উদাহরণ ফ্লেভার ক্রম করতে অসমর্থ."
 
@@ -4719,20 +3804,11 @@ msgstr "মেটাডেটা আপডেট করুন"
 msgid "Update Network"
 msgstr "নেটওয়ার্ক আপডেট করুন"
 
-msgid "Update Port"
-msgstr "পোর্ট আপডেট করুন"
-
 msgid "Update Role"
 msgstr "ভূমিকা আপডেট করুন"
 
 msgid "Update Router"
 msgstr "রাউটার আপডেট করুন"
-
-msgid "Update Stack"
-msgstr "স্টেক আপডেট করুন"
-
-msgid "Update Stack Parameters"
-msgstr "স্টেক পরিশর্ত আপডেট করুন"
 
 msgid "Update Status"
 msgstr "স্থিতি আপডেট করুন"
@@ -4745,14 +3821,6 @@ msgstr "ভলিয়্যুম স্ন্যাপশট স্থিতি 
 
 msgid "Update Volume Status"
 msgstr "ভলিয়্যুম স্থিতি আপডেট করুন"
-
-msgid ""
-"Update a stack with the provided values. Please note that any encrypted "
-"parameters, such as passwords, will be reset to default if you do not change "
-"them here."
-msgstr ""
-"সরবরাহকারী মান সহ একটি স্ট্যাক আপডেট করুন. মনে রাখবেন যে পাসওয়ার্ডের মতো যে কোনো "
-"এনক্রিপ্ট করা পরিশর্ত, স্থিতকে রিসেট হবে যদি এখানে তাদের পরিবর্তন না করেন."
 
 msgid ""
 "Update a subnet associated with the network. Advanced configuration are "
@@ -4814,22 +3882,12 @@ msgstr "উত্স হিসেবে ভলিয়্যুম ব্যবহ
 msgid "Use image as a source"
 msgstr "উত্স হিসেবে ইমেজ ব্যবহার করুন"
 
-msgid ""
-"Use one of the available template source options to specify the template to "
-"be used in creating this stack."
-msgstr ""
-"এই স্ট্যাক তৈরি করতে ব্যবহার হবে টেমপ্লেট নির্দিষ্ট করতে লভ্য টেমপ্লেট উত্স বিকল্পের "
-"একটি ব্যবহার করুন."
-
 msgid "Use snapshot as a source"
 msgstr "উত্স হিসেবে স্ন্যাপশট ব্যবহার করুন"
 
 #, python-format
 msgid "Used <span> %(used)s </span> of <span> %(available)s </span>"
 msgstr "<span> %(available)s </span> এর <span> %(used)s </span> ব্যবহৃত"
-
-msgid "Used in Policy"
-msgstr "নীতিতে ব্যবহৃত"
 
 msgid "User"
 msgstr "ব্যবহর্তা"
@@ -4885,33 +3943,8 @@ msgstr "VCPUs (ব্যবহৃত)"
 msgid "VLAN"
 msgstr "VLAN"
 
-msgid "VPN"
-msgstr "VPN"
-
-msgid "VPN Connections"
-msgstr "VPN সংযোগ"
-
-msgid "VPN Service"
-msgstr "VPN সেবা"
-
-#, python-format
-msgid "VPN Service %s was successfully updated."
-msgstr "VPN সেবা %s সফলভাবে আপডেট হয়েছিল."
-
-msgid "VPN Service Details"
-msgstr "VPN সেবা বিশদ"
-
-msgid "VPN Service associated with this connection"
-msgstr "এই সংযোগ সহ VPN সেবা মিলিত"
-
-msgid "VPN Services"
-msgstr "VPN সেবা"
-
 msgid "VXLAN"
 msgstr "VXLAN"
-
-msgid "Valid integer greater than the DPD interval"
-msgstr "বৈধ পূর্ণসংখ্যা DPD বিরামকালের চেয়ে বেশি"
 
 msgid "Value"
 msgstr "মান"
@@ -4930,9 +3963,6 @@ msgstr "লগ দেখুন"
 
 msgid "View Usage"
 msgstr "প্রয়োগ দেখান"
-
-msgid "Virtual Private Network"
-msgstr "অলীক ব্যক্তিগত নেটওয়ার্ক"
 
 msgid "Volume"
 msgstr "ভলিয়্যুম"
@@ -5085,36 +4115,8 @@ msgstr "আপনি হয়ত ঠিকানা ভুল টাইপ কর�
 msgid "You may optionally set a password on the rebuilt instance."
 msgstr "আপনি পুনর্নির্মাণ উদাহরণে বৈকল্পিকভাবে একটি পাসওয়ার্ড সেট করতেও পারেন."
 
-msgid "You may update IKE Policy details here."
-msgstr "আপনি এখানে IKE নীতি বিশদ আপডেটও করতে পারেন."
-
-msgid "You may update IPSec Policy details here."
-msgstr "আপনি এখানে IPSec নীতি বিশদ আপডেটও করতে পারেন."
-
-msgid "You may update IPSec Site Connection details here."
-msgstr "এখানে আপনি IPSec সাইট সংযোগ বিশদ আপডেটও করতে পারেন."
-
-msgid "You may update VPN Service details here."
-msgstr "আপনি  এখানে VPN সেবা বিশদ আপডেট করতে পারেন."
-
-msgid "You may update firewall details here."
-msgstr "আপনি এখানে ফায়ারওয়াল বিশদ আপডেট করতে পারেন."
-
-msgid ""
-"You may update policy details here. Use 'Insert Rule' or 'Remove Rule' links "
-"instead to insert or remove a rule"
-msgstr ""
-"আপনি এখানে নীতি বিশদ আপডেট করতেও পারেন. একটি নিয়ম সন্নিহিত বা সরিয়ে ফেলার "
-"বদলে  'নিয়ম সন্নিহিত' বা 'নিয়ম সরিয়ে ফেলা' লিঙ্কগুলি ব্যবহার করুন"
-
-msgid "You may update rule details here."
-msgstr "আপনি এখানে নিয়ম বিশদ আপডেট করতেও পারেন."
-
 msgid "You may update the editable properties of your network here."
 msgstr "এখানে আপনি আপনার নেটওয়ার্কের সম্পাদনযোগ্য বৈশিষ্ট্যগুলি আপডেট করতেও পারেন."
-
-msgid "You may update the editable properties of your port here."
-msgstr "এখানে আপনি আপনার পোর্টের সম্পাদনযোগ্য বৈশিষ্ট্যগুলি আপডেট করতেও পারেন."
 
 msgid "You may update the editable properties of your router here."
 msgstr "এখানে আপনি আপনার রাউটারের সম্পাদনযোগ্য বৈশিষ্ট্যগুলি আপডেট করতেও পারেন."
@@ -5130,9 +4132,6 @@ msgstr "আপনাকে একটি ইমেজ নির্বাচন �
 
 msgid "You must set volume size"
 msgstr "আপনার ভলিয়্যুম আয়তন সেট থাকা চাই"
-
-msgid "You must specify a template via one of the available sources."
-msgstr "আপনাকে লভ্য উত্সের মাধ্যমে একটি টেমপ্লেট নির্দিষ্ট করা চাই."
 
 msgid ""
 "You must specify the source of the traffic to be allowed via this rule. You "
@@ -5153,92 +4152,20 @@ msgstr "আপনার ইমেজ %s সৃষ্টির জন্য স�
 msgid "Zone"
 msgstr "অঞ্চল"
 
-msgid "aes-128"
-msgstr "aes-128"
-
-msgid "aes-192"
-msgstr "aes-192"
-
-msgid "aes-256"
-msgstr "aes-256"
-
-msgid "ah"
-msgstr "ah"
-
-msgid "ah-esp"
-msgstr "ah-esp"
-
 msgid "back-end"
 msgstr "ব্যাক-এন্ড"
-
-msgid "bi-directional"
-msgstr "দ্বি-মুখী"
-
-msgid "clear"
-msgstr "পরিষ্কার করুন"
-
-msgid "disabled"
-msgstr "অসমর্থ"
 
 msgid "dm-crypt"
 msgstr "dm-crypt"
 
-msgid "environment"
-msgstr "পরিবেশ"
-
-msgid "esp"
-msgstr "esp"
-
 msgid "front-end"
 msgstr "ফ্রন্ট-এন্ড"
 
-msgid "group14"
-msgstr "শ্রেণি14"
-
-msgid "group2"
-msgstr "শ্রেণি2"
-
-msgid "group5"
-msgstr "শ্রেণি5"
-
-msgid "hold"
-msgstr "ধরুন"
-
 msgid "instance"
 msgstr "উদাহরণ"
-
-msgid "response-only"
-msgstr "উত্তর-কেবলমাত্র"
-
-msgid "restart"
-msgstr "পুনরায় শুরু"
-
-msgid "restart-by-peer"
-msgstr "পীর দ্বারা পুনরায় শুরু করুন"
-
-msgid "seconds"
-msgstr "সেকেন্ড"
-
-msgid "sha1"
-msgstr "sha1"
-
-msgid "template"
-msgstr "টেমপ্লেট"
-
-msgid "transport"
-msgstr "যানবাহন"
-
-msgid "tunnel"
-msgstr "সুড়ঙ্গ"
 
 msgid "undefined"
 msgstr "অনির্ধারিত"
 
 msgid "unknown IP address"
 msgstr "অজানা IP ঠিকানা"
-
-msgid "v1"
-msgstr "v1"
-
-msgid "v2"
-msgstr "v2"
